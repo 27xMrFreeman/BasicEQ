@@ -24,9 +24,9 @@ struct CustomRotarySlider : juce::Slider
 //==============================================================================
 /**
 */
-class BasicEQAudioProcessorEditor  : public juce::AudioProcessorEditor
-    //juce::AudioProcessorParameter::Listener,
-    //juce::Timer
+class BasicEQAudioProcessorEditor  : public juce::AudioProcessorEditor,
+    juce::AudioProcessorParameter::Listener,
+    juce::Timer
 {
 public:
     BasicEQAudioProcessorEditor (BasicEQAudioProcessor&);
@@ -36,7 +36,7 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-    //void parameterValueChanged(int parameterIndex, float newValue) override;
+    void parameterValueChanged(int parameterIndex, float newValue) override;
 
     /** Indicates that a parameter change gesture has started.
 
@@ -51,9 +51,9 @@ public:
         to trigger an AsyncUpdater or ChangeBroadcaster which you can respond to later on the
         message thread.
     */
-    //void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
 
-    //void timerCallback() override;
+    void timerCallback() override;
 
 private:
     // This reference is provided as a quick way for your editor to

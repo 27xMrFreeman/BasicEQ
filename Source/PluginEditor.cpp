@@ -26,11 +26,24 @@ highCutSlopeSliderAttachment(audioProcessor.apvts, "HighCut Slope", highCutSlope
         addAndMakeVisible(comp);
     }
 
+    const auto& params = audioProcessor.getParameters();
+    for (auto param : params)
+    {
+        param->addListener(this);
+    }
+
+    startTimerHz(60);
+
     setSize (800, 600);
 }
 
 BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
 {
+    const auto& params = audioProcessor.getParameters();
+    for (auto param : params)
+    {
+        param->removeListener(this);
+    }
 }
 
 //==============================================================================
@@ -130,14 +143,18 @@ void BasicEQAudioProcessorEditor::resized()
 
 }
 
-//void BasicEQAudioProcessorEditor::parameterValueChanged(int parameterIndex, float newValue)
-//{
-//    if (parametersChanged.compareAndSetBool(false, true))
-//    {
-//        //update mono chain
-//        //signal a repaint
-//    }
-//}
+void BasicEQAudioProcessorEditor::parameterValueChanged(int parameterIndex, float newValue)
+{
+    if (parametersChanged.compareAndSetBool(false, true))
+    {
+        //update mono chain
+        auto chainSettings = getChainSettings(audioProcessor.apvts);
+        auto peakCoefficients = makePeakFilter(chainSettings, audioProcessor.getSampleRate());
+        updateCoefficients(monoChain.get<ChainPositions::Peak>().coefficients, peakCoefficients);
+        //signal a repaint
+        repaint();
+    }
+}
 
 std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
 {
