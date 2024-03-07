@@ -130,6 +130,15 @@ void BasicEQAudioProcessorEditor::resized()
 
 }
 
+//void BasicEQAudioProcessorEditor::parameterValueChanged(int parameterIndex, float newValue)
+//{
+//    if (parametersChanged.compareAndSetBool(false, true))
+//    {
+//        //update mono chain
+//        //signal a repaint
+//    }
+//}
+
 std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
 {
     return

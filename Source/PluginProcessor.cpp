@@ -233,20 +233,24 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     return settings;
 }
 
+Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRate)
+{
+    return juce::dsp::IIR::Coefficients<float>::makePeakFilter( sampleRate,
+                                                                chainSettings.peakFreq,
+                                                                chainSettings.peakQuality,
+                                                                juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
+}
+
 void BasicEQAudioProcessor::updatePeakFilter(const ChainSettings& chainSettings)
 {
     // calculate peak coefficients
-    auto peakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(getSampleRate(),
-                                                                                chainSettings.peakFreq,
-                                                                                chainSettings.peakQuality,
-                                                                                juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
-
+    auto peakCoefficients = makePeakFilter(chainSettings, getSampleRate());
     // initializing LR chains, coefficients need to be dereferenced (get values they point at)
     updateCoefficients(leftChain.get<ChainPositions::Peak>().coefficients, peakCoefficients);
     updateCoefficients(rightChain.get<ChainPositions::Peak>().coefficients, peakCoefficients);
 }
 
-void BasicEQAudioProcessor::updateCoefficients(Coefficients& old, const Coefficients& replacements)
+void updateCoefficients(Coefficients& old, const Coefficients& replacements)
 {
     *old = *replacements;
 }
