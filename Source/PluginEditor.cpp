@@ -73,7 +73,7 @@ void BasicEQAudioProcessorEditor::paint (juce::Graphics& g)
         double mag = 1.f;
         auto freq = mapToLog10(double(i)/double(w), 20.0, 20000.0);
 
-        if (!monoChain.isBypassed<ChainPositions::Peak>())
+        if (! monoChain.isBypassed<ChainPositions::Peak>() )
             mag *= peak.coefficients->getMagnitudeForFrequency(freq, sampleRate);
         if (!lowcut.isBypassed<0>())
             mag *= lowcut.get<0>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
@@ -145,6 +145,11 @@ void BasicEQAudioProcessorEditor::resized()
 
 void BasicEQAudioProcessorEditor::parameterValueChanged(int parameterIndex, float newValue)
 {
+    parametersChanged.set(true);
+}
+
+void BasicEQAudioProcessorEditor::timerCallback() 
+{
     if (parametersChanged.compareAndSetBool(false, true))
     {
         //update mono chain
@@ -154,7 +159,10 @@ void BasicEQAudioProcessorEditor::parameterValueChanged(int parameterIndex, floa
         //signal a repaint
         repaint();
     }
-}
+};
+
+void BasicEQAudioProcessorEditor::parameterGestureChanged(int parameterIndex, bool gestureIsStarting) {  };
+
 
 std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
 {
