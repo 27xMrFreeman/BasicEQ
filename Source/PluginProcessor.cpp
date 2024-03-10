@@ -307,7 +307,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         juce::NormalisableRange<float>(-24.f, 24.f, 0.1f, 1.f), 0.0f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Q", "Peak Q",
-        juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.f), 0.71f));
+        juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.f), 7.f));
 
     juce::StringArray stringArray; // String array containing 4 choices for slope setting
     for (int i = 0; i < 4; i++) {

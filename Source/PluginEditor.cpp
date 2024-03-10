@@ -66,8 +66,8 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     auto w = responseArea.getWidth();
 
     auto& lowcut = monoChain.get<ChainPositions::LowCut>();
-    auto& highcut = monoChain.get<ChainPositions::HighCut>();
     auto& peak = monoChain.get<ChainPositions::Peak>();
+    auto& highcut = monoChain.get<ChainPositions::HighCut>();
 
     auto sampleRate = audioProcessor.getSampleRate();
 
@@ -120,7 +120,7 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     }
 
     g.setColour(Colours::springgreen);
-    g.drawRoundedRectangle(responseArea.toFloat(), 4.f, 1.f);
+    g.drawRoundedRectangle(responseArea.toFloat(), 4.f, 1.5f);
 
     g.setColour(Colours::white);
     g.strokePath(filterResponseCurve, PathStrokeType(2.f));
@@ -131,7 +131,7 @@ BasicEQAudioProcessorEditor::BasicEQAudioProcessorEditor(BasicEQAudioProcessor& 
 responseCurveComponent(audioProcessor),
 peakFreqSliderAttachment(audioProcessor.apvts, "Peak Freq", peakFreqSlider),
 peakGainSliderAttachment(audioProcessor.apvts, "Peak Gain", peakGainSlider),
-peakQualitySliderAttachment(audioProcessor.apvts, "Peak Quality", peakQualitySlider),
+peakQualitySliderAttachment(audioProcessor.apvts, "Peak Q", peakQualitySlider),
 lowCutFreqSliderAttachment(audioProcessor.apvts, "LowCut Freq", lowCutFreqSlider),
 lowCutSlopeSliderAttachment(audioProcessor.apvts, "LowCut Slope", lowCutSlopeSlider),
 highCutFreqSliderAttachment(audioProcessor.apvts, "HighCut Freq", highCutFreqSlider),
