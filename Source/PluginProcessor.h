@@ -135,13 +135,15 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    juce::File root, savedFile;
+    juce::dsp::Convolution irLoader;
+
     static juce::AudioProcessorValueTreeState::ParameterLayout
         createParameterLayout();
     juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
 
 private:
     MonoChain leftChain, rightChain;
-    juce::dsp::Convolution irLoader;
     
     void updatePeakFilter(const ChainSettings& chainSettings);
 

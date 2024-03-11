@@ -147,6 +147,22 @@ highCutSlopeSliderAttachment(audioProcessor.apvts, "HighCut Slope", highCutSlope
     loadBtn.setButtonText("Load IR");
     loadBtn.onClick = [this]()
     {
+            fileChooser = std::make_unique<juce::FileChooser>("Choose Impulse Response", audioProcessor.root, "*"); // declare file window, at root directory, only .wav files allowed
+            // set file chooser flags
+            const auto fileChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::canSelectDirectories;
+            // open window with set flags
+            fileChooser->launchAsync(fileChooserFlags,
+                [this](const juce::FileChooser& chooser)
+                {
+                    // save chosen file
+                    juce::File result(chooser.getResult());
+                    audioProcessor.savedFile = result;
+                    audioProcessor.root = result.getParentDirectory().getFullPathName();    // set root directory to where the file was selected from
+                    
+                    audioProcessor.irLoader.reset();
+                    // load IR, stereo, trimmed, normalized, size 0 = original IR size
+                    audioProcessor.irLoader.loadImpulseResponse(result, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
+                });
 
     };
 
@@ -191,7 +207,7 @@ void BasicEQAudioProcessorEditor::resized()
 
     auto btnX = getWidth() * JUCE_LIVE_CONSTANT(0.2);
     auto btnY = getHeight() * JUCE_LIVE_CONSTANT(0.4);
-    auto btnWidth = getWidth() * JUCE_LIVE_CONSTANT(0.05);
+    auto btnWidth = getWidth() * JUCE_LIVE_CONSTANT(0.1);
     auto btnHeight = btnWidth * 0.6;
     loadBtn.setBounds(btnX, btnY, btnWidth, btnHeight);
 
