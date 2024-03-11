@@ -106,6 +106,11 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     rightChain.prepare(spec);
 
     updateFilters();
+
+    spec.numChannels = getTotalNumOutputChannels();
+
+    irLoader.reset();
+    irLoader.prepare(spec);
 }
 
 void BasicEQAudioProcessor::releaseResources()
@@ -158,15 +163,22 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     updateFilters();
 
     juce::dsp::AudioBlock<float> block(buffer);
-
+    // input block divided to mono L/R for EQ processing
     auto leftBlock = block.getSingleChannelBlock(0);
     auto rightBlock = block.getSingleChannelBlock(1);
-
+    
     juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
     juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
 
     leftChain.process(leftContext);
     rightChain.process(rightContext);
+    
+    //input stereo block sent to irLoader
+    // TODO: put irloader in series with EQ
+    if (irLoader.getCurrentIRSize() > 0)
+    {
+        irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
+    }
 
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...

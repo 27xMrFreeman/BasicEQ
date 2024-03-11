@@ -144,6 +144,12 @@ highCutSlopeSliderAttachment(audioProcessor.apvts, "HighCut Slope", highCutSlope
         addAndMakeVisible(comp);
     }
 
+    loadBtn.setButtonText("Load IR");
+    loadBtn.onClick = [this]()
+    {
+
+    };
+
     setSize (800, 600);
 }
 
@@ -169,8 +175,9 @@ void BasicEQAudioProcessorEditor::resized()
     auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.33);
     responseCurveComponent.setBounds(responseArea);
 
-    auto lowCutArea = bounds.removeFromLeft(bounds.getWidth() * 0.33);
-    auto highCutArea = bounds.removeFromRight(bounds.getWidth() * 0.5);
+    auto EQArea = bounds.removeFromRight(bounds.getWidth() * 0.5);
+    auto lowCutArea = EQArea.removeFromLeft(EQArea.getWidth() * 0.33);
+    auto highCutArea = EQArea.removeFromRight(EQArea.getWidth() * 0.5);
 
     lowCutFreqSlider.setBounds(lowCutArea.removeFromTop(lowCutArea.getHeight() * 0.66));
     lowCutSlopeSlider.setBounds(lowCutArea);
@@ -178,10 +185,15 @@ void BasicEQAudioProcessorEditor::resized()
     highCutFreqSlider.setBounds(highCutArea.removeFromTop(highCutArea.getHeight() * 0.66 ));
     highCutSlopeSlider.setBounds(highCutArea);
 
-    peakFreqSlider.setBounds(bounds.removeFromTop(bounds.getHeight() * 0.33));
-    peakGainSlider.setBounds(bounds.removeFromTop(bounds.getHeight() * 0.5));
-    peakQualitySlider.setBounds(bounds);
+    peakFreqSlider.setBounds(EQArea.removeFromTop(EQArea.getHeight() * 0.33));
+    peakGainSlider.setBounds(EQArea.removeFromTop(EQArea.getHeight() * 0.5));
+    peakQualitySlider.setBounds(EQArea);
 
+    auto btnX = getWidth() * JUCE_LIVE_CONSTANT(0.2);
+    auto btnY = getHeight() * JUCE_LIVE_CONSTANT(0.4);
+    auto btnWidth = getWidth() * JUCE_LIVE_CONSTANT(0.05);
+    auto btnHeight = btnWidth * 0.6;
+    loadBtn.setBounds(btnX, btnY, btnWidth, btnHeight);
 
 }
 
@@ -196,6 +208,7 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &highCutFreqSlider,
         &lowCutSlopeSlider,
         &highCutSlopeSlider,
-        &responseCurveComponent
+        &responseCurveComponent,
+        &loadBtn
     };
 }

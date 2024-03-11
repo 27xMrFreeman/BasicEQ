@@ -141,6 +141,7 @@ public:
 
 private:
     MonoChain leftChain, rightChain;
+    juce::dsp::Convolution irLoader;
     
     void updatePeakFilter(const ChainSettings& chainSettings);
 

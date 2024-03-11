@@ -72,6 +72,12 @@ private:
     // access the processor object that created it.
     BasicEQAudioProcessor& audioProcessor;
 
+    // IR loader GUI:
+    juce::TextButton loadBtn;
+
+
+    // EQ GUI:
+        // knobs
     CustomRotarySlider peakFreqSlider,
         peakGainSlider,
         peakQualitySlider,
@@ -80,8 +86,10 @@ private:
         lowCutSlopeSlider,
         highCutSlopeSlider;
 
+        // rendered response curve of EQ filters line
     ResponseCurveComponent responseCurveComponent;
 
+        // attaching knobs to values
     using APVTS = juce::AudioProcessorValueTreeState;
     using Attachment = APVTS::SliderAttachment;
 
