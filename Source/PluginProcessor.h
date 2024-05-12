@@ -146,7 +146,6 @@ private:
     MonoChain leftChain, rightChain;
     
     void updatePeakFilter(const ChainSettings& chainSettings);
-
     void updateLowCutFilter(const ChainSettings& chainSettings);
     void updateHighCutFilter(const ChainSettings& chainSettings);
 

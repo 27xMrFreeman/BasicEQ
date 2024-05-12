@@ -75,6 +75,7 @@ private:
     // IR loader GUI:
     juce::TextButton loadBtn;
     std::unique_ptr<juce::FileChooser> fileChooser;
+    juce::Label irNameLabel;
 
     // EQ GUI:
         // knobs
