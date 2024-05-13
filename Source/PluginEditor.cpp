@@ -135,7 +135,9 @@ peakQualitySliderAttachment(audioProcessor.apvts, "Peak Q", peakQualitySlider),
 lowCutFreqSliderAttachment(audioProcessor.apvts, "LowCut Freq", lowCutFreqSlider),
 lowCutSlopeSliderAttachment(audioProcessor.apvts, "LowCut Slope", lowCutSlopeSlider),
 highCutFreqSliderAttachment(audioProcessor.apvts, "HighCut Freq", highCutFreqSlider),
-highCutSlopeSliderAttachment(audioProcessor.apvts, "HighCut Slope", highCutSlopeSlider)
+highCutSlopeSliderAttachment(audioProcessor.apvts, "HighCut Slope", highCutSlopeSlider),
+xPosSliderAttachment(audioProcessor.apvts, "X Position", xPosSlider),
+yPosSliderAttachment(audioProcessor.apvts, "Y Position", yPosSlider)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -144,27 +146,27 @@ highCutSlopeSliderAttachment(audioProcessor.apvts, "HighCut Slope", highCutSlope
         addAndMakeVisible(comp);
     }
 
-    loadBtn.setButtonText("Load IR");
-    loadBtn.onClick = [this]()
-    {
-            fileChooser = std::make_unique<juce::FileChooser>("Choose Impulse Response", audioProcessor.root, "*wav", true); // declare file window, at root directory, only .wav files allowed
-            // set file chooser flags
-            const auto fileChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::canSelectDirectories;
-            // open window with set flags
-            fileChooser->launchAsync(fileChooserFlags,
-                [this](const juce::FileChooser& chooser)
-                {
-                    // save chosen file
-                    juce::File result(chooser.getResult());
-                    audioProcessor.savedFile = result;
-                    audioProcessor.root = result.getParentDirectory().getFullPathName();    // set root directory to where the file was selected from
-                    irNameLabel.setText( result.getFileNameWithoutExtension(), juce::dontSendNotification );
-                    audioProcessor.irLoader.reset();
-                    // load IR, stereo, trimmed, normalized, size 0 = original IR size
-                    audioProcessor.irLoader.loadImpulseResponse(result, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
-                });
+    //loadBtn.setButtonText("Load IR");                              
+    //loadBtn.onClick = [this]()
+    //{
+    //        fileChooser = std::make_unique<juce::FileChooser>("Choose Impulse Response", audioProcessor.root, "*wav", true); // declare file window, at root directory, only .wav files allowed
+    //        // set file chooser flags
+    //        const auto fileChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::canSelectDirectories;
+    //        // open window with set flags
+    //        fileChooser->launchAsync(fileChooserFlags,
+    //            [this](const juce::FileChooser& chooser)
+    //            {
+    //                // save chosen file
+    //                juce::File result(chooser.getResult());
+    //                audioProcessor.savedFile = result;
+    //                audioProcessor.root = result.getParentDirectory().getFullPathName();    // set root directory to where the file was selected from
+    //                irNameLabel.setText( result.getFileNameWithoutExtension(), juce::dontSendNotification );
+    //                audioProcessor.irLoader.reset();
+    //                // load IR, stereo, trimmed, normalized, size 0 = original IR size
+    //                audioProcessor.irLoader.loadImpulseResponse(result, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
+    //            });
 
-    };
+    //};
 
     setSize (800, 600);
 }
@@ -188,10 +190,15 @@ void BasicEQAudioProcessorEditor::resized()
     // subcomponents in your editor..
 
     auto bounds = getLocalBounds();
+    
     auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.33);
-    responseCurveComponent.setBounds(responseArea.removeFromRight(bounds.getWidth()*0.5));
+    responseCurveComponent.setBounds(responseArea/*.removeFromRight(bounds.getWidth() * 0.5)*/);
 
-    auto EQArea = bounds.removeFromRight(bounds.getWidth() * 0.5);
+    auto IRArea = bounds.removeFromLeft(bounds.getWidth() * 0.5);
+    xPosSlider.setBounds(IRArea.removeFromLeft(IRArea.getWidth() * 0.5));
+    yPosSlider.setBounds(IRArea);
+
+    auto EQArea = bounds;
     auto lowCutArea = EQArea.removeFromLeft(EQArea.getWidth() * 0.33);
     auto highCutArea = EQArea.removeFromRight(EQArea.getWidth() * 0.5);
 
@@ -209,8 +216,7 @@ void BasicEQAudioProcessorEditor::resized()
     auto btnY = getHeight() * 0.4;
     auto btnWidth = getWidth() * 0.1;
     auto btnHeight = btnWidth * 0.6;
-    loadBtn.setBounds(btnX, btnY, btnWidth, btnHeight);
-    irNameLabel.setBounds(btnX, btnY + (btnHeight*1.1), btnWidth, btnHeight);
+    irNameLabel.setBounds(btnX, btnY, btnWidth, btnHeight);
 
 }
 
@@ -226,7 +232,9 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &lowCutSlopeSlider,
         &highCutSlopeSlider,
         &responseCurveComponent,
-        &loadBtn,
-        &irNameLabel
+        //&loadBtn,
+        &irNameLabel,
+        &xPosSlider,
+        &yPosSlider
     };
 }

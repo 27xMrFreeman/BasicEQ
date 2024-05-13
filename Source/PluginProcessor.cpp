@@ -321,16 +321,25 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Q", "Peak Q",
         juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.f), 7.f));
 
-    juce::StringArray stringArray; // String array containing 4 choices for slope setting
+    layout.add(std::make_unique<juce::AudioParameterFloat>("X Position", "X Position", juce::NormalisableRange<float>(0.f, 10.f, 1.f, 1.f), 0));
+
+    juce::StringArray mikDistanceArray;
+    mikDistanceArray.add("0 cm");
+    mikDistanceArray.add("10 cm");
+    mikDistanceArray.add("40 cm");
+
+    layout.add(std::make_unique<juce::AudioParameterChoice>("Y Position", "Y Position", mikDistanceArray, 0));
+
+    juce::StringArray slopeStringArray; // String array containing 4 choices for slope setting
     for (int i = 0; i < 4; i++) {
         juce::String str;
         str << (12 + i * 12);
         str << " db/Oct";
-        stringArray.add(str);
+        slopeStringArray.add(str);
     }
 
-    layout.add(std::make_unique<juce::AudioParameterChoice>("LowCut Slope", "LowCut Slope", stringArray, 0));
-    layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut Slope", "HighCut Slope", stringArray, 0));
+    layout.add(std::make_unique<juce::AudioParameterChoice>("LowCut Slope", "LowCut Slope", slopeStringArray, 0));
+    layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut Slope", "HighCut Slope", slopeStringArray, 0));
 
     return layout;
 }
