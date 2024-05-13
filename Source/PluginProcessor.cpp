@@ -3,6 +3,17 @@
 
     This file contains the basic framework code for a JUCE plugin processor.
 
+    TODO:
+    setup valuetree to save previously loaded file, load that file to IRLoader in setStateInformation()
+
+    load files based on position of xPositionSlider and yPositionSlider
+
+    add drop down menu to choose type of cab, load files based on that
+
+    add FFT analysis of loaded IR
+
+    try to interpolate between mik positions and maybe even cab types
+
   ==============================================================================
 */
 
@@ -323,10 +334,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
 
     layout.add(std::make_unique<juce::AudioParameterFloat>("X Position", "X Position", juce::NormalisableRange<float>(0.f, 10.f, 1.f, 1.f), 0));
 
-    juce::StringArray mikDistanceArray;
-    mikDistanceArray.add("0 cm");
-    mikDistanceArray.add("10 cm");
-    mikDistanceArray.add("40 cm");
+    juce::StringArray mikDistanceArray("0", "10", "40");
 
     layout.add(std::make_unique<juce::AudioParameterChoice>("Y Position", "Y Position", mikDistanceArray, 0));
 
