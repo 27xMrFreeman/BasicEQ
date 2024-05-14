@@ -120,6 +120,8 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
 
     spec.numChannels = getTotalNumOutputChannels();
 
+    
+
     irLoader.reset();
     irLoader.prepare(spec);
 }
@@ -350,6 +352,20 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut Slope", "HighCut Slope", stringArray, 0));
 
     return layout;
+}
+
+void loadShippedImpulseResponses()
+{
+    // impulseResponseArray[typ komba][typ mikrofonu][pozice Y][pozice X]
+    // toto nasleduje strukturu slozek v Data
+    // 
+    juce::Array<juce::Array<juce::Array<juce::Array<juce::File>>>> impulseResponseArray;
+
+    
+
+    for (juce::DirectoryEntry entry : juce::RangedDirectoryIterator(juce::File("C:/Users/knize/Documents/VST_CODE/BasicEQ/Data"), true, "*.wav", 2)) {
+        
+    }
 }
 
 //==============================================================================
