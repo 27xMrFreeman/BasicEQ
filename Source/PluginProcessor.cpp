@@ -3,6 +3,17 @@
 
     This file contains the basic framework code for a JUCE plugin processor.
 
+    TODO:
+    setup valuetree to save previously loaded file, load that file to IRLoader in setStateInformation()
+
+    load files based on position of xPositionSlider and yPositionSlider
+
+    add drop down menu to choose type of cab, load files based on that
+
+    add FFT analysis of loaded IR
+
+    try to interpolate between mik positions and maybe even cab types
+
   ==============================================================================
 */
 
