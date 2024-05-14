@@ -76,6 +76,7 @@ private:
     juce::TextButton loadBtn;
     std::unique_ptr<juce::FileChooser> fileChooser;
     juce::Label irNameLabel;
+    CustomRotarySlider xPosSlider, yPosSlider;
 
     // EQ GUI:
         // knobs
@@ -101,7 +102,9 @@ private:
         lowCutFreqSliderAttachment,
         highCutFreqSliderAttachment,
         lowCutSlopeSliderAttachment,
-        highCutSlopeSliderAttachment;
+        highCutSlopeSliderAttachment,
+        xPosSliderAttachment,
+        yPosSliderAttachment;
 
     std::vector<juce::Component*> getComps();
 

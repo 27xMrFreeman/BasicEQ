@@ -321,6 +321,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Q", "Peak Q",
         juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.f), 7.f));
 
+    layout.add(std::make_unique<juce::AudioParameterInt>("X Position", "X Position", 0, 10, 0));
+
+    juce::StringArray yPosChoices("0 cm", "10 cm", "40 cm");
+    
+    layout.add(std::make_unique<juce::AudioParameterChoice>("Y Position", "Y Position", yPosChoices, 0));
+
     juce::StringArray stringArray; // String array containing 4 choices for slope setting
     for (int i = 0; i < 4; i++) {
         juce::String str;

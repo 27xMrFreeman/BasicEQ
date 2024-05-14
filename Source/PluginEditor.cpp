@@ -135,7 +135,9 @@ peakQualitySliderAttachment(audioProcessor.apvts, "Peak Q", peakQualitySlider),
 lowCutFreqSliderAttachment(audioProcessor.apvts, "LowCut Freq", lowCutFreqSlider),
 lowCutSlopeSliderAttachment(audioProcessor.apvts, "LowCut Slope", lowCutSlopeSlider),
 highCutFreqSliderAttachment(audioProcessor.apvts, "HighCut Freq", highCutFreqSlider),
-highCutSlopeSliderAttachment(audioProcessor.apvts, "HighCut Slope", highCutSlopeSlider)
+highCutSlopeSliderAttachment(audioProcessor.apvts, "HighCut Slope", highCutSlopeSlider),
+xPosSliderAttachment(audioProcessor.apvts, "X Position", xPosSlider),
+yPosSliderAttachment(audioProcessor.apvts, "Y Position", yPosSlider)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -191,7 +193,11 @@ void BasicEQAudioProcessorEditor::resized()
     auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.33);
     responseCurveComponent.setBounds(responseArea.removeFromRight(bounds.getWidth()*0.5));
 
-    auto EQArea = bounds.removeFromRight(bounds.getWidth() * 0.5);
+    auto IRArea = bounds.removeFromLeft(bounds.getWidth() * 0.5);
+    xPosSlider.setBounds(IRArea.removeFromRight(IRArea.getWidth() * 0.5));
+    yPosSlider.setBounds(IRArea);
+
+    auto EQArea = bounds.removeFromRight(bounds.getWidth());
     auto lowCutArea = EQArea.removeFromLeft(EQArea.getWidth() * 0.33);
     auto highCutArea = EQArea.removeFromRight(EQArea.getWidth() * 0.5);
 
@@ -206,7 +212,7 @@ void BasicEQAudioProcessorEditor::resized()
     peakQualitySlider.setBounds(EQArea);
 
     auto btnX = getWidth() * 0.2;
-    auto btnY = getHeight() * 0.4;
+    auto btnY = getHeight() * 0.2;
     auto btnWidth = getWidth() * 0.1;
     auto btnHeight = btnWidth * 0.6;
     loadBtn.setBounds(btnX, btnY, btnWidth, btnHeight);
@@ -227,6 +233,8 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &highCutSlopeSlider,
         &responseCurveComponent,
         &loadBtn,
-        &irNameLabel
+        &irNameLabel,
+        &xPosSlider,
+        &yPosSlider
     };
 }
