@@ -120,10 +120,11 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
 
     spec.numChannels = getTotalNumOutputChannels();
 
-    
+    loadShippedImpulseResponses(impulseResponseArray);
 
     irLoader.reset();
     irLoader.prepare(spec);
+
 }
 
 void BasicEQAudioProcessor::releaseResources()
@@ -354,17 +355,33 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     return layout;
 }
 
-void loadShippedImpulseResponses()
+void BasicEQAudioProcessor::loadShippedImpulseResponses(juce::Array<juce::Array<juce::Array<juce::Array<juce::File>>>> impulseResponseArray)
 {
     // impulseResponseArray[typ komba][typ mikrofonu][pozice Y][pozice X]
     // toto nasleduje strukturu slozek v Data
     // 
-    juce::Array<juce::Array<juce::Array<juce::Array<juce::File>>>> impulseResponseArray;
-
+    
+    int comboType, mikType, yPosition, xPosition;
     
 
     for (juce::DirectoryEntry entry : juce::RangedDirectoryIterator(juce::File("C:/Users/knize/Documents/VST_CODE/BasicEQ/Data"), true, "*.wav", 2)) {
+        juce::String filename = entry.getFile().getFileNameWithoutExtension();
+        juce::StringArray filenameArray;
+        filenameArray.addTokens(filename, "_", "\"");
         
+        if (filenameArray[0] == "57A") { mikType = 0; }
+        else if (filenameArray[0] == "kalib") { mikType = 1; }
+        else { mikType = 2; }
+        if (filenameArray[1] == "0cm") { yPosition = 0; }
+        else if (filenameArray[1] == "10cm") { yPosition = 1; }
+        else { yPosition = 2; }
+        if (filenameArray[2] == "Mar") { comboType = 0; }
+        else if (filenameArray[2] == "MM") { comboType = 1; }
+        else { comboType = 2; }
+        xPosition = filenameArray[3].getIntValue();
+
+        impulseResponseArray[comboType][mikType][yPosition][xPosition] = entry.getFile();
+        filenameArray.clear();
     }
 }
 

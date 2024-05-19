@@ -135,7 +135,7 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    void loadShippedImpulseResponses();
+    void loadShippedImpulseResponses(juce::Array<juce::Array<juce::Array<juce::Array<juce::File>>>> impulseResponseArray);
 
     juce::File root, savedFile;
     juce::dsp::Convolution irLoader;
@@ -146,7 +146,8 @@ public:
 
 private:
     MonoChain leftChain, rightChain;
-    
+    juce::Array<juce::Array<juce::Array<juce::Array<juce::File>>>> impulseResponseArray;
+
     void updatePeakFilter(const ChainSettings& chainSettings);
     void updateLowCutFilter(const ChainSettings& chainSettings);
     void updateHighCutFilter(const ChainSettings& chainSettings);
