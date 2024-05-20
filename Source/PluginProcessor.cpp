@@ -117,10 +117,10 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     rightChain.prepare(spec);
 
     updateFilters();
-
+    
     spec.numChannels = getTotalNumOutputChannels();
 
-    loadShippedImpulseResponses(impulseResponseArray);
+    loadShippedImpulseResponses();
 
     irLoader.reset();
     irLoader.prepare(spec);
@@ -255,6 +255,8 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     settings.peakQuality = apvts.getRawParameterValue("Peak Q")->load();
     settings.lowCutSlope = static_cast<Slope>(apvts.getRawParameterValue("LowCut Slope")->load());
     settings.highCutSlope = static_cast<Slope>(apvts.getRawParameterValue("HighCut Slope")->load());
+    settings.xPos = apvts.getRawParameterValue("X Position")->load();
+    settings.yPos = static_cast<Distance>(apvts.getRawParameterValue("Y Position")->load());
 
     return settings;
 }
@@ -265,6 +267,14 @@ Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRat
                                                                 chainSettings.peakFreq,
                                                                 chainSettings.peakQuality,
                                                                 juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
+}
+
+void BasicEQAudioProcessor::updateLoadedIR(int comboTypeID, int mikTypeID, int yPos, int xPos)
+{
+    irLoader.reset();
+    // load IR, stereo, trimmed, normalized, size 0 = original IR size
+    irLoader.loadImpulseResponse(impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos], juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
+    DBG("Loaded IR from array " << comboTypeID << " " << mikTypeID << " " << yPos << " " << xPos);
 }
 
 void BasicEQAudioProcessor::updatePeakFilter(const ChainSettings& chainSettings)
@@ -335,7 +345,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Q", "Peak Q",
         juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.f), 7.f));
 
-    layout.add(std::make_unique<juce::AudioParameterInt>("X Position", "X Position", 0, 10, 0));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("X Position", "X Position", juce::NormalisableRange<float>(0, 10, 2), 0));
 
     juce::StringArray yPosChoices("0 cm", "10 cm", "40 cm");
     
@@ -355,14 +365,27 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     return layout;
 }
 
-void BasicEQAudioProcessor::loadShippedImpulseResponses(juce::Array<juce::Array<juce::Array<juce::Array<juce::File>>>> impulseResponseArray)
+void BasicEQAudioProcessor::loadShippedImpulseResponses()
 {
     // impulseResponseArray[typ komba][typ mikrofonu][pozice Y][pozice X]
     // toto nasleduje strukturu slozek v Data
     // 
     
     int comboType, mikType, yPosition, xPosition;
-    
+    impulseResponseArray.resize(3);
+    for (auto& array_2 : impulseResponseArray) {
+        array_2.resize(3);
+        for (auto& array_1 : array_2) {
+            array_1.resize(3);
+            for (auto& array_0 : array_1) {
+                array_0.resize(11);
+            }
+        }
+    }
+    /*DBG(impulseResponseArray.size());
+    DBG(impulseResponseArray[0].size());
+    DBG(impulseResponseArray[0][0].size());
+    DBG(impulseResponseArray[0][0][0].size());*/
 
     for (juce::DirectoryEntry entry : juce::RangedDirectoryIterator(juce::File("C:/Users/knize/Documents/VST_CODE/BasicEQ/Data"), true, "*.wav", 2)) {
         juce::String filename = entry.getFile().getFileNameWithoutExtension();
@@ -380,7 +403,15 @@ void BasicEQAudioProcessor::loadShippedImpulseResponses(juce::Array<juce::Array<
         else { comboType = 2; }
         xPosition = filenameArray[3].getIntValue();
 
-        impulseResponseArray[comboType][mikType][yPosition][xPosition] = entry.getFile();
+        juce::File file = entry.getFile();
+        
+        impulseResponseArray.getReference(comboType).getReference(mikType).getReference(yPosition).insert(xPosition, file);
+        //DBG("added " << file.getFileName());
+
+        //juce::String filepath = impulseResponseArray.getUnchecked(comboType).getUnchecked(mikType).getUnchecked(yPosition).getUnchecked(xPosition).getFullPathName();
+        /*juce::String filepath = impulseResponseArray[comboType][mikType][yPosition][xPosition].getFullPathName();
+        DBG("Loading " << filename << " into array " << comboType<< mikType<<yPosition<<xPosition);
+        DBG("Loaded " << filepath << " into array");*/
         filenameArray.clear();
     }
 }

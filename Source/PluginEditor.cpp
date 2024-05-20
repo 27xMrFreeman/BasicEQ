@@ -31,6 +31,7 @@ ResponseCurveComponent::~ResponseCurveComponent()
 
 void ResponseCurveComponent::parameterValueChanged(int parameterIndex, float newValue)
 {
+    DBG("param changed" << parameterIndex);
     parametersChanged.set(true);
 }
 
@@ -146,6 +147,21 @@ yPosSliderAttachment(audioProcessor.apvts, "Y Position", yPosSlider)
         addAndMakeVisible(comp);
     }
 
+    comboTypeBox.addItem("Mar", 1);
+    comboTypeBox.addItem("MM", 2);
+    comboTypeBox.addItem("SV", 3);
+    comboTypeBox.setSelectedId(1);
+    comboTypeBox.onChange = [this]() { DBG("comboTypeBox, ypos = " << yPosSlider.getValue()); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
+
+    mikTypeBox.addItem("57A", 1);
+    mikTypeBox.addItem("kalib", 2);
+    mikTypeBox.addItem("sm57", 3);
+    mikTypeBox.setSelectedId(1);
+    mikTypeBox.onChange = [this]() { DBG("mikTypeBox"); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId()-1, mikTypeBox.getSelectedId()-1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
+
+    yPosSlider.onValueChange = [this]() { DBG("yPos = " << yPosSlider.getValue()); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
+    xPosSlider.onValueChange = [this]() { DBG("xPos = " << xPosSlider.getValue()); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
+
     loadBtn.setButtonText("Load IR");
     loadBtn.onClick = [this]()
     {
@@ -165,7 +181,8 @@ yPosSliderAttachment(audioProcessor.apvts, "Y Position", yPosSlider)
                     // load IR, stereo, trimmed, normalized, size 0 = original IR size
                     audioProcessor.irLoader.loadImpulseResponse(result, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
                 });
-
+            userIRLoaded = true;
+            DBG("loaded ir" << (int)userIRLoaded.compareAndSetBool(true, true));
     };
 
     setSize (800, 600);
@@ -194,8 +211,11 @@ void BasicEQAudioProcessorEditor::resized()
     responseCurveComponent.setBounds(responseArea.removeFromRight(bounds.getWidth()*0.5));
 
     auto IRArea = bounds.removeFromLeft(bounds.getWidth() * 0.5);
-    xPosSlider.setBounds(IRArea.removeFromRight(IRArea.getWidth() * 0.5));
-    yPosSlider.setBounds(IRArea);
+    auto IRSlidersArea = IRArea.removeFromBottom(IRArea.getHeight() * 0.5);
+    xPosSlider.setBounds(IRSlidersArea.removeFromRight(IRSlidersArea.getWidth() * 0.5));
+    yPosSlider.setBounds(IRSlidersArea);
+    comboTypeBox.setBounds(IRArea.removeFromLeft(IRArea.getWidth() * 0.5));
+    mikTypeBox.setBounds(IRArea);
 
     auto EQArea = bounds.removeFromRight(bounds.getWidth());
     auto lowCutArea = EQArea.removeFromLeft(EQArea.getWidth() * 0.33);
@@ -235,6 +255,8 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &loadBtn,
         &irNameLabel,
         &xPosSlider,
-        &yPosSlider
+        &yPosSlider,
+        &comboTypeBox,
+        &mikTypeBox
     };
 }

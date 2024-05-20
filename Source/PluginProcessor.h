@@ -19,11 +19,19 @@ enum Slope
     Slope_48
 };
 
+enum Distance
+{
+    Distance_0,
+    Distance_10,
+    Distance_40
+};
+
 struct ChainSettings
 {
     float peakFreq{ 0 }, peakGainInDecibels{ 0 }, peakQuality{ 1.f };
     float lowCutFreq{ 0 }, highCutFreq{ 0 };
     Slope lowCutSlope{ Slope::Slope_12 }, highCutSlope{ Slope::Slope_12 };
+    int xPos{ 0 }, yPos{ Distance::Distance_0 };
 };
 
 ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts);
@@ -135,18 +143,19 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    void loadShippedImpulseResponses(juce::Array<juce::Array<juce::Array<juce::Array<juce::File>>>> impulseResponseArray);
+    void updateLoadedIR(int comboTypeID, int mikTypeID, int yPos, int xPos);
+    void loadShippedImpulseResponses();
 
     juce::File root, savedFile;
     juce::dsp::Convolution irLoader;
-
+    juce::Array<juce::Array<juce::Array<juce::Array<juce::File>>>> impulseResponseArray;
     static juce::AudioProcessorValueTreeState::ParameterLayout
         createParameterLayout();
     juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
 
 private:
     MonoChain leftChain, rightChain;
-    juce::Array<juce::Array<juce::Array<juce::Array<juce::File>>>> impulseResponseArray;
+    
 
     void updatePeakFilter(const ChainSettings& chainSettings);
     void updateLowCutFilter(const ChainSettings& chainSettings);

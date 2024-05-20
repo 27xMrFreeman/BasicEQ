@@ -50,7 +50,6 @@ struct ResponseCurveComponent : juce::Component,
 private:
     BasicEQAudioProcessor& audioProcessor;
     juce::Atomic<bool> parametersChanged{ false };
-
     MonoChain monoChain;
 };
 
@@ -77,6 +76,10 @@ private:
     std::unique_ptr<juce::FileChooser> fileChooser;
     juce::Label irNameLabel;
     CustomRotarySlider xPosSlider, yPosSlider;
+    juce::ComboBox comboTypeBox, mikTypeBox;
+    juce::Atomic<bool> userIRLoaded{ false };
+    
+
 
     // EQ GUI:
         // knobs
