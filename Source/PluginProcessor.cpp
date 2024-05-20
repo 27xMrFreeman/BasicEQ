@@ -378,7 +378,7 @@ void BasicEQAudioProcessor::loadShippedImpulseResponses()
         for (auto& array_1 : array_2) {
             array_1.resize(3);
             for (auto& array_0 : array_1) {
-                array_0.resize(11);
+                array_0.resize(12);
             }
         }
     }
@@ -405,13 +405,14 @@ void BasicEQAudioProcessor::loadShippedImpulseResponses()
 
         juce::File file = entry.getFile();
         
-        impulseResponseArray.getReference(comboType).getReference(mikType).getReference(yPosition).insert(xPosition, file);
+        impulseResponseArray.getReference(comboType).getReference(mikType).getReference(yPosition).set(xPosition, file);
         //DBG("added " << file.getFileName());
 
         //juce::String filepath = impulseResponseArray.getUnchecked(comboType).getUnchecked(mikType).getUnchecked(yPosition).getUnchecked(xPosition).getFullPathName();
         /*juce::String filepath = impulseResponseArray[comboType][mikType][yPosition][xPosition].getFullPathName();
-        DBG("Loading " << filename << " into array " << comboType<< mikType<<yPosition<<xPosition);
-        DBG("Loaded " << filepath << " into array");*/
+        DBG("Loading " << filename << " into array " << comboType << " " << mikType << " " << yPosition << " " << xPosition);
+        DBG("Loaded " << impulseResponseArray[comboType][mikType][yPosition][xPosition].getFullPathName() << " into array");
+        DBG("File in 2 2 2 10: " << impulseResponseArray.getUnchecked(2).getUnchecked(2).getUnchecked(2).getUnchecked(10).getFullPathName());*/
         filenameArray.clear();
     }
 }
