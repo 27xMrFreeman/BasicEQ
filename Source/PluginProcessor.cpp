@@ -117,7 +117,6 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     rightChain.prepare(spec);
 
     updateFilters();
-    
     spec.numChannels = getTotalNumOutputChannels();
 
     loadShippedImpulseResponses();
@@ -193,7 +192,7 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     {
         irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
     }
-
+    //DBG("IR size is " << irLoader.getCurrentIRSize());
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...
     // Make sure to reset the state if your inner loop is processing
@@ -275,6 +274,8 @@ void BasicEQAudioProcessor::updateLoadedIR(int comboTypeID, int mikTypeID, int y
     // load IR, stereo, trimmed, normalized, size 0 = original IR size
     irLoader.loadImpulseResponse(impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos], juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
     DBG("Loaded IR from array " << comboTypeID << " " << mikTypeID << " " << yPos << " " << xPos);
+    DBG("File name is " << impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos].getFileName());
+    DBG("IR Size is " << irLoader.getCurrentIRSize());
 }
 
 void BasicEQAudioProcessor::updatePeakFilter(const ChainSettings& chainSettings)
@@ -345,7 +346,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Q", "Peak Q",
         juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.f), 7.f));
 
-    layout.add(std::make_unique<juce::AudioParameterFloat>("X Position", "X Position", juce::NormalisableRange<float>(0, 10, 2), 0));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("X Position", "X Position", juce::NormalisableRange<float>(0, 8, 2), 0));
 
     juce::StringArray yPosChoices("0 cm", "10 cm", "40 cm");
     

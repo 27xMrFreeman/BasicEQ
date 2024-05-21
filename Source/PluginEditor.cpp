@@ -151,16 +151,16 @@ yPosSliderAttachment(audioProcessor.apvts, "Y Position", yPosSlider)
     comboTypeBox.addItem("MM", 2);
     comboTypeBox.addItem("SV", 3);
     comboTypeBox.setSelectedId(1);
-    comboTypeBox.onChange = [this]() { DBG("comboTypeBox, ypos = " << yPosSlider.getValue()); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
+    comboTypeBox.onChange = [this]() { DBG("changed combo"); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
 
     mikTypeBox.addItem("57A", 1);
     mikTypeBox.addItem("kalib", 2);
     mikTypeBox.addItem("sm57", 3);
     mikTypeBox.setSelectedId(1);
-    mikTypeBox.onChange = [this]() { DBG("mikTypeBox"); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId()-1, mikTypeBox.getSelectedId()-1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
+    mikTypeBox.onChange = [this]() { DBG("changed mic"); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId()-1, mikTypeBox.getSelectedId()-1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
 
-    yPosSlider.onValueChange = [this]() { DBG("yPos = " << yPosSlider.getValue()); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
-    xPosSlider.onValueChange = [this]() { DBG("xPos = " << xPosSlider.getValue()); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
+    yPosSlider.onValueChange = [this]() { DBG("changed yPos to " << yPosSlider.getValue()); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
+    xPosSlider.onValueChange = [this]() { DBG("changed xPos to " << xPosSlider.getValue()); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
 
     loadBtn.setButtonText("Load IR");
     loadBtn.onClick = [this]()
@@ -182,7 +182,7 @@ yPosSliderAttachment(audioProcessor.apvts, "Y Position", yPosSlider)
                     audioProcessor.irLoader.loadImpulseResponse(result, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
                 });
             userIRLoaded = true;
-            DBG("loaded ir" << (int)userIRLoaded.compareAndSetBool(true, true));
+            DBG("loaded ir " << (int)userIRLoaded.compareAndSetBool(true, true) << "with length " << audioProcessor.irLoader.getCurrentIRSize());
     };
 
     setSize (800, 600);
@@ -214,8 +214,17 @@ void BasicEQAudioProcessorEditor::resized()
     auto IRSlidersArea = IRArea.removeFromBottom(IRArea.getHeight() * 0.5);
     xPosSlider.setBounds(IRSlidersArea.removeFromRight(IRSlidersArea.getWidth() * 0.5));
     yPosSlider.setBounds(IRSlidersArea);
-    comboTypeBox.setBounds(IRArea.removeFromLeft(IRArea.getWidth() * 0.5));
-    mikTypeBox.setBounds(IRArea);
+
+    auto comboBoxArea = IRArea;
+    auto mikBoxArea = IRArea;
+    comboBoxArea = comboBoxArea.removeFromLeft(comboBoxArea.getWidth() * 0.5);
+    comboBoxArea = comboBoxArea.removeFromLeft(comboBoxArea.getWidth() * 0.75);
+    comboBoxArea = comboBoxArea.removeFromRight(comboBoxArea.getWidth() * 0.67);
+    mikBoxArea = mikBoxArea.removeFromRight(mikBoxArea.getWidth() * 0.5);
+    mikBoxArea = mikBoxArea.removeFromRight(mikBoxArea.getWidth() * 0.75);
+    mikBoxArea = mikBoxArea.removeFromLeft(mikBoxArea.getWidth() * 0.67);
+    comboTypeBox.setBounds(comboBoxArea.removeFromTop(comboBoxArea.getHeight() * 0.66).removeFromBottom(comboBoxArea.getHeight()*0.5));
+    mikTypeBox.setBounds(mikBoxArea.removeFromTop(mikBoxArea.getHeight() * 0.66).removeFromBottom(mikBoxArea.getHeight() * 0.5));
 
     auto EQArea = bounds.removeFromRight(bounds.getWidth());
     auto lowCutArea = EQArea.removeFromLeft(EQArea.getWidth() * 0.33);
@@ -231,12 +240,9 @@ void BasicEQAudioProcessorEditor::resized()
     peakGainSlider.setBounds(EQArea.removeFromTop(EQArea.getHeight() * 0.5));
     peakQualitySlider.setBounds(EQArea);
 
-    auto btnX = getWidth() * 0.2;
-    auto btnY = getHeight() * 0.2;
-    auto btnWidth = getWidth() * 0.1;
-    auto btnHeight = btnWidth * 0.6;
-    loadBtn.setBounds(btnX, btnY, btnWidth, btnHeight);
-    irNameLabel.setBounds(btnX, btnY + (btnHeight*1.1), btnWidth, btnHeight);
+    auto loadBtnArea = IRArea;
+    loadBtn.setBounds(loadBtnArea.removeFromLeft(loadBtnArea.getWidth()*0.6).removeFromRight(loadBtnArea.getWidth()*0.5).removeFromBottom(loadBtnArea.getHeight()*0.8).removeFromTop(loadBtnArea.getHeight()*0.2));
+    irNameLabel.setBounds(loadBtnArea);
 
 }
 
