@@ -73,10 +73,10 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
 
     auto sliderBounds = getSliderBounds();
 
-    g.setColour(Colours::red);
+    /*g.setColour(Colours::red);
     g.drawRect(getLocalBounds());
     g.setColour(Colours::azure);
-    g.drawRect(sliderBounds);
+    g.drawRect(sliderBounds);*/         // bounding boxes of sliders for debugging purposes
 
     getLookAndFeel().drawRotarySlider(g, 
                                         sliderBounds.getX(), 
@@ -107,7 +107,36 @@ juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const
 
 juce::String RotarySliderWithLabels::getDisplayString() const
 {
-    return juce::String(getValue());
+    if (auto* choiceParam = dynamic_cast<juce::AudioParameterChoice*>(param)) // if we can convert param to parameter choice, then it is a choice, so we return choice name
+    {
+        return choiceParam->getCurrentChoiceName();
+    }
+
+    juce::String str;
+    bool addK = false;
+
+    if (auto* floatParam = dynamic_cast<juce::AudioParameterFloat*>(param)) // if we can convert param to float then it is float
+    {
+        // this whole block is for truncating Hz -> kHz
+        float val = getValue(); 
+        if (val > 999.f)
+        {
+            val /= 1000.f;
+            addK = true;
+        }
+        str = juce::String(val, (addK ? 2 : 0)); // if addK is true, limit to 2 decimal places, otherwise use default value
+    }
+    else
+    {
+        jassertfalse; // this shouldnt happen, happens only if there is a parameter thats not choice or float
+    }
+
+    if (suffix.isNotEmpty())
+        str << " ";
+    if (addK) str << "k"; // adds the k to kHz
+    str << suffix;
+
+    return str;
 }
 //==============================================================================
 
