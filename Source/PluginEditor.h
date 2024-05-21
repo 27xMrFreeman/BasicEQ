@@ -11,13 +11,41 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
-struct CustomRotarySlider : juce::Slider
+struct LookAndFeel : juce::LookAndFeel_V4
 {
-    CustomRotarySlider() : juce::Slider(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag,
-                                        juce::Slider::TextEntryBoxPosition::TextBoxBelow)
-    {
+    void drawRotarySlider(juce::Graphics&,
+        int x, int y, int width, int height,
+        float sliderPosProportional,
+        float rotaryStartAngle,
+        float rotaryEndAngle,
+        juce::Slider&) override {}
+};
 
+struct RotarySliderWithLabels : juce::Slider
+{
+    RotarySliderWithLabels(juce::RangedAudioParameter& rap, const juce::String& unitSuffix) : 
+        juce::Slider(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag,
+                                        juce::Slider::TextEntryBoxPosition::TextBoxBelow),
+        param(&rap),
+        suffix(unitSuffix)
+    {
+        setLookAndFeel(&lnf); // set lnf as the look and feel object
     }
+
+    ~RotarySliderWithLabels()
+    {
+        setLookAndFeel(nullptr);
+    }
+
+    void paint(juce::Graphics& g) override {}
+    juce::Rectangle<int> getSliderBounds() const;
+    int getTextHeight() const { return 14; }
+    juce::String getDisplayString() const;
+private:
+    LookAndFeel lnf;
+
+    juce::RangedAudioParameter* param;
+    juce::String suffix;
 };
 
 struct ResponseCurveComponent : juce::Component,
@@ -75,7 +103,7 @@ private:
     juce::TextButton loadBtn;
     std::unique_ptr<juce::FileChooser> fileChooser;
     juce::Label irNameLabel;
-    CustomRotarySlider xPosSlider, yPosSlider;
+    RotarySliderWithLabels xPosSlider, yPosSlider;
     juce::ComboBox comboTypeBox, mikTypeBox;
     juce::Atomic<bool> userIRLoaded{ false };
     
@@ -83,7 +111,7 @@ private:
 
     // EQ GUI:
         // knobs
-    CustomRotarySlider peakFreqSlider,
+    RotarySliderWithLabels peakFreqSlider,
         peakGainSlider,
         peakQualitySlider,
         lowCutFreqSlider,
