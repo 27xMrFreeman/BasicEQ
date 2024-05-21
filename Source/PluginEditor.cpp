@@ -60,6 +60,41 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
 
 }
 
+void LookAndFeel::drawToggleButton(juce::Graphics& g,
+    juce::ToggleButton& toggleButton,
+    bool shouldDrawButtonAsHighlighted,
+    bool shouldDrawButtonAsDown)
+{
+    using namespace juce;
+
+    Path powerButton;
+
+    auto bounds = toggleButton.getLocalBounds();
+    auto size = jmin(bounds.getWidth(), bounds.getHeight())-5;
+    auto r = bounds.withSizeKeepingCentre(size, size).toFloat();
+
+    float ang = 30.f;
+
+    size -= 6;
+
+    powerButton.addCentredArc(r.getCentreX(), r.getCentreY(), size * 0.5, size * 0.5, 0.f, degreesToRadians(ang), degreesToRadians(360.f - ang), true);
+
+    powerButton.startNewSubPath(r.getCentreX(), r.getY()+3);
+    powerButton.lineTo(r.getCentre());
+
+    PathStrokeType pst(2.f, PathStrokeType::JointStyle::curved);
+
+    auto color = toggleButton.getToggleState() ? Colours::dimgrey : Colours::lightgreen;
+    
+    g.setColour(color);
+    g.strokePath(powerButton, pst);
+    size = jmin(bounds.getWidth(), bounds.getHeight())-3;
+    r = bounds.withSizeKeepingCentre(size, size).toFloat();
+    g.setColour(Colours::silver);
+    g.drawEllipse(r, 2);
+
+}
+
 //==============================================================================
 
 void RotarySliderWithLabels::paint(juce::Graphics& g)
@@ -354,6 +389,10 @@ peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButt
         addAndMakeVisible(comp);
     }
 
+    lowCutBypassButton.setLookAndFeel(&lnf);
+    highCutBypassButton.setLookAndFeel(&lnf);
+    peakBypassButton.setLookAndFeel(&lnf);
+
     comboTypeBox.addItem("Mar", 1);
     comboTypeBox.addItem("MM", 2);
     comboTypeBox.addItem("SV", 3);
@@ -397,7 +436,9 @@ peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButt
 
 BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
 {
-    
+    lowCutBypassButton.setLookAndFeel(nullptr);
+    highCutBypassButton.setLookAndFeel(nullptr);
+    peakBypassButton.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -438,15 +479,15 @@ void BasicEQAudioProcessorEditor::resized()
     auto lowCutArea = EQArea.removeFromLeft(EQArea.getWidth() * 0.33);
     auto highCutArea = EQArea.removeFromRight(EQArea.getWidth() * 0.5);
 
-    lowCutBypassButton.setBounds(lowCutArea.removeFromTop(25));
+    lowCutBypassButton.setBounds(lowCutArea.removeFromTop(30));
     lowCutFreqSlider.setBounds(lowCutArea.removeFromTop(lowCutArea.getHeight() * 0.66));
     lowCutSlopeSlider.setBounds(lowCutArea);
 
-    highCutBypassButton.setBounds(highCutArea.removeFromTop(25));
+    highCutBypassButton.setBounds(highCutArea.removeFromTop(30));
     highCutFreqSlider.setBounds(highCutArea.removeFromTop(highCutArea.getHeight() * 0.66 ));
     highCutSlopeSlider.setBounds(highCutArea);
 
-    peakBypassButton.setBounds(EQArea.removeFromTop(25));
+    peakBypassButton.setBounds(EQArea.removeFromTop(30));
     peakFreqSlider.setBounds(EQArea.removeFromTop(EQArea.getHeight() * 0.33));
     peakGainSlider.setBounds(EQArea.removeFromTop(EQArea.getHeight() * 0.5));
     peakQualitySlider.setBounds(EQArea);
