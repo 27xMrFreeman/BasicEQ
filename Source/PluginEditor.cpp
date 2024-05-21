@@ -65,7 +65,7 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
 void RotarySliderWithLabels::paint(juce::Graphics& g)
 {
     using namespace juce;
-    
+
     auto startAng = degreesToRadians(180.f + 35.f);     // angle starts at 12´, 180° = 6´
     auto endAng = degreesToRadians(180.f - 35.f) + MathConstants<float>::twoPi; // adding 2pi to ensure startAng < endAng
 
@@ -78,16 +78,41 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
     g.setColour(Colours::azure);
     g.drawRect(sliderBounds);*/         // bounding boxes of sliders for debugging purposes
 
-    getLookAndFeel().drawRotarySlider(g, 
-                                        sliderBounds.getX(), 
-                                        sliderBounds.getY(),
-                                        sliderBounds.getWidth(), 
-                                        sliderBounds.getHeight(), 
-                                        jmap(getValue(), range.getStart(), range.getEnd(), 0.0, 1.0), // converts range of slider to 0->1
-                                        startAng, 
-                                        endAng, 
-                                        *this);
+    getLookAndFeel().drawRotarySlider(g,
+        sliderBounds.getX(),
+        sliderBounds.getY(),
+        sliderBounds.getWidth(),
+        sliderBounds.getHeight(),
+        jmap(getValue(), range.getStart(), range.getEnd(), 0.0, 1.0), // converts range of slider to 0->1
+        startAng,
+        endAng,
+        *this);
 
+    auto center = sliderBounds.toFloat().getCentre();
+    auto radius = sliderBounds.getWidth()*0.5f;
+
+    g.setColour(Colours::white);
+    g.setFont(getTextHeight());
+
+    auto numChoices = labels.size();
+    for (int i = 0; i < numChoices; ++i)
+    {
+        auto pos = labels[i].pos;
+        jassert(0.f <= pos);
+        jassert(pos <= 1.f);        // make sure position is between 0 and 1
+
+        auto ang = jmap(pos, 0.f, 1.f, startAng, endAng); // mapped to angles
+        // text needs to be a bit out from the slider
+        auto c = center.getPointOnCircumference(radius + getTextHeight() * 0.5f, ang);          // this gets the centre of the text a bit out from the circle
+
+        Rectangle<float> r; // rectangle for bounding box of text
+        auto str = labels[i].label; // get text from labels
+        r.setSize(g.getCurrentFont().getStringWidth(str), getTextHeight());     // set size of rectangle depending on font width and height
+        r.setCentre(c);     // set centre of rectangle to c -> text could be touching circle
+        r.setY(r.getY() + getTextHeight());         // move rectangle down, so that text doesnt touch the circle
+
+        g.drawFittedText(str, r.toNearestInt(), juce::Justification::centred, 1);
+    }
 }
 
 juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const
@@ -283,6 +308,26 @@ yPosSliderAttachment(audioProcessor.apvts, "Y Position", yPosSlider)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
+
+    peakFreqSlider.labels.add({ 0.f, "10Hz" });
+    peakFreqSlider.labels.add({ 1.f, "20kHz" });
+    peakGainSlider.labels.add({ 0.f, "-24dB" });
+    peakGainSlider.labels.add({ 1.f, "24dB" });
+    peakQualitySlider.labels.add({ 0.f, "0.1" });
+    peakQualitySlider.labels.add({ 1.f, "10" });
+    lowCutFreqSlider.labels.add({ 0.f, "10Hz" });
+    lowCutFreqSlider.labels.add({ 1.f, "20kHz" });
+    lowCutSlopeSlider.labels.add({ 0.f, "12" });
+    lowCutSlopeSlider.labels.add({ 1.f, "48" });
+    highCutFreqSlider.labels.add({ 0.f, "10Hz" });
+    highCutFreqSlider.labels.add({ 1.f, "20kHz" });
+    highCutSlopeSlider.labels.add({ 0.f, "12" });
+    highCutSlopeSlider.labels.add({ 1.f, "48" });
+    xPosSlider.labels.add({ 0.f, "0cm" });
+    xPosSlider.labels.add({ 1.f, "8cm" });
+    yPosSlider.labels.add({ 0.f, "0cm" });
+    yPosSlider.labels.add({ 1.f, "40cm" });
+
     for (auto* comp : getComps())
     {
         addAndMakeVisible(comp);
@@ -367,6 +412,7 @@ void BasicEQAudioProcessorEditor::resized()
     comboTypeBox.setBounds(comboBoxArea.removeFromTop(comboBoxArea.getHeight() * 0.66).removeFromBottom(comboBoxArea.getHeight()*0.5));
     mikTypeBox.setBounds(mikBoxArea.removeFromTop(mikBoxArea.getHeight() * 0.66).removeFromBottom(mikBoxArea.getHeight() * 0.5));
 
+    bounds.removeFromTop(5);
     auto EQArea = bounds.removeFromRight(bounds.getWidth());
     auto lowCutArea = EQArea.removeFromLeft(EQArea.getWidth() * 0.33);
     auto highCutArea = EQArea.removeFromRight(EQArea.getWidth() * 0.5);
