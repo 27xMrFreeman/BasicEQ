@@ -117,6 +117,10 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     rightChain.prepare(spec);
 
     updateFilters();
+
+    leftChannelFifo.prepare(samplesPerBlock);
+    rightChannelFifo.prepare(samplesPerBlock);
+
     spec.numChannels = getTotalNumOutputChannels();
 
     loadShippedImpulseResponses();
@@ -192,6 +196,10 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     {
         irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
     }
+
+    leftChannelFifo.update(buffer);
+    rightChannelFifo.update(buffer);
+
     //DBG("IR size is " << irLoader.getCurrentIRSize());
     // This is the place where you'd normally do the guts of your plugin's
     // audio processing...

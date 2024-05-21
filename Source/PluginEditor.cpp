@@ -201,13 +201,15 @@ juce::String RotarySliderWithLabels::getDisplayString() const
 //==============================================================================
 
 
-ResponseCurveComponent::ResponseCurveComponent(BasicEQAudioProcessor& p) : audioProcessor(p)
+ResponseCurveComponent::ResponseCurveComponent(BasicEQAudioProcessor& p) : audioProcessor(p), leftChannelFifo(&audioProcessor.leftChannelFifo)
 {
     const auto& params = audioProcessor.getParameters();
     for (auto param : params)
     {
         param->addListener(this);
     }
+
+
 
     updateChain();
 
@@ -231,6 +233,26 @@ void ResponseCurveComponent::parameterValueChanged(int parameterIndex, float new
 
 void ResponseCurveComponent::timerCallback()
 {
+    juce::AudioBuffer<float> tempIncomingBuffer;
+    // if there is a buffer available in the FIFO, send it to FFT data generator
+    while (leftChannelFifo->getNumCompleteBuffersAvailable() > 0)
+    {
+        if (leftChannelFifo->getAudioBuffer(tempIncomingBuffer))    // if we can get the buffer
+        {
+            auto size = tempIncomingBuffer.getNumSamples();
+            // this shifts stuff in the buffer by how big the sent out buffer is
+            juce::FloatVectorOperations::copy(  monoBuffer.getWritePointer(0, 0),   // where to copy - to the start of the buffer
+                                                monoBuffer.getReadPointer(0, size), // source to copy - starts where the previous buffer block ended
+                                                monoBuffer.getNumSamples() - size); // how many values to copy - all values except the ones in the previous buffer block
+
+            juce::FloatVectorOperations::copy(  monoBuffer.getWritePointer(0, monoBuffer.getNumSamples() - size),   // copy to the end of the buffer
+                                                tempIncomingBuffer.getReadPointer(0, 0),                            // copy from start of incoming buffer
+                                                size);                                                              // copy as many values as are in incoming buffer
+            // block above effectively shifts audio in monoBuffer left by the block size, appending new data from tempIncomingBuffer at the end of monoBuffer //
+
+        }
+    }
+
     if (parametersChanged.compareAndSetBool(false, true))
     {
         updateChain();
