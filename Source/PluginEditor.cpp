@@ -46,12 +46,17 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
 {
     using namespace juce;
     
-    auto startAng = degreesToRadians(180.f + 45.f);     // angle starts at 12´, 180° = 6´
-    auto endAng = degreesToRadians(180.f - 45.f) + MathConstants<float>::twoPi; // adding 2pi to ensure startAng < endAng
+    auto startAng = degreesToRadians(180.f + 35.f);     // angle starts at 12´, 180° = 6´
+    auto endAng = degreesToRadians(180.f - 35.f) + MathConstants<float>::twoPi; // adding 2pi to ensure startAng < endAng
 
     auto range = getRange();
 
     auto sliderBounds = getSliderBounds();
+
+    g.setColour(Colours::red);
+    g.drawRect(getLocalBounds());
+    g.setColour(Colours::azure);
+    g.drawRect(sliderBounds);
 
     getLookAndFeel().drawRotarySlider(g, 
                                         sliderBounds.getX(), 
@@ -67,7 +72,17 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
 
 juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const
 {
-    return getLocalBounds();
+    //return getLocalBounds();
+    auto bounds = getLocalBounds();
+
+    auto size = juce::jmin(bounds.getWidth(), bounds.getHeight());
+
+    size -= getTextHeight() * 2;
+    juce::Rectangle<int> r;
+    r.setSize(size, size);
+    r.setCentre(bounds.getCentreX(), 0);
+    r.setY(2);
+    return r;
 }
 
 
