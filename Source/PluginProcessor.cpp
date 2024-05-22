@@ -287,7 +287,7 @@ Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRat
                                                                 juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
 }
 
-void BasicEQAudioProcessor::updateLoadedIR(int comboTypeID, int mikTypeID, int yPos, int xPos)
+juce::File BasicEQAudioProcessor::updateLoadedIR(int comboTypeID, int mikTypeID, int yPos, int xPos)
 {
     irLoader.reset();
     // load IR, stereo, trimmed, normalized, size 0 = original IR size
@@ -295,6 +295,7 @@ void BasicEQAudioProcessor::updateLoadedIR(int comboTypeID, int mikTypeID, int y
     DBG("Loaded IR from array " << comboTypeID << " " << mikTypeID << " " << yPos << " " << xPos);
     DBG("File name is " << impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos].getFileName());
     DBG("IR Size is " << irLoader.getCurrentIRSize());
+    return impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos];
 }
 
 void BasicEQAudioProcessor::updatePeakFilter(const ChainSettings& chainSettings)

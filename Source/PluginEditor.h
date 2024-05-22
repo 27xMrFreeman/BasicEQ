@@ -226,6 +226,10 @@ struct PathProducer
 
     void process(juce::Rectangle<float> fftBounds, double sampleRate);
     juce::Path getPath() { return leftChannelFFTPath; }
+    
+    AnalyzerPathGenerator<juce::Path> pathProducer;
+
+    juce::Path leftChannelFFTPath;
 
 private:
     SingleChannelSampleFifo<BasicEQAudioProcessor::BlockType>* leftChannelFifo;
@@ -234,9 +238,9 @@ private:
 
     FFTDataGenerator<std::vector<float>> leftChannelFFTDataGenerator;
 
-    AnalyzerPathGenerator<juce::Path> pathProducer;
+    
 
-    juce::Path leftChannelFFTPath;
+    
 };
 
 struct ResponseCurveComponent : juce::Component,
@@ -282,27 +286,26 @@ private:
     juce::Rectangle<int> getAnalysisArea();
 };
 
-struct IrFFTComponent : juce::Component,
-    juce::AudioProcessorParameter::Listener,
-    juce::Timer
+struct IrFFTComponent : juce::Component/*,
+    juce::AudioProcessorParameter::Listener*/
 {
     IrFFTComponent(BasicEQAudioProcessor&);
     ~IrFFTComponent();
 
-    void parameterValueChanged(int parameterIndex, float newValue) override;
-    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
-
-    void timerCallback() override;
-
+    /*void parameterValueChanged(int parameterIndex, float newValue) override;
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;*/
+    void loadedIRChanged(juce::File newIR);
     void paint(juce::Graphics& g) override;
     void resized() override;
 private:
     BasicEQAudioProcessor& audioProcessor;
     juce::Atomic<bool> parametersChanged{ false };
+    MonoChain monoChain;
 
     juce::Image background;
 
-    //PathProducer pathProducer;
+    juce::dsp::FFT fft{ FFTOrder::order4096 };
+    PathProducer leftPathProducer, rightPathProducer;
 
     juce::Rectangle<int> getRenderArea();
     juce::Rectangle<int> getAnalysisArea();

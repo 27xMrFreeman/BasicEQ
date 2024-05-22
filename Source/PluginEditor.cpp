@@ -459,43 +459,103 @@ juce::Rectangle<int> ResponseCurveComponent::getAnalysisArea()
     return bounds;
 }
 
-IrFFTComponent::IrFFTComponent(BasicEQAudioProcessor& p) : audioProcessor(p)
+IrFFTComponent::IrFFTComponent(BasicEQAudioProcessor& p) : audioProcessor(p), 
+leftPathProducer(audioProcessor.leftChannelFifo),
+rightPathProducer(audioProcessor.rightChannelFifo)
 {
-    const auto& params = audioProcessor.getParameters();
+    /*const auto& params = audioProcessor.getParameters();
     for (auto param : params)
     {
         param->addListener(this);
-    }
-
-    startTimerHz(10);
+    }*/
 }
 
 IrFFTComponent::~IrFFTComponent()
 {
-    const auto& params = audioProcessor.getParameters();
+    /*const auto& params = audioProcessor.getParameters();
     for (auto param : params)
     {
         param->removeListener(this);
-    }
+    }*/
 }
 
-void IrFFTComponent::parameterValueChanged(int parameterIndex, float newValue)
+//void IrFFTComponent::parameterValueChanged(int parameterIndex, float newValue)
+//{
+//    parametersChanged.set(true);
+//}
+//
+//void IrFFTComponent::parameterGestureChanged(int parameterIndex, bool gestureIsStarting) {};
+
+// when we change the IR in onChange lambdas of UI elements, we need to:
+// call this function
+// pass it the selected IR wav file
+// convert wav to vector of floats - currently in AudioBuffer which is pretty much the same, have to see if it will go into FFT or not
+// compute FFT
+// store FFT data into a path
+// call repaint
+void IrFFTComponent::loadedIRChanged(juce::File newIR)
 {
-    parametersChanged.set(true);
-}
+    juce::AudioFormatManager formatManager;
+    formatManager.registerBasicFormats();
 
-void IrFFTComponent::parameterGestureChanged(int parameterIndex, bool gestureIsStarting) {};
+    if (!newIR.existsAsFile())  { DBG("loadedIRChanged: loaded file is not a file"); }
 
-void IrFFTComponent::timerCallback()
-{
-    auto fftBounds = getLocalBounds().toFloat();
-    auto sampleRate = audioProcessor.getSampleRate();
+    std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(newIR));
+    if (reader.get() == nullptr) { DBG("loadedIRChanged: nullptr in reader"); }
 
-    if (parametersChanged.compareAndSetBool(false, true))
+    auto fileSampleRate = reader->sampleRate;
+    auto lengthInSamples = reader->lengthInSamples;
+    
+    // THIS SHOULD WORK FOR STEREO
+    //juce::AudioBuffer<float> audioBuffer(reader->numChannels, lengthInSamples);
+    //reader->read(&audioBuffer, 0, 8192, 0, true, true); // reader should return zeros if the file it reads is shorter than 4096 samples, this size must be 2 * FFT size
+    
+    // THIS IS FOR LEFT CH ONLY
+    juce::AudioBuffer<float> audioBuffer(1, lengthInSamples);
+    reader->read(&audioBuffer, 0, 8192, 0, true, false);
+    
+    //fft.performFrequencyOnlyForwardTransform(audioBuffer.getWritePointer(Channel::Left), false);
+
+    auto fftBounds = getAnalysisArea().toFloat();
+    
+    FFTDataGenerator<std::vector<float>> leftChannelFFTDataGenerator;
+    FFTDataGenerator<std::vector<float>> rightChannelFFTDataGenerator;
+
+    leftChannelFFTDataGenerator.produceFFTDataForRendering(audioBuffer, -48.f);
+
+    // if there are FFT data buffers to pull, try to pull it and generate path from it
+    // fftBounds is where it should draw the path
+    const auto fftSize = leftChannelFFTDataGenerator.getFFTSize();
+    const auto binWidth = fileSampleRate / (double)fftSize; // e.g. 48000 / 2048 = 23 Hz - frequency width of one fft bin, casting fftSize to double because sampleRate is double
+
+    while (leftChannelFFTDataGenerator.getNumAvailableFFTDataBlocks() > 0)
     {
-        repaint();
+        std::vector<float> fftData;
+        if (leftChannelFFTDataGenerator.getFFTData(fftData))
+        {
+            leftPathProducer.pathProducer.generatePath(fftData, fftBounds, fftSize, binWidth, -92.f);
+        }
     }
+
+    // if there are paths that can be pulled, pull as many as possible, display the most recent one
+    while (leftPathProducer.pathProducer.getNumPathsAvailable())
+    {
+        leftPathProducer.pathProducer.getPath(leftPathProducer.leftChannelFFTPath);
+    }
+
+    repaint();
 }
+
+//void IrFFTComponent::timerCallback()
+//{
+//    auto fftBounds = getLocalBounds().toFloat();
+//    auto sampleRate = audioProcessor.getSampleRate();
+//
+//    if (parametersChanged.compareAndSetBool(false, true))
+//    {
+//        repaint();
+//    }
+//}
 
 void IrFFTComponent::paint(juce::Graphics& g)
 {
@@ -509,6 +569,17 @@ void IrFFTComponent::paint(juce::Graphics& g)
     g.setColour(Colours::silver);
     g.drawRoundedRectangle(irArea.toFloat(), 6.f, 3.f);
 
+    // here we need to paint the path from FFT values
+    auto leftChannelFFTPath = leftPathProducer.getPath();
+    auto rightChannelFFTPath = rightPathProducer.getPath();
+
+    leftChannelFFTPath.applyTransform(AffineTransform().translation(irArea.getX(), irArea.getY()));
+    rightChannelFFTPath.applyTransform(AffineTransform().translation(irArea.getX(), irArea.getY()));
+    g.setColour(Colours::yellow);
+    g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));
+
+    g.setColour(Colours::aqua);
+    g.strokePath(rightChannelFFTPath, PathStrokeType(1.f));
 }
 
 void IrFFTComponent::resized()
@@ -626,16 +697,36 @@ peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButt
     comboTypeBox.addItem("MM", 2);
     comboTypeBox.addItem("SV", 3);
     comboTypeBox.setSelectedId(1);
-    comboTypeBox.onChange = [this]() { DBG("changed combo"); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
+    comboTypeBox.onChange = [this]() { 
+        DBG("changed combo"); 
+        juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); 
+        userIRLoaded = false; 
+        irfftComponent.loadedIRChanged(newIR);
+        };
 
     mikTypeBox.addItem("57A", 1);
     mikTypeBox.addItem("kalib", 2);
     mikTypeBox.addItem("sm57", 3);
     mikTypeBox.setSelectedId(1);
-    mikTypeBox.onChange = [this]() { DBG("changed mic"); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId()-1, mikTypeBox.getSelectedId()-1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
+    mikTypeBox.onChange = [this]() { 
+        DBG("changed mic"); 
+        juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId()-1, mikTypeBox.getSelectedId()-1, yPosSlider.getValue(), xPosSlider.getValue());
+        userIRLoaded = false;
+        irfftComponent.loadedIRChanged(newIR);
+        };
 
-    yPosSlider.onValueChange = [this]() { DBG("changed yPos to " << yPosSlider.getValue()); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
-    xPosSlider.onValueChange = [this]() { DBG("changed xPos to " << xPosSlider.getValue()); audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); userIRLoaded = false; };
+    yPosSlider.onValueChange = [this]() { 
+        DBG("changed yPos to " << yPosSlider.getValue());
+        juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
+        userIRLoaded = false;
+        irfftComponent.loadedIRChanged(newIR);
+        };
+    xPosSlider.onValueChange = [this]() { 
+        DBG("changed xPos to " << xPosSlider.getValue());
+        juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
+        userIRLoaded = false;
+        irfftComponent.loadedIRChanged(newIR);
+        };
 
     loadBtn.setButtonText("Load IR");
     loadBtn.onClick = [this]()
@@ -655,6 +746,7 @@ peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButt
                     audioProcessor.irLoader.reset();
                     // load IR, stereo, trimmed, normalized, size 0 = original IR size
                     audioProcessor.irLoader.loadImpulseResponse(result, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
+                    irfftComponent.loadedIRChanged(result);
                 });
             userIRLoaded = true;
             DBG("loaded ir " << (int)userIRLoaded.compareAndSetBool(true, true) << "with length " << audioProcessor.irLoader.getCurrentIRSize());

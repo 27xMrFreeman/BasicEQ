@@ -277,7 +277,7 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    void updateLoadedIR(int comboTypeID, int mikTypeID, int yPos, int xPos);
+    juce::File updateLoadedIR(int comboTypeID, int mikTypeID, int yPos, int xPos);
     void loadShippedImpulseResponses();
 
     juce::File root, savedFile;
