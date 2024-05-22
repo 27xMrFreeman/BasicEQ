@@ -128,6 +128,10 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     irLoader.reset();
     irLoader.prepare(spec);
 
+    /*osc.initialise([](float x) { return std::sin(x); });
+    osc.prepare(spec);
+    osc.setFrequency(50);*/ // oscillator for testing FFT
+
 }
 
 void BasicEQAudioProcessor::releaseResources()
@@ -180,6 +184,11 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     updateFilters();
 
     juce::dsp::AudioBlock<float> block(buffer);
+
+    //buffer.clear(); // for testing FFT with oscillator
+    //juce::dsp::ProcessContextReplacing<float> stereoContext(block);
+    //osc.process(stereoContext);
+
     // input block divided to mono L/R for EQ processing
     auto leftBlock = block.getSingleChannelBlock(0);
     auto rightBlock = block.getSingleChannelBlock(1);
@@ -197,8 +206,8 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
         irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
     }
 
-    leftChannelFifo.update(buffer);
-    rightChannelFifo.update(buffer);
+    /*leftChannelFifo.update(buffer);
+    rightChannelFifo.update(buffer);*/
 
     //DBG("IR size is " << irLoader.getCurrentIRSize());
     // This is the place where you'd normally do the guts of your plugin's
