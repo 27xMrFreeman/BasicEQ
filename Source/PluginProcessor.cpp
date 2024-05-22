@@ -206,8 +206,8 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
         irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
     }
 
-    /*leftChannelFifo.update(buffer);
-    rightChannelFifo.update(buffer);*/
+    leftChannelFifo.update(buffer);
+    rightChannelFifo.update(buffer);
 
     //DBG("IR size is " << irLoader.getCurrentIRSize());
     // This is the place where you'd normally do the guts of your plugin's
@@ -360,7 +360,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     layout.add(std::make_unique<juce::AudioParameterFloat>("LowCut Freq", "LowCut Freq",
-        juce::NormalisableRange<float>(10.f, 20000.f, 1.f, 0.4f), 0.0f));
+        juce::NormalisableRange<float>(10.f, 20000.f, 1.f, 0.3f), 0.0f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>("HighCut Freq", "HighCut Freq",
         juce::NormalisableRange<float>(10.f, 20000.f, 1.f, 1.f), 20000.f));

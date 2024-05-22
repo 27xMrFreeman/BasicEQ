@@ -118,7 +118,8 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
         sliderBounds.getY(),
         sliderBounds.getWidth(),
         sliderBounds.getHeight(),
-        jmap(getValue(), range.getStart(), range.getEnd(), 0.0, 1.0), // converts range of slider to 0->1
+        param->convertTo0to1(getValue()),
+        //jmap(getValue(), range.getStart(), range.getEnd(), 0.0, 1.0), // converts range of slider to 0->1
         startAng,
         endAng,
         *this);
