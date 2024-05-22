@@ -36,10 +36,10 @@ struct Fifo
         for (auto& buffer : buffers)
         {
             buffer.clear();
-            buffer.resize(numElements, 0); // resize buffer and fill with zeros
+            buffer.resize(numElements, 0);
         }
     }
-    // two prepare function depending on what type is passed, either AudioBuffer or vector
+
     bool push(const T& t)
     {
         auto write = fifo.write(1);
@@ -300,8 +300,6 @@ private:
     void updateHighCutFilter(const ChainSettings& chainSettings);
 
     void updateFilters();
-
-    juce::dsp::Oscillator<float> osc;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BasicEQAudioProcessor)
