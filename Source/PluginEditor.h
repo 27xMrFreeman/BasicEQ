@@ -282,6 +282,32 @@ private:
     juce::Rectangle<int> getAnalysisArea();
 };
 
+struct IrFFTComponent : juce::Component,
+    juce::AudioProcessorParameter::Listener,
+    juce::Timer
+{
+    IrFFTComponent(BasicEQAudioProcessor&);
+    ~IrFFTComponent();
+
+    void parameterValueChanged(int parameterIndex, float newValue) override;
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
+
+    void timerCallback() override;
+
+    void paint(juce::Graphics& g) override;
+    void resized() override;
+private:
+    BasicEQAudioProcessor& audioProcessor;
+    juce::Atomic<bool> parametersChanged{ false };
+
+    juce::Image background;
+
+    //PathProducer pathProducer;
+
+    juce::Rectangle<int> getRenderArea();
+    juce::Rectangle<int> getAnalysisArea();
+};
+
 //==============================================================================
 /**
 */
@@ -308,7 +334,7 @@ private:
     juce::ComboBox comboTypeBox, mikTypeBox;
     juce::Atomic<bool> userIRLoaded{ false };
     
-
+    IrFFTComponent irfftComponent;
 
     // EQ GUI:
         // knobs
@@ -347,3 +373,5 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BasicEQAudioProcessorEditor)
 };
+
+

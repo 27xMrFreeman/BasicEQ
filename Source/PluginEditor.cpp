@@ -212,8 +212,6 @@ rightPathProducer(audioProcessor.rightChannelFifo)
         param->addListener(this);
     }
 
-    
-
     updateChain();
 
     startTimerHz(60);
@@ -408,6 +406,8 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
 
 void ResponseCurveComponent::resized()
 {
+
+    // drawing frequency grid behind EQ response graph
     using namespace juce;
     background = Image(Image::PixelFormat::RGB, getWidth(), getHeight(), true);
 
@@ -459,6 +459,111 @@ juce::Rectangle<int> ResponseCurveComponent::getAnalysisArea()
     return bounds;
 }
 
+IrFFTComponent::IrFFTComponent(BasicEQAudioProcessor& p) : audioProcessor(p)
+{
+    const auto& params = audioProcessor.getParameters();
+    for (auto param : params)
+    {
+        param->addListener(this);
+    }
+
+    startTimerHz(10);
+}
+
+IrFFTComponent::~IrFFTComponent()
+{
+    const auto& params = audioProcessor.getParameters();
+    for (auto param : params)
+    {
+        param->removeListener(this);
+    }
+}
+
+void IrFFTComponent::parameterValueChanged(int parameterIndex, float newValue)
+{
+    parametersChanged.set(true);
+}
+
+void IrFFTComponent::parameterGestureChanged(int parameterIndex, bool gestureIsStarting) {};
+
+void IrFFTComponent::timerCallback()
+{
+    auto fftBounds = getLocalBounds().toFloat();
+    auto sampleRate = audioProcessor.getSampleRate();
+
+    if (parametersChanged.compareAndSetBool(false, true))
+    {
+        repaint();
+    }
+}
+
+void IrFFTComponent::paint(juce::Graphics& g)
+{
+    using namespace juce;
+    g.fillAll(Colours::black);
+
+    g.drawImage(background, getLocalBounds().toFloat());
+
+    auto irArea = getLocalBounds();
+
+    g.setColour(Colours::silver);
+    g.drawRoundedRectangle(irArea.toFloat(), 6.f, 3.f);
+
+}
+
+void IrFFTComponent::resized()
+{
+    // drawing frequency grid behind IR graph
+    using namespace juce;
+    background = Image(Image::PixelFormat::RGB, getWidth(), getHeight(), true);
+
+    Graphics g(background);
+
+    Array<float> freqsDim
+    {
+        20, 30, 40, 50, 60, 70, 80, 90,
+        200, 300, 400, 500, 600, 700, 800, 900,
+        2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000,
+        20000
+    };
+    Array<float> freqsLight{ 100, 1000, 10000 };
+
+    for (auto f : freqsDim)
+    {
+        g.setColour(Colour::fromRGB(60, 60, 60));
+        auto normX = mapFromLog10(f, 20.f, 20000.f);
+        g.drawVerticalLine(getWidth() * normX, 0.f, getHeight());
+    }
+
+    g.setColour(Colour::fromRGB(120, 120, 120));
+    for (auto f : freqsLight)
+    {
+        auto normX = mapFromLog10(f, 20.f, 20000.f);
+        g.drawVerticalLine(getWidth() * normX, 0.f, getHeight());
+    }
+}
+
+juce::Rectangle<int> IrFFTComponent::getRenderArea()
+{
+    auto bounds = getLocalBounds();
+
+    bounds.removeFromTop(0);
+    bounds.removeFromBottom(0);
+    bounds.removeFromLeft(0);
+    bounds.removeFromRight(0);
+
+    return bounds;
+}
+
+
+juce::Rectangle<int> IrFFTComponent::getAnalysisArea()
+{
+    auto bounds = getRenderArea();
+    bounds.removeFromTop(4);
+    bounds.removeFromBottom(4);
+    return bounds;
+}
+
 //==============================================================================
 BasicEQAudioProcessorEditor::BasicEQAudioProcessorEditor(BasicEQAudioProcessor& p) : AudioProcessorEditor(&p), audioProcessor(p),
 peakFreqSlider(*audioProcessor.apvts.getParameter("Peak Freq"), "Hz"),
@@ -471,6 +576,7 @@ highCutSlopeSlider(*audioProcessor.apvts.getParameter("HighCut Slope"), "dB/Oct"
 xPosSlider(*audioProcessor.apvts.getParameter("X Position"), "cm"),
 yPosSlider(*audioProcessor.apvts.getParameter("Y Position"), "cm"),
 responseCurveComponent(audioProcessor),
+irfftComponent(audioProcessor),
 peakFreqSliderAttachment(audioProcessor.apvts, "Peak Freq", peakFreqSlider),
 peakGainSliderAttachment(audioProcessor.apvts, "Peak Gain", peakGainSlider),
 peakQualitySliderAttachment(audioProcessor.apvts, "Peak Q", peakQualitySlider),
@@ -601,6 +707,8 @@ void BasicEQAudioProcessorEditor::resized()
     auto EQArea = bounds.removeFromRight(bounds.getWidth());
     auto lowCutArea = EQArea.removeFromLeft(EQArea.getWidth() * 0.33);
     auto highCutArea = EQArea.removeFromRight(EQArea.getWidth() * 0.5);
+    irfftComponent.setBounds(responseArea);
+    DBG("width " << bounds.getWidth() << " height " << bounds.getHeight());
 
     lowCutBypassButton.setBounds(lowCutArea.removeFromTop(30));
     lowCutFreqSlider.setBounds(lowCutArea.removeFromTop(lowCutArea.getHeight() * 0.66));
@@ -633,6 +741,7 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &lowCutSlopeSlider,
         &highCutSlopeSlider,
         &responseCurveComponent,
+        &irfftComponent,
         &loadBtn,
         &irNameLabel,
         &xPosSlider,
@@ -644,3 +753,4 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &highCutBypassButton
     };
 }
+
