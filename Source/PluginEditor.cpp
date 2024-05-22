@@ -322,6 +322,8 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll(Colours::black);
 
+    g.drawImage(background, getLocalBounds().toFloat());
+
     auto responseArea = getLocalBounds();
 
     auto w = responseArea.getWidth();
@@ -396,11 +398,43 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     g.setColour(Colours::aqua);
     g.strokePath(rightChannelFFTPath, PathStrokeType(1.f));
 
-    g.setColour(Colours::springgreen);
-    g.drawRoundedRectangle(responseArea.toFloat(), 4.f, 1.5f);
+    g.setColour(Colours::silver);
+    g.drawRoundedRectangle(responseArea.toFloat(), 6.f, 3.f);
 
     g.setColour(Colours::white);
     g.strokePath(filterResponseCurve, PathStrokeType(2.f));
+}
+
+void ResponseCurveComponent::resized()
+{
+    using namespace juce;
+    background = Image(Image::PixelFormat::RGB, getWidth(), getHeight(), true);
+
+    Graphics g(background);
+
+    Array<float> freqsDim
+    {
+        20, 30, 40, 50, 60, 70, 80, 90,
+        200, 300, 400, 500, 600, 700, 800, 900,
+        2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000,
+        20000
+    };
+    Array<float> freqsLight{ 100, 1000, 10000 };
+
+    for (auto f : freqsDim)
+    {
+        g.setColour(Colour::fromRGB(60,60,60));
+        auto normX = mapFromLog10(f, 20.f, 20000.f);
+        g.drawVerticalLine(getWidth() * normX, 0.f, getHeight());
+    }
+
+    g.setColour(Colour::fromRGB(120, 120, 120));
+    for (auto f : freqsLight)
+    {
+        auto normX = mapFromLog10(f, 20.f, 20000.f);
+        g.drawVerticalLine(getWidth() * normX, 0.f, getHeight());
+    }
+
 }
 
 juce::Rectangle<int> ResponseCurveComponent::getRenderArea()

@@ -266,6 +266,7 @@ struct ResponseCurveComponent : juce::Component,
     void timerCallback() override;
 
     void paint(juce::Graphics& g) override;
+    void resized() override;
 private:
     BasicEQAudioProcessor& audioProcessor;
     juce::Atomic<bool> parametersChanged{ false };
@@ -273,6 +274,7 @@ private:
 
     void updateChain();
 
+    juce::Image background;
     
     PathProducer leftPathProducer, rightPathProducer;
 
