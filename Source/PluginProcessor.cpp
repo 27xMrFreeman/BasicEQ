@@ -128,6 +128,10 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     irLoader.reset();
     irLoader.prepare(spec);
 
+    /*osc.initialise([](float x) { return std::sin(x); });
+    osc.prepare(spec);
+    osc.setFrequency(50);*/ // oscillator for testing FFT
+
 }
 
 void BasicEQAudioProcessor::releaseResources()
@@ -180,6 +184,11 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     updateFilters();
 
     juce::dsp::AudioBlock<float> block(buffer);
+
+    //buffer.clear(); // for testing FFT with oscillator
+    //juce::dsp::ProcessContextReplacing<float> stereoContext(block);
+    //osc.process(stereoContext);
+
     // input block divided to mono L/R for EQ processing
     auto leftBlock = block.getSingleChannelBlock(0);
     auto rightBlock = block.getSingleChannelBlock(1);
@@ -351,7 +360,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     layout.add(std::make_unique<juce::AudioParameterFloat>("LowCut Freq", "LowCut Freq",
-        juce::NormalisableRange<float>(10.f, 20000.f, 1.f, 0.4f), 0.0f));
+        juce::NormalisableRange<float>(10.f, 20000.f, 1.f, 0.3f), 0.0f));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>("HighCut Freq", "HighCut Freq",
         juce::NormalisableRange<float>(10.f, 20000.f, 1.f, 1.f), 20000.f));

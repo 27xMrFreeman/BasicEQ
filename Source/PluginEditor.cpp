@@ -118,7 +118,8 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
         sliderBounds.getY(),
         sliderBounds.getWidth(),
         sliderBounds.getHeight(),
-        jmap(getValue(), range.getStart(), range.getEnd(), 0.0, 1.0), // converts range of slider to 0->1
+        param->convertTo0to1(getValue()),
+        //jmap(getValue(), range.getStart(), range.getEnd(), 0.0, 1.0), // converts range of slider to 0->1
         startAng,
         endAng,
         *this);
@@ -201,7 +202,9 @@ juce::String RotarySliderWithLabels::getDisplayString() const
 //==============================================================================
 
 
-ResponseCurveComponent::ResponseCurveComponent(BasicEQAudioProcessor& p) : audioProcessor(p), leftChannelFifo(&audioProcessor.leftChannelFifo)
+ResponseCurveComponent::ResponseCurveComponent(BasicEQAudioProcessor& p) : audioProcessor(p), //leftChannelFifo(&audioProcessor.leftChannelFifo)
+leftPathProducer(audioProcessor.leftChannelFifo),
+rightPathProducer(audioProcessor.rightChannelFifo)
 {
     const auto& params = audioProcessor.getParameters();
     for (auto param : params)
@@ -209,7 +212,7 @@ ResponseCurveComponent::ResponseCurveComponent(BasicEQAudioProcessor& p) : audio
         param->addListener(this);
     }
 
-
+    
 
     updateChain();
 
@@ -231,7 +234,7 @@ void ResponseCurveComponent::parameterValueChanged(int parameterIndex, float new
     parametersChanged.set(true);
 }
 
-void ResponseCurveComponent::timerCallback()
+void PathProducer::process(juce::Rectangle<float> fftBounds, double sampleRate)
 {
     juce::AudioBuffer<float> tempIncomingBuffer;
     // if there is a buffer available in the FIFO, send it to FFT data generator
@@ -241,24 +244,56 @@ void ResponseCurveComponent::timerCallback()
         {
             auto size = tempIncomingBuffer.getNumSamples();
             // this shifts stuff in the buffer by how big the sent out buffer is
-            juce::FloatVectorOperations::copy(  monoBuffer.getWritePointer(0, 0),   // where to copy - to the start of the buffer
-                                                monoBuffer.getReadPointer(0, size), // source to copy - starts where the previous buffer block ended
-                                                monoBuffer.getNumSamples() - size); // how many values to copy - all values except the ones in the previous buffer block
+            juce::FloatVectorOperations::copy(monoBuffer.getWritePointer(0, 0),   // where to copy - to the start of the buffer
+                monoBuffer.getReadPointer(0, size), // source to copy - starts where the previous buffer block ended
+                monoBuffer.getNumSamples() - size); // how many values to copy - all values except the ones in the previous buffer block
 
-            juce::FloatVectorOperations::copy(  monoBuffer.getWritePointer(0, monoBuffer.getNumSamples() - size),   // copy to the end of the buffer
-                                                tempIncomingBuffer.getReadPointer(0, 0),                            // copy from start of incoming buffer
-                                                size);                                                              // copy as many values as are in incoming buffer
+            juce::FloatVectorOperations::copy(monoBuffer.getWritePointer(0, monoBuffer.getNumSamples() - size),   // copy to the end of the buffer
+                tempIncomingBuffer.getReadPointer(0, 0),                            // copy from start of incoming buffer
+                size);                                                              // copy as many values as are in incoming buffer
             // block above effectively shifts audio in monoBuffer left by the block size, appending new data from tempIncomingBuffer at the end of monoBuffer //
 
+            leftChannelFFTDataGenerator.produceFFTDataForRendering(monoBuffer, -92.f); // pass monoBuffer to the FFT, negativeInfinity set to -48dB (what level of audio will be the lowest)
         }
     }
+
+    // if there are FFT data buffers to pull, try to pull it and generate path from it
+    // fftBounds is where it should draw the path
+    const auto fftSize = leftChannelFFTDataGenerator.getFFTSize();
+    const auto binWidth = sampleRate / (double)fftSize; // e.g. 48000 / 2048 = 23 Hz - frequency width of one fft bin, casting fftSize to double because sampleRate is double
+
+    while (leftChannelFFTDataGenerator.getNumAvailableFFTDataBlocks() > 0)
+    {
+        std::vector<float> fftData;
+        if (leftChannelFFTDataGenerator.getFFTData(fftData))
+        {
+            pathProducer.generatePath(fftData, fftBounds, fftSize, binWidth, -92.f);
+        }
+    }
+
+    // if there are paths that can be pulled, pull as many as possible, display the most recent one
+    while (pathProducer.getNumPathsAvailable())
+    {
+        pathProducer.getPath(leftChannelFFTPath);
+    }
+}
+
+void ResponseCurveComponent::timerCallback()
+{
+    auto fftBounds = getAnalysisArea().toFloat();
+    auto sampleRate = audioProcessor.getSampleRate();
+
+    leftPathProducer.process(fftBounds, sampleRate);
+    rightPathProducer.process(fftBounds, sampleRate);
 
     if (parametersChanged.compareAndSetBool(false, true))
     {
         updateChain();
         //signal a repaint
-        repaint();
+        //repaint();
     }
+    // need to be repainting all the time, not only when a parameter changes
+    repaint();
 }
 
 void ResponseCurveComponent::updateChain()
@@ -287,6 +322,8 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     using namespace juce;
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll(Colours::black);
+
+    g.drawImage(background, getLocalBounds().toFloat());
 
     auto responseArea = getLocalBounds();
 
@@ -351,11 +388,75 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
         filterResponseCurve.lineTo(responseArea.getX() + i, map(mags[i]));
     }
 
-    g.setColour(Colours::springgreen);
-    g.drawRoundedRectangle(responseArea.toFloat(), 4.f, 1.5f);
+    auto leftChannelFFTPath = leftPathProducer.getPath();
+    auto rightChannelFFTPath = rightPathProducer.getPath();
+
+    leftChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
+    rightChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
+    g.setColour(Colours::yellow);
+    g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));
+
+    g.setColour(Colours::aqua);
+    g.strokePath(rightChannelFFTPath, PathStrokeType(1.f));
+
+    g.setColour(Colours::silver);
+    g.drawRoundedRectangle(responseArea.toFloat(), 6.f, 3.f);
 
     g.setColour(Colours::white);
     g.strokePath(filterResponseCurve, PathStrokeType(2.f));
+}
+
+void ResponseCurveComponent::resized()
+{
+    using namespace juce;
+    background = Image(Image::PixelFormat::RGB, getWidth(), getHeight(), true);
+
+    Graphics g(background);
+
+    Array<float> freqsDim
+    {
+        20, 30, 40, 50, 60, 70, 80, 90,
+        200, 300, 400, 500, 600, 700, 800, 900,
+        2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000,
+        20000
+    };
+    Array<float> freqsLight{ 100, 1000, 10000 };
+
+    for (auto f : freqsDim)
+    {
+        g.setColour(Colour::fromRGB(60,60,60));
+        auto normX = mapFromLog10(f, 20.f, 20000.f);
+        g.drawVerticalLine(getWidth() * normX, 0.f, getHeight());
+    }
+
+    g.setColour(Colour::fromRGB(120, 120, 120));
+    for (auto f : freqsLight)
+    {
+        auto normX = mapFromLog10(f, 20.f, 20000.f);
+        g.drawVerticalLine(getWidth() * normX, 0.f, getHeight());
+    }
+
+}
+
+juce::Rectangle<int> ResponseCurveComponent::getRenderArea()
+{
+    auto bounds = getLocalBounds();
+
+    bounds.removeFromTop(0);
+    bounds.removeFromBottom(0);
+    bounds.removeFromLeft(0);
+    bounds.removeFromRight(0);
+
+    return bounds;
+}
+
+
+juce::Rectangle<int> ResponseCurveComponent::getAnalysisArea()
+{
+    auto bounds = getRenderArea();
+    bounds.removeFromTop(4);
+    bounds.removeFromBottom(4);
+    return bounds;
 }
 
 //==============================================================================
