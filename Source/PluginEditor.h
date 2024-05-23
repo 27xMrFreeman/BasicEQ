@@ -331,6 +331,9 @@ private:
     // access the processor object that created it.
     BasicEQAudioProcessor& audioProcessor;
 
+    // background image
+    juce::Image backgroundImage;
+
     // IR loader GUI:
     juce::TextButton loadBtn;
     std::unique_ptr<juce::FileChooser> fileChooser;

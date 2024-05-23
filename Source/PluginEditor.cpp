@@ -15,11 +15,11 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
 
     auto bounds = Rectangle<float>(x, y, width, height);
 
-    g.setColour(Colour(72u, 30u, 20u));
+    /*g.setColour(Colour(72u, 30u, 20u));
     g.fillEllipse(bounds);
 
     g.setColour(Colour(242u, 97u, 63u));
-    g.drawEllipse(bounds, 1.5);
+    g.drawEllipse(bounds, 1.5);*/
 
     if( auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider))
     {
@@ -41,7 +41,15 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
 
         p.applyTransform(AffineTransform().rotated(sliderAngRad, center.getX(), center.getY())); // transform rotates path by sliderAngRad with x and y of pivot point
 
-        g.fillPath(p);
+        //g.fillPath(p);
+
+        // TRYING TO PUT IMAGE HERE
+        
+
+
+        // TRYING TO PUT IMAGE HERE
+
+
 
         g.setFont(rswl->getTextHeight());                           // sets basic font with set height
         auto text = rswl->getDisplayString();                       // gets text to put in
@@ -755,7 +763,9 @@ void BasicEQAudioProcessorEditor::paint (juce::Graphics& g)
 {
     using namespace juce;
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (Colours::black);
+    //g.fillAll (Colours::black);
+    backgroundImage = ImageCache::getFromMemory(BinaryData::darkbrushedmetaltexturesteelblackstockphotoscratchwallpaper_png, BinaryData::darkbrushedmetaltexturesteelblackstockphotoscratchwallpaper_pngSize);
+    g.drawImage(backgroundImage, getLocalBounds().toFloat(), RectanglePlacement::stretchToFit);
 }
 
 void BasicEQAudioProcessorEditor::resized()

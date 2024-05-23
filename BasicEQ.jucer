@@ -3,6 +3,13 @@
 <JUCERPROJECT id="ch0Qbp" name="BasicEQ" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="mAuQQK" name="BasicEQ">
+    <GROUP id="{F640BCEA-ABE8-5245-9F88-90E07B1587F1}" name="Assets">
+      <FILE id="tW9MXV" name="dark-brushed-metal-texture-steel-black-stock-photo-scratch-wallpaper.png"
+            compile="0" resource="1" file="Assets/dark-brushed-metal-texture-steel-black-stock-photo-scratch-wallpaper.png"/>
+      <FILE id="lKAyVB" name="knob_blue.png" compile="0" resource="1" file="Assets/knob_blue.png"/>
+      <FILE id="hCSYUp" name="knob_green.png" compile="0" resource="1" file="Assets/knob_green.png"/>
+      <FILE id="P8IkrX" name="knob_red.png" compile="0" resource="1" file="Assets/knob_red.png"/>
+    </GROUP>
     <GROUP id="{738C76C2-F9DF-054B-1271-C9222DBDB02E}" name="Source">
       <FILE id="NxhyJ6" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
@@ -14,6 +21,7 @@
     </GROUP>
   </MAINGROUP>
   <MODULES>
+    <MODULE id="foleys_gui_magic" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
@@ -22,6 +30,7 @@
     <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_cryptography" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
@@ -50,6 +59,8 @@
         <MODULEPATH id="juce_gui_basics" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_dsp" path="../../../JUCE/modules"/>
+        <MODULEPATH id="foleys_gui_magic" path="modules/foleys_gui_magic/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../JUCE/modules"/>
       </MODULEPATHS>
     </VS2022>
   </EXPORTFORMATS>
