@@ -231,12 +231,13 @@ struct PathProducer
 
     juce::Path leftChannelFFTPath;
 
+    FFTDataGenerator<std::vector<float>> leftChannelFFTDataGenerator;
+
 private:
     SingleChannelSampleFifo<BasicEQAudioProcessor::BlockType>* leftChannelFifo;
 
     juce::AudioBuffer<float> monoBuffer;
 
-    FFTDataGenerator<std::vector<float>> leftChannelFFTDataGenerator;
 
     
 

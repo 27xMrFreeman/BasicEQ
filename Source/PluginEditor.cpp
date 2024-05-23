@@ -505,33 +505,30 @@ void IrFFTComponent::loadedIRChanged(juce::File newIR)
 
     auto fileSampleRate = reader->sampleRate;
     auto lengthInSamples = reader->lengthInSamples;
-    
-    // THIS SHOULD WORK FOR STEREO
+    auto fftBounds = getAnalysisArea().toFloat();
+    const auto fftSize = leftPathProducer.leftChannelFFTDataGenerator.getFFTSize();
+    const auto binWidth = fileSampleRate / (double)fftSize; // e.g. 48000 / 2048 = 23 Hz - frequency width of one fft bin, casting fftSize to double because sampleRate is double
+
+    // 
     //juce::AudioBuffer<float> audioBuffer(reader->numChannels, lengthInSamples);
     //reader->read(&audioBuffer, 0, 8192, 0, true, true); // reader should return zeros if the file it reads is shorter than 4096 samples, this size must be 2 * FFT size
     
     // THIS IS FOR LEFT CH ONLY
-    juce::AudioBuffer<float> audioBuffer(1, lengthInSamples);
-    reader->read(&audioBuffer, 0, 8192, 0, true, false);
+    juce::AudioBuffer<float> audioBuffer(1, fftSize); // allocate buffer for 1 channel with how many samples are needed for FFT
+    reader->read(&audioBuffer, 0, fftSize, 0, true, false);
     
     //fft.performFrequencyOnlyForwardTransform(audioBuffer.getWritePointer(Channel::Left), false);
 
-    auto fftBounds = getAnalysisArea().toFloat();
-    
-    FFTDataGenerator<std::vector<float>> leftChannelFFTDataGenerator;
-    FFTDataGenerator<std::vector<float>> rightChannelFFTDataGenerator;
-
-    leftChannelFFTDataGenerator.produceFFTDataForRendering(audioBuffer, -48.f);
+    leftPathProducer.leftChannelFFTDataGenerator.produceFFTDataForRendering(audioBuffer, -92.f);
 
     // if there are FFT data buffers to pull, try to pull it and generate path from it
     // fftBounds is where it should draw the path
-    const auto fftSize = leftChannelFFTDataGenerator.getFFTSize();
-    const auto binWidth = fileSampleRate / (double)fftSize; // e.g. 48000 / 2048 = 23 Hz - frequency width of one fft bin, casting fftSize to double because sampleRate is double
+    
 
-    while (leftChannelFFTDataGenerator.getNumAvailableFFTDataBlocks() > 0)
+    while (leftPathProducer.leftChannelFFTDataGenerator.getNumAvailableFFTDataBlocks() > 0)
     {
         std::vector<float> fftData;
-        if (leftChannelFFTDataGenerator.getFFTData(fftData))
+        if (leftPathProducer.leftChannelFFTDataGenerator.getFFTData(fftData))
         {
             leftPathProducer.pathProducer.generatePath(fftData, fftBounds, fftSize, binWidth, -92.f);
         }
