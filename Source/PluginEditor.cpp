@@ -44,25 +44,45 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
         //g.fillPath(p);
 
         // TRYING TO PUT IMAGE HERE
+        juce::Image knobRed = ImageCache::getFromMemory(BinaryData::knob_red_png, BinaryData::knob_red_pngSize);
+        juce::Image knobRedRescaled = knobRed.rescaled(bounds.getWidth() / knobRed.getWidth() * knobRed.getWidth(), bounds.getHeight() / knobRed.getHeight() * knobRed.getHeight(), Graphics::highResamplingQuality);
         
-
+        AffineTransform rotator;
+        //if (!slider.isMouseOverOrDragging())
+        //{
+        //    g.drawImage(knobRed, bounds, RectanglePlacement::stretchToFit, false);
+        //}
+        //else
+        //{
+        //    //g.drawImage(knobRed, x, y, width, height, 0, 0, width, height, false);
+        //    g.drawImage(knobRed, bounds, RectanglePlacement::stretchToFit, false);
+        //}
+        //g.drawImageTransformed(knobRed, x, y, width, height, rotator.rotated((float)sliderPosProportional * rotaryEndAngle, (float)(knobRed.getWidth() / 2), (float)(knobRed.getHeight() / 2)), false);
+        g.drawImage(knobRedRescaled, bounds, RectanglePlacement::stretchToFit, false);
+        int origX = g.getClipBounds().getX();
+        int origY = g.getClipBounds().getY();
+        g.drawImageTransformed(knobRedRescaled, rotator.rotated(sliderAngRad, knobRedRescaled.getWidth() / 2, knobRedRescaled.getHeight() / 2).translated(bounds.getX()-origX, bounds.getY()-origY));
+        
 
         // TRYING TO PUT IMAGE HERE
 
 
+        if (slider.isMouseOverOrDragging())
+        {
+            g.setFont(rswl->getTextHeight());                           // sets basic font with set height
+            auto text = rswl->getDisplayString();                       // gets text to put in
+            auto strWidth = g.getCurrentFont().getStringWidth(text);    // gets width of text
 
-        g.setFont(rswl->getTextHeight());                           // sets basic font with set height
-        auto text = rswl->getDisplayString();                       // gets text to put in
-        auto strWidth = g.getCurrentFont().getStringWidth(text);    // gets width of text
+            r.setSize(strWidth + 4, rswl->getTextHeight() + 2);         // rectangle r is little bigger than the text
+            r.setCentre(bounds.getCentre());                            // set centre of the rectangle to centre of bounds (slider)
 
-        r.setSize(strWidth + 4, rswl->getTextHeight() + 2);         // rectangle r is little bigger than the text
-        r.setCentre(bounds.getCentre());                            // set centre of the rectangle to centre of bounds (slider)
+            g.setColour(Colours::black);
+            g.fillRect(r);
 
-        g.setColour(Colours::black);
-        g.fillRect(r);
-
-        g.setColour(Colours::white);
-        g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
+            g.setColour(Colours::white);
+            g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
+        }
+        
 
     }
 
@@ -116,10 +136,10 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
 
     auto sliderBounds = getSliderBounds();
 
-    /*g.setColour(Colours::red);
+    g.setColour(Colours::red);
     g.drawRect(getLocalBounds());
     g.setColour(Colours::azure);
-    g.drawRect(sliderBounds);*/         // bounding boxes of sliders for debugging purposes
+    g.drawRect(sliderBounds);         // bounding boxes of sliders for debugging purposes
 
     getLookAndFeel().drawRotarySlider(g,
         sliderBounds.getX(),
@@ -487,12 +507,6 @@ IrFFTComponent::~IrFFTComponent()
     }*/
 }
 
-//void IrFFTComponent::parameterValueChanged(int parameterIndex, float newValue)
-//{
-//    parametersChanged.set(true);
-//}
-//
-//void IrFFTComponent::parameterGestureChanged(int parameterIndex, bool gestureIsStarting) {};
 
 // when we change the IR in onChange lambdas of UI elements, we need to:
 // call this function
@@ -795,6 +809,7 @@ void BasicEQAudioProcessorEditor::resized()
 
     bounds.removeFromTop(5);
     auto EQArea = bounds.removeFromRight(bounds.getWidth());
+    EQArea.reduce(EQArea.getWidth() * 0.05, 0);
     auto lowCutArea = EQArea.removeFromLeft(EQArea.getWidth() * 0.33);
     auto highCutArea = EQArea.removeFromRight(EQArea.getWidth() * 0.5);
     irfftComponent.setBounds(responseArea);
