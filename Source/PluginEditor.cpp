@@ -15,11 +15,11 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
 
     auto bounds = Rectangle<float>(x, y, width, height);
 
-    g.setColour(Colour(97u, 18u, 167u));
+    g.setColour(Colour(72u, 30u, 20u));
     g.fillEllipse(bounds);
 
-    g.setColour(Colour(255u, 255u, 255u));
-    g.drawEllipse(bounds, 1.f);
+    g.setColour(Colour(242u, 97u, 63u));
+    g.drawEllipse(bounds, 1.5);
 
     if( auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider))
     {
@@ -391,10 +391,10 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
 
     leftChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
     rightChannelFFTPath.applyTransform(AffineTransform().translation(responseArea.getX(), responseArea.getY()));
-    g.setColour(Colours::yellow);
+    g.setColour(Colours::lawngreen);
     g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));
 
-    g.setColour(Colours::aqua);
+    g.setColour(Colours::orangered);
     g.strokePath(rightChannelFFTPath, PathStrokeType(1.f));
 
     g.setColour(Colours::silver);
@@ -503,6 +503,8 @@ void IrFFTComponent::loadedIRChanged(juce::File newIR)
     std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(newIR));
     if (reader.get() == nullptr) { DBG("loadedIRChanged: nullptr in reader"); }
 
+    leftPathProducer.leftChannelFFTDataGenerator.changeOrder(FFTOrder::order16384);
+
     auto fileSampleRate = reader->sampleRate;
     auto lengthInSamples = reader->lengthInSamples;
     auto fftBounds = getAnalysisArea().toFloat();
@@ -519,7 +521,7 @@ void IrFFTComponent::loadedIRChanged(juce::File newIR)
     
     //fft.performFrequencyOnlyForwardTransform(audioBuffer.getWritePointer(Channel::Left), false);
 
-    leftPathProducer.leftChannelFFTDataGenerator.produceFFTDataForRendering(audioBuffer, -92.f);
+    leftPathProducer.leftChannelFFTDataGenerator.produceFFTDataForRendering(audioBuffer, - 130.f);
 
     // if there are FFT data buffers to pull, try to pull it and generate path from it
     // fftBounds is where it should draw the path
@@ -530,7 +532,7 @@ void IrFFTComponent::loadedIRChanged(juce::File newIR)
         std::vector<float> fftData;
         if (leftPathProducer.leftChannelFFTDataGenerator.getFFTData(fftData))
         {
-            leftPathProducer.pathProducer.generatePath(fftData, fftBounds, fftSize, binWidth, -92.f);
+            leftPathProducer.pathProducer.generatePath(fftData, fftBounds, fftSize, binWidth, - 90.f);
         }
     }
 
@@ -542,17 +544,6 @@ void IrFFTComponent::loadedIRChanged(juce::File newIR)
 
     repaint();
 }
-
-//void IrFFTComponent::timerCallback()
-//{
-//    auto fftBounds = getLocalBounds().toFloat();
-//    auto sampleRate = audioProcessor.getSampleRate();
-//
-//    if (parametersChanged.compareAndSetBool(false, true))
-//    {
-//        repaint();
-//    }
-//}
 
 void IrFFTComponent::paint(juce::Graphics& g)
 {
@@ -568,15 +559,15 @@ void IrFFTComponent::paint(juce::Graphics& g)
 
     // here we need to paint the path from FFT values
     auto leftChannelFFTPath = leftPathProducer.getPath();
-    auto rightChannelFFTPath = rightPathProducer.getPath();
+    //auto rightChannelFFTPath = rightPathProducer.getPath();
 
-    leftChannelFFTPath.applyTransform(AffineTransform().translation(irArea.getX(), irArea.getY()));
-    rightChannelFFTPath.applyTransform(AffineTransform().translation(irArea.getX(), irArea.getY()));
-    g.setColour(Colours::yellow);
+    leftChannelFFTPath.applyTransform(AffineTransform().translation(irArea.getX(), irArea.getY()-80));
+    //rightChannelFFTPath.applyTransform(AffineTransform().translation(irArea.getX(), irArea.getY()));
+    g.setColour(Colours::white);
     g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));
 
-    g.setColour(Colours::aqua);
-    g.strokePath(rightChannelFFTPath, PathStrokeType(1.f));
+    //g.setColour(Colours::aqua);
+    //g.strokePath(rightChannelFFTPath, PathStrokeType(1.f));
 }
 
 void IrFFTComponent::resized()
