@@ -58,7 +58,7 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
         //    g.drawImage(knobRed, bounds, RectanglePlacement::stretchToFit, false);
         //}
         //g.drawImageTransformed(knobRed, x, y, width, height, rotator.rotated((float)sliderPosProportional * rotaryEndAngle, (float)(knobRed.getWidth() / 2), (float)(knobRed.getHeight() / 2)), false);
-        g.drawImage(knobRedRescaled, bounds, RectanglePlacement::stretchToFit, false);
+        //g.drawImage(knobRedRescaled, bounds, RectanglePlacement::stretchToFit, false);
         int origX = g.getClipBounds().getX();
         int origY = g.getClipBounds().getY();
         g.drawImageTransformed(knobRedRescaled, rotator.rotated(sliderAngRad, knobRedRescaled.getWidth() / 2, knobRedRescaled.getHeight() / 2).translated(bounds.getX()-origX, bounds.getY()-origY));
@@ -123,6 +123,157 @@ void LookAndFeel::drawToggleButton(juce::Graphics& g,
 
 }
 
+void LookAndFeelBlue::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPosProportional, float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider)
+{
+    using namespace juce;
+
+    auto bounds = Rectangle<float>(x, y, width, height);
+
+    /*g.setColour(Colour(72u, 30u, 20u));
+    g.fillEllipse(bounds);
+
+    g.setColour(Colour(242u, 97u, 63u));
+    g.drawEllipse(bounds, 1.5);*/
+
+    if (auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider))
+    {
+        auto center = bounds.getCentre();
+        //whatever we want to rotate needs to be in a path
+        Path p;
+
+        Rectangle<float> r;
+        r.setLeft(center.getX() - 2);   // left side of rectangle 2 pixels left of center
+        r.setRight(center.getX() + 2);  // right side of rectangle 2 pixels right of center
+        r.setTop(bounds.getY());        // top of rectangle = top of bounds
+        r.setBottom(center.getY() - rswl->getTextHeight() * 1.5);     // bottom of rectangle = text height above center
+
+        p.addRoundedRectangle(r, 2.f);
+
+        jassert(rotaryStartAngle < rotaryEndAngle); // check if start angle is smaller than end angle
+
+        auto sliderAngRad = jmap(sliderPosProportional, 0.f, 1.f, rotaryStartAngle, rotaryEndAngle); // mapping normalised slider value to angles
+
+        p.applyTransform(AffineTransform().rotated(sliderAngRad, center.getX(), center.getY())); // transform rotates path by sliderAngRad with x and y of pivot point
+
+        //g.fillPath(p);
+
+        // TRYING TO PUT IMAGE HERE
+        juce::Image knobRed = ImageCache::getFromMemory(BinaryData::knob_blue_png, BinaryData::knob_blue_pngSize);
+        juce::Image knobRedRescaled = knobRed.rescaled(bounds.getWidth() / knobRed.getWidth() * knobRed.getWidth(), bounds.getHeight() / knobRed.getHeight() * knobRed.getHeight(), Graphics::highResamplingQuality);
+
+        AffineTransform rotator;
+        //if (!slider.isMouseOverOrDragging())
+        //{
+        //    g.drawImage(knobRed, bounds, RectanglePlacement::stretchToFit, false);
+        //}
+        //else
+        //{
+        //    //g.drawImage(knobRed, x, y, width, height, 0, 0, width, height, false);
+        //    g.drawImage(knobRed, bounds, RectanglePlacement::stretchToFit, false);
+        //}
+        //g.drawImageTransformed(knobRed, x, y, width, height, rotator.rotated((float)sliderPosProportional * rotaryEndAngle, (float)(knobRed.getWidth() / 2), (float)(knobRed.getHeight() / 2)), false);
+        //g.drawImage(knobRedRescaled, bounds, RectanglePlacement::stretchToFit, false);
+        int origX = g.getClipBounds().getX();
+        int origY = g.getClipBounds().getY();
+        g.drawImageTransformed(knobRedRescaled, rotator.rotated(sliderAngRad, knobRedRescaled.getWidth() / 2, knobRedRescaled.getHeight() / 2).translated(bounds.getX() - origX, bounds.getY() - origY));
+
+
+        // TRYING TO PUT IMAGE HERE
+
+
+        if (slider.isMouseOverOrDragging())
+        {
+            g.setFont(rswl->getTextHeight());                           // sets basic font with set height
+            auto text = rswl->getDisplayString();                       // gets text to put in
+            auto strWidth = g.getCurrentFont().getStringWidth(text);    // gets width of text
+
+            r.setSize(strWidth + 4, rswl->getTextHeight() + 2);         // rectangle r is little bigger than the text
+            r.setCentre(bounds.getCentre());                            // set centre of the rectangle to centre of bounds (slider)
+
+            g.setColour(Colours::black);
+            g.fillRect(r);
+
+            g.setColour(Colours::white);
+            g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
+        }
+    }
+}
+
+void LookAndFeelGreen::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPosProportional, float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider)
+{
+    using namespace juce;
+
+    auto bounds = Rectangle<float>(x, y, width, height);
+
+    /*g.setColour(Colour(72u, 30u, 20u));
+    g.fillEllipse(bounds);
+
+    g.setColour(Colour(242u, 97u, 63u));
+    g.drawEllipse(bounds, 1.5);*/
+
+    if (auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider))
+    {
+        auto center = bounds.getCentre();
+        //whatever we want to rotate needs to be in a path
+        Path p;
+
+        Rectangle<float> r;
+        r.setLeft(center.getX() - 2);   // left side of rectangle 2 pixels left of center
+        r.setRight(center.getX() + 2);  // right side of rectangle 2 pixels right of center
+        r.setTop(bounds.getY());        // top of rectangle = top of bounds
+        r.setBottom(center.getY() - rswl->getTextHeight() * 1.5);     // bottom of rectangle = text height above center
+
+        p.addRoundedRectangle(r, 2.f);
+
+        jassert(rotaryStartAngle < rotaryEndAngle); // check if start angle is smaller than end angle
+
+        auto sliderAngRad = jmap(sliderPosProportional, 0.f, 1.f, rotaryStartAngle, rotaryEndAngle); // mapping normalised slider value to angles
+
+        p.applyTransform(AffineTransform().rotated(sliderAngRad, center.getX(), center.getY())); // transform rotates path by sliderAngRad with x and y of pivot point
+
+        //g.fillPath(p);
+
+        // TRYING TO PUT IMAGE HERE
+        juce::Image knobRed = ImageCache::getFromMemory(BinaryData::knob_green_png, BinaryData::knob_green_pngSize);
+        juce::Image knobRedRescaled = knobRed.rescaled(bounds.getWidth() / knobRed.getWidth() * knobRed.getWidth(), bounds.getHeight() / knobRed.getHeight() * knobRed.getHeight(), Graphics::highResamplingQuality);
+
+        AffineTransform rotator;
+        //if (!slider.isMouseOverOrDragging())
+        //{
+        //    g.drawImage(knobRed, bounds, RectanglePlacement::stretchToFit, false);
+        //}
+        //else
+        //{
+        //    //g.drawImage(knobRed, x, y, width, height, 0, 0, width, height, false);
+        //    g.drawImage(knobRed, bounds, RectanglePlacement::stretchToFit, false);
+        //}
+        //g.drawImageTransformed(knobRed, x, y, width, height, rotator.rotated((float)sliderPosProportional * rotaryEndAngle, (float)(knobRed.getWidth() / 2), (float)(knobRed.getHeight() / 2)), false);
+        //g.drawImage(knobRedRescaled, bounds, RectanglePlacement::stretchToFit, false);
+        int origX = g.getClipBounds().getX();
+        int origY = g.getClipBounds().getY();
+        g.drawImageTransformed(knobRedRescaled, rotator.rotated(sliderAngRad, knobRedRescaled.getWidth() / 2, knobRedRescaled.getHeight() / 2).translated(bounds.getX() - origX, bounds.getY() - origY));
+
+
+        // TRYING TO PUT IMAGE HERE
+
+
+        if (slider.isMouseOverOrDragging())
+        {
+            g.setFont(rswl->getTextHeight());                           // sets basic font with set height
+            auto text = rswl->getDisplayString();                       // gets text to put in
+            auto strWidth = g.getCurrentFont().getStringWidth(text);    // gets width of text
+
+            r.setSize(strWidth + 4, rswl->getTextHeight() + 2);         // rectangle r is little bigger than the text
+            r.setCentre(bounds.getCentre());                            // set centre of the rectangle to centre of bounds (slider)
+
+            g.setColour(Colours::black);
+            g.fillRect(r);
+
+            g.setColour(Colours::white);
+            g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
+        }
+    }
+}
 //==============================================================================
 
 void RotarySliderWithLabels::paint(juce::Graphics& g)
@@ -400,7 +551,7 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
 
     Path filterResponseCurve;
 
-    const double outputMin = responseArea.getBottom();
+    const double outputMin = responseArea.getBottom()-10;
     const double outputMax = responseArea.getY();
     auto map = [outputMin, outputMax](double input)
         {
@@ -425,11 +576,11 @@ void ResponseCurveComponent::paint(juce::Graphics& g)
     g.setColour(Colours::orangered);
     g.strokePath(rightChannelFFTPath, PathStrokeType(1.f));
 
-    g.setColour(Colours::silver);
-    g.drawRoundedRectangle(responseArea.toFloat(), 6.f, 3.f);
-
     g.setColour(Colours::white);
     g.strokePath(filterResponseCurve, PathStrokeType(2.f));
+    
+    g.setColour(Colours::silver);
+    g.drawRoundedRectangle(responseArea.toFloat(), 6.f, 5.f);
 }
 
 void ResponseCurveComponent::resized()
@@ -523,7 +674,7 @@ void IrFFTComponent::loadedIRChanged(juce::File newIR)
     if (!newIR.existsAsFile())  { DBG("loadedIRChanged: loaded file is not a file"); }
 
     std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(newIR));
-    if (reader.get() == nullptr) { DBG("loadedIRChanged: nullptr in reader"); }
+    if (reader.get() == nullptr) { DBG("loadedIRChanged: nullptr in reader"); return; }
 
     leftPathProducer.leftChannelFFTDataGenerator.changeOrder(FFTOrder::order16384);
 
@@ -576,8 +727,7 @@ void IrFFTComponent::paint(juce::Graphics& g)
 
     auto irArea = getLocalBounds();
 
-    g.setColour(Colours::silver);
-    g.drawRoundedRectangle(irArea.toFloat(), 6.f, 3.f);
+   
 
     // here we need to paint the path from FFT values
     auto leftChannelFFTPath = leftPathProducer.getPath();
@@ -587,6 +737,9 @@ void IrFFTComponent::paint(juce::Graphics& g)
     //rightChannelFFTPath.applyTransform(AffineTransform().translation(irArea.getX(), irArea.getY()));
     g.setColour(Colours::white);
     g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));
+
+    g.setColour(Colours::silver);
+    g.drawRoundedRectangle(irArea.toFloat(), 6.f, 5.f);
 
     //g.setColour(Colours::aqua);
     //g.strokePath(rightChannelFFTPath, PathStrokeType(1.f));
@@ -702,6 +855,13 @@ peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButt
     lowCutBypassButton.setLookAndFeel(&lnf);
     highCutBypassButton.setLookAndFeel(&lnf);
     peakBypassButton.setLookAndFeel(&lnf);
+    lowCutFreqSlider.setLookAndFeel(&lnfb);
+    lowCutSlopeSlider.setLookAndFeel(&lnfb);
+    highCutFreqSlider.setLookAndFeel(&lnf);
+    highCutSlopeSlider.setLookAndFeel(&lnf);
+    peakFreqSlider.setLookAndFeel(&lnfg);
+    peakGainSlider.setLookAndFeel(&lnfg);
+    peakQualitySlider.setLookAndFeel(&lnfg);
 
     comboTypeBox.addItem("Mar", 1);
     comboTypeBox.addItem("MM", 2);
@@ -750,6 +910,7 @@ peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButt
                 {
                     // save chosen file
                     juce::File result(chooser.getResult());
+                    if (!result.existsAsFile()) { DBG("pressed cancel"); return; }
                     audioProcessor.savedFile = result;
                     audioProcessor.root = result.getParentDirectory().getFullPathName();    // set root directory to where the file was selected from
                     irNameLabel.setText( result.getFileNameWithoutExtension(), juce::dontSendNotification );
@@ -770,6 +931,13 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
     lowCutBypassButton.setLookAndFeel(nullptr);
     highCutBypassButton.setLookAndFeel(nullptr);
     peakBypassButton.setLookAndFeel(nullptr);
+    lowCutFreqSlider.setLookAndFeel(nullptr);
+    lowCutSlopeSlider.setLookAndFeel(nullptr);
+    highCutFreqSlider.setLookAndFeel(nullptr);
+    highCutSlopeSlider.setLookAndFeel(nullptr);
+    peakFreqSlider.setLookAndFeel(nullptr);
+    peakGainSlider.setLookAndFeel(nullptr);
+    peakQualitySlider.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -789,10 +957,14 @@ void BasicEQAudioProcessorEditor::resized()
 
     auto bounds = getLocalBounds();
     auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.33);
-    responseCurveComponent.setBounds(responseArea.removeFromRight(bounds.getWidth()*0.5));
+
+    auto responseCurveComponentBounds = responseArea.removeFromRight(responseArea.getWidth() * 0.5);
+    responseCurveComponent.setBounds(responseCurveComponentBounds.reduced(responseCurveComponentBounds.getWidth()*0.05, 0).removeFromBottom(responseCurveComponentBounds.getHeight()*0.95));
 
     auto IRArea = bounds.removeFromLeft(bounds.getWidth() * 0.5);
-    auto IRSlidersArea = IRArea.removeFromBottom(IRArea.getHeight() * 0.5);
+    auto IRSlidersArea = IRArea.removeFromBottom(IRArea.getHeight() * 0.7);
+    IRSlidersArea.reduce(IRSlidersArea.getWidth()*0.05, 0);
+    IRSlidersArea.removeFromBottom(IRSlidersArea.getHeight() * 0.4);
     xPosSlider.setBounds(IRSlidersArea.removeFromRight(IRSlidersArea.getWidth() * 0.5));
     yPosSlider.setBounds(IRSlidersArea);
 
@@ -801,34 +973,44 @@ void BasicEQAudioProcessorEditor::resized()
     comboBoxArea = comboBoxArea.removeFromLeft(comboBoxArea.getWidth() * 0.5);
     comboBoxArea = comboBoxArea.removeFromLeft(comboBoxArea.getWidth() * 0.75);
     comboBoxArea = comboBoxArea.removeFromRight(comboBoxArea.getWidth() * 0.67);
+    comboBoxArea.reduce(0, comboBoxArea.getHeight() * 0.35);
+    comboTypeBox.setBounds(comboBoxArea);
+
     mikBoxArea = mikBoxArea.removeFromRight(mikBoxArea.getWidth() * 0.5);
     mikBoxArea = mikBoxArea.removeFromRight(mikBoxArea.getWidth() * 0.75);
     mikBoxArea = mikBoxArea.removeFromLeft(mikBoxArea.getWidth() * 0.67);
-    comboTypeBox.setBounds(comboBoxArea.removeFromTop(comboBoxArea.getHeight() * 0.66).removeFromBottom(comboBoxArea.getHeight()*0.5));
-    mikTypeBox.setBounds(mikBoxArea.removeFromTop(mikBoxArea.getHeight() * 0.66).removeFromBottom(mikBoxArea.getHeight() * 0.5));
+    mikBoxArea.reduce(0, mikBoxArea.getHeight() * 0.35);
+    mikTypeBox.setBounds(mikBoxArea);
 
-    bounds.removeFromTop(5);
+    auto IrFFTComponentBounds = responseArea;
+    irfftComponent.setBounds(IrFFTComponentBounds.reduced(IrFFTComponentBounds.getWidth() * 0.05, 0).removeFromBottom(IrFFTComponentBounds.getHeight() * 0.95));
+
+    //bounds.removeFromTop(5);
     auto EQArea = bounds.removeFromRight(bounds.getWidth());
     EQArea.reduce(EQArea.getWidth() * 0.05, 0);
+    EQArea.removeFromBottom(EQArea.getHeight() * 0.279);
+    EQArea.removeFromTop(EQArea.getHeight() * 0.05);
     auto lowCutArea = EQArea.removeFromLeft(EQArea.getWidth() * 0.33);
     auto highCutArea = EQArea.removeFromRight(EQArea.getWidth() * 0.5);
-    irfftComponent.setBounds(responseArea);
 
     lowCutBypassButton.setBounds(lowCutArea.removeFromTop(30));
+    lowCutArea.removeFromTop(lowCutArea.getHeight() * 0.02);
     lowCutFreqSlider.setBounds(lowCutArea.removeFromTop(lowCutArea.getHeight() * 0.66));
     lowCutSlopeSlider.setBounds(lowCutArea);
 
     highCutBypassButton.setBounds(highCutArea.removeFromTop(30));
+    highCutArea.removeFromTop(highCutArea.getHeight() * 0.02);
     highCutFreqSlider.setBounds(highCutArea.removeFromTop(highCutArea.getHeight() * 0.66 ));
     highCutSlopeSlider.setBounds(highCutArea);
 
     peakBypassButton.setBounds(EQArea.removeFromTop(30));
+    EQArea.removeFromTop(EQArea.getHeight() * 0.02);
     peakFreqSlider.setBounds(EQArea.removeFromTop(EQArea.getHeight() * 0.33));
     peakGainSlider.setBounds(EQArea.removeFromTop(EQArea.getHeight() * 0.5));
     peakQualitySlider.setBounds(EQArea);
 
     auto loadBtnArea = IRArea;
-    loadBtn.setBounds(loadBtnArea.removeFromLeft(loadBtnArea.getWidth()*0.6).removeFromRight(loadBtnArea.getWidth()*0.5).removeFromBottom(loadBtnArea.getHeight()*0.8).removeFromTop(loadBtnArea.getHeight()*0.2));
+    loadBtn.setBounds(loadBtnArea.removeFromLeft(loadBtnArea.getWidth()*0.6).removeFromRight(loadBtnArea.getWidth()*0.5).removeFromBottom(loadBtnArea.getHeight()*0.9).removeFromTop(loadBtnArea.getHeight()*0.3));
     irNameLabel.setBounds(loadBtnArea);
 
 }

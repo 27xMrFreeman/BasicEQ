@@ -181,6 +181,26 @@ struct LookAndFeel : juce::LookAndFeel_V4
                             bool shouldDrawButtonAsDown) override;
 };
 
+struct LookAndFeelBlue : juce::LookAndFeel_V4
+{
+    void drawRotarySlider(juce::Graphics&,
+        int x, int y, int width, int height,
+        float sliderPosProportional,
+        float rotaryStartAngle,
+        float rotaryEndAngle,
+        juce::Slider&) override;
+};
+
+struct LookAndFeelGreen : juce::LookAndFeel_V4
+{
+    void drawRotarySlider(juce::Graphics&,
+        int x, int y, int width, int height,
+        float sliderPosProportional,
+        float rotaryStartAngle,
+        float rotaryEndAngle,
+        juce::Slider&) override;
+};
+
 struct RotarySliderWithLabels : juce::Slider
 {
     RotarySliderWithLabels(juce::RangedAudioParameter& rap, const juce::String& unitSuffix) : 
@@ -189,7 +209,7 @@ struct RotarySliderWithLabels : juce::Slider
         param(&rap),
         suffix(unitSuffix)
     {
-        setLookAndFeel(&lnf); // set lnf as the look and feel object
+        //setLookAndFeel(&lnf); // set lnf as the look and feel object
     }
 
     ~RotarySliderWithLabels()
@@ -211,6 +231,8 @@ struct RotarySliderWithLabels : juce::Slider
     juce::String getDisplayString() const;
 private:
     LookAndFeel lnf;
+    LookAndFeelBlue lnfb;
+    LookAndFeelGreen lnfg;
 
     juce::RangedAudioParameter* param;
     juce::String suffix;
@@ -378,6 +400,8 @@ private:
     std::vector<juce::Component*> getComps();
 
     LookAndFeel lnf;
+    LookAndFeelBlue lnfb;
+    LookAndFeelGreen lnfg;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BasicEQAudioProcessorEditor)
 };
