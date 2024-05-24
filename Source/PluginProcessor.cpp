@@ -421,7 +421,10 @@ void BasicEQAudioProcessor::loadShippedImpulseResponses()
     DBG(impulseResponseArray[0][0].size());
     DBG(impulseResponseArray[0][0][0].size());*/
 
-    for (juce::DirectoryEntry entry : juce::RangedDirectoryIterator(juce::File("C:/Users/knize/Documents/VST_CODE/BasicEQ/Data"), true, "*.wav", 2)) {
+    //DBG(juce::File::getSpecialLocation(juce::File::currentExecutableFile).getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getChildFile("Data").getFullPathName());
+    juce::File dataFolder = juce::File::getSpecialLocation(juce::File::currentExecutableFile).getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getChildFile("Data");
+
+    for (juce::DirectoryEntry entry : juce::RangedDirectoryIterator(/*juce::File("C:/Users/knize/Documents/VST_CODE/BasicEQ/Data")*/dataFolder, true, "*.wav", 2)) {
         juce::String filename = entry.getFile().getFileNameWithoutExtension();
         juce::StringArray filenameArray;
         filenameArray.addTokens(filename, "_", "\"");
