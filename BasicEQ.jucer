@@ -6,10 +6,10 @@
     <GROUP id="{F640BCEA-ABE8-5245-9F88-90E07B1587F1}" name="Assets">
       <FILE id="tW9MXV" name="dark-brushed-metal-texture-steel-black-stock-photo-scratch-wallpaper.png"
             compile="0" resource="1" file="Assets/dark-brushed-metal-texture-steel-black-stock-photo-scratch-wallpaper.png"/>
-      <FILE id="oXpoky" name="knob_black.png" compile="0" resource="1" file="F:/VUT/bakalarka/Zdroje/knob_black.png"/>
-      <FILE id="lKAyVB" name="knob_blue.png" compile="0" resource="1" file="Assets/knob_blue.png"/>
-      <FILE id="hCSYUp" name="knob_green.png" compile="0" resource="1" file="Assets/knob_green.png"/>
-      <FILE id="P8IkrX" name="knob_red.png" compile="0" resource="1" file="Assets/knob_red.png"/>
+      <FILE id="RgkpIc" name="knob_black.png" compile="0" resource="1" file="F:/VUT/bakalarka/Zdroje/knob_black.png"/>
+      <FILE id="IiJ7mN" name="knob_blue.png" compile="0" resource="1" file="F:/VUT/bakalarka/Zdroje/knob_blue.png"/>
+      <FILE id="FWR5R9" name="knob_green.png" compile="0" resource="1" file="F:/VUT/bakalarka/Zdroje/knob_green.png"/>
+      <FILE id="l5XTvz" name="knob_red.png" compile="0" resource="1" file="F:/VUT/bakalarka/Zdroje/knob_red.png"/>
     </GROUP>
     <GROUP id="{738C76C2-F9DF-054B-1271-C9222DBDB02E}" name="Source">
       <FILE id="NxhyJ6" name="PluginProcessor.cpp" compile="1" resource="0"
