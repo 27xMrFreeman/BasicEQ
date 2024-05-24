@@ -274,6 +274,82 @@ void LookAndFeelGreen::drawRotarySlider(juce::Graphics& g, int x, int y, int wid
         }
     }
 }
+
+void LookAndFeelBlack::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPosProportional, float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider)
+{
+    using namespace juce;
+
+    auto bounds = Rectangle<float>(x, y, width, height);
+
+    /*g.setColour(Colour(72u, 30u, 20u));
+    g.fillEllipse(bounds);
+
+    g.setColour(Colour(242u, 97u, 63u));
+    g.drawEllipse(bounds, 1.5);*/
+
+    if (auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider))
+    {
+        auto center = bounds.getCentre();
+        //whatever we want to rotate needs to be in a path
+        Path p;
+
+        Rectangle<float> r;
+        r.setLeft(center.getX() - 2);   // left side of rectangle 2 pixels left of center
+        r.setRight(center.getX() + 2);  // right side of rectangle 2 pixels right of center
+        r.setTop(bounds.getY());        // top of rectangle = top of bounds
+        r.setBottom(center.getY() - rswl->getTextHeight() * 1.5);     // bottom of rectangle = text height above center
+
+        p.addRoundedRectangle(r, 2.f);
+
+        jassert(rotaryStartAngle < rotaryEndAngle); // check if start angle is smaller than end angle
+
+        auto sliderAngRad = jmap(sliderPosProportional, 0.f, 1.f, rotaryStartAngle, rotaryEndAngle); // mapping normalised slider value to angles
+
+        p.applyTransform(AffineTransform().rotated(sliderAngRad, center.getX(), center.getY())); // transform rotates path by sliderAngRad with x and y of pivot point
+
+        //g.fillPath(p);
+
+        // TRYING TO PUT IMAGE HERE
+        juce::Image knobRed = ImageCache::getFromMemory(BinaryData::knob_black_png, BinaryData::knob_black_pngSize);
+        juce::Image knobRedRescaled = knobRed.rescaled(bounds.getWidth() / knobRed.getWidth() * knobRed.getWidth(), bounds.getHeight() / knobRed.getHeight() * knobRed.getHeight(), Graphics::highResamplingQuality);
+
+        AffineTransform rotator;
+        //if (!slider.isMouseOverOrDragging())
+        //{
+        //    g.drawImage(knobRed, bounds, RectanglePlacement::stretchToFit, false);
+        //}
+        //else
+        //{
+        //    //g.drawImage(knobRed, x, y, width, height, 0, 0, width, height, false);
+        //    g.drawImage(knobRed, bounds, RectanglePlacement::stretchToFit, false);
+        //}
+        //g.drawImageTransformed(knobRed, x, y, width, height, rotator.rotated((float)sliderPosProportional * rotaryEndAngle, (float)(knobRed.getWidth() / 2), (float)(knobRed.getHeight() / 2)), false);
+        //g.drawImage(knobRedRescaled, bounds, RectanglePlacement::stretchToFit, false);
+        int origX = g.getClipBounds().getX();
+        int origY = g.getClipBounds().getY();
+        g.drawImageTransformed(knobRedRescaled, rotator.rotated(sliderAngRad, knobRedRescaled.getWidth() / 2, knobRedRescaled.getHeight() / 2).translated(bounds.getX() - origX, bounds.getY() - origY));
+
+
+        // TRYING TO PUT IMAGE HERE
+
+
+        if (slider.isMouseOverOrDragging())
+        {
+            g.setFont(rswl->getTextHeight());                           // sets basic font with set height
+            auto text = rswl->getDisplayString();                       // gets text to put in
+            auto strWidth = g.getCurrentFont().getStringWidth(text);    // gets width of text
+
+            r.setSize(strWidth + 4, rswl->getTextHeight() + 2);         // rectangle r is little bigger than the text
+            r.setCentre(bounds.getCentre());                            // set centre of the rectangle to centre of bounds (slider)
+
+            g.setColour(Colours::black);
+            g.fillRect(r);
+
+            g.setColour(Colours::white);
+            g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
+        }
+    }
+}
 //==============================================================================
 
 void RotarySliderWithLabels::paint(juce::Graphics& g)
@@ -287,10 +363,10 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
 
     auto sliderBounds = getSliderBounds();
 
-    g.setColour(Colours::red);
+    /*g.setColour(Colours::red);
     g.drawRect(getLocalBounds());
     g.setColour(Colours::azure);
-    g.drawRect(sliderBounds);         // bounding boxes of sliders for debugging purposes
+    g.drawRect(sliderBounds); */        // bounding boxes of sliders for debugging purposes
 
     getLookAndFeel().drawRotarySlider(g,
         sliderBounds.getX(),
@@ -862,6 +938,8 @@ peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButt
     peakFreqSlider.setLookAndFeel(&lnfg);
     peakGainSlider.setLookAndFeel(&lnfg);
     peakQualitySlider.setLookAndFeel(&lnfg);
+    xPosSlider.setLookAndFeel(&lnfk);
+    yPosSlider.setLookAndFeel(&lnfk);
 
     comboTypeBox.addItem("Mar", 1);
     comboTypeBox.addItem("MM", 2);
@@ -938,6 +1016,8 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
     peakFreqSlider.setLookAndFeel(nullptr);
     peakGainSlider.setLookAndFeel(nullptr);
     peakQualitySlider.setLookAndFeel(nullptr);
+    xPosSlider.setLookAndFeel(nullptr);
+    yPosSlider.setLookAndFeel(nullptr);
 }
 
 //==============================================================================

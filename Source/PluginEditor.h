@@ -201,6 +201,16 @@ struct LookAndFeelGreen : juce::LookAndFeel_V4
         juce::Slider&) override;
 };
 
+struct LookAndFeelBlack : juce::LookAndFeel_V4
+{
+    void drawRotarySlider(juce::Graphics&,
+        int x, int y, int width, int height,
+        float sliderPosProportional,
+        float rotaryStartAngle,
+        float rotaryEndAngle,
+        juce::Slider&) override;
+};
+
 struct RotarySliderWithLabels : juce::Slider
 {
     RotarySliderWithLabels(juce::RangedAudioParameter& rap, const juce::String& unitSuffix) : 
@@ -233,6 +243,7 @@ private:
     LookAndFeel lnf;
     LookAndFeelBlue lnfb;
     LookAndFeelGreen lnfg;
+    LookAndFeelBlack lnfk;
 
     juce::RangedAudioParameter* param;
     juce::String suffix;
@@ -402,6 +413,7 @@ private:
     LookAndFeel lnf;
     LookAndFeelBlue lnfb;
     LookAndFeelGreen lnfg;
+    LookAndFeelBlack lnfk;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BasicEQAudioProcessorEditor)
 };
