@@ -813,7 +813,6 @@ void BasicEQAudioProcessorEditor::resized()
     auto lowCutArea = EQArea.removeFromLeft(EQArea.getWidth() * 0.33);
     auto highCutArea = EQArea.removeFromRight(EQArea.getWidth() * 0.5);
     irfftComponent.setBounds(responseArea);
-    DBG("width " << bounds.getWidth() << " height " << bounds.getHeight());
 
     lowCutBypassButton.setBounds(lowCutArea.removeFromTop(30));
     lowCutFreqSlider.setBounds(lowCutArea.removeFromTop(lowCutArea.getHeight() * 0.66));
