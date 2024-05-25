@@ -483,7 +483,7 @@ ResponseCurveComponent::~ResponseCurveComponent()
 
 void ResponseCurveComponent::parameterValueChanged(int parameterIndex, float newValue)
 {
-    DBG("param changed" << parameterIndex);
+    //DBG("param changed" << parameterIndex);
     parametersChanged.set(true);
 }
 
@@ -747,10 +747,10 @@ void IrFFTComponent::loadedIRChanged(juce::File newIR)
     juce::AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
 
-    if (!newIR.existsAsFile())  { DBG("loadedIRChanged: loaded file is not a file"); }
+    if (!newIR.existsAsFile()) { /*DBG("loadedIRChanged: loaded file is not a file");*/ return; }
 
     std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(newIR));
-    if (reader.get() == nullptr) { DBG("loadedIRChanged: nullptr in reader"); return; }
+    if (reader.get() == nullptr) { /*DBG("loadedIRChanged: nullptr in reader");*/ return; }
 
     leftPathProducer.leftChannelFFTDataGenerator.changeOrder(FFTOrder::order16384);
 
@@ -951,7 +951,7 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     comboTypeBox.addItem("SV", 3);
     comboTypeBox.setSelectedId(1);
     comboTypeBox.onChange = [this]() { 
-        DBG("changed combo"); 
+        //DBG("changed combo"); 
         juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); 
         userIRLoaded = false; 
         irfftComponent.loadedIRChanged(newIR);
@@ -962,20 +962,20 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     mikTypeBox.addItem("sm57", 3);
     mikTypeBox.setSelectedId(1);
     mikTypeBox.onChange = [this]() { 
-        DBG("changed mic"); 
+        //DBG("changed mic"); 
         juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId()-1, mikTypeBox.getSelectedId()-1, yPosSlider.getValue(), xPosSlider.getValue());
         userIRLoaded = false;
         irfftComponent.loadedIRChanged(newIR);
         };
 
     yPosSlider.onValueChange = [this]() { 
-        DBG("changed yPos to " << yPosSlider.getValue());
+        //DBG("changed yPos to " << yPosSlider.getValue());
         juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
         userIRLoaded = false;
         irfftComponent.loadedIRChanged(newIR);
         };
     xPosSlider.onValueChange = [this]() { 
-        DBG("changed xPos to " << xPosSlider.getValue());
+        //DBG("changed xPos to " << xPosSlider.getValue());
         juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
         userIRLoaded = false;
         irfftComponent.loadedIRChanged(newIR);
@@ -993,7 +993,7 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
                 {
                     // save chosen file
                     juce::File result(chooser.getResult());
-                    if (!result.existsAsFile()) { DBG("pressed cancel"); return; }
+                    if (!result.existsAsFile()) { /*DBG("pressed cancel");*/ return; }
                     audioProcessor.savedFile = result;
                     audioProcessor.root = result.getParentDirectory().getFullPathName();    // set root directory to where the file was selected from
                     irNameLabel.setText( result.getFileNameWithoutExtension(), juce::dontSendNotification );
@@ -1003,10 +1003,10 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
                     irfftComponent.loadedIRChanged(result);
                 });
             userIRLoaded = true;
-            DBG("loaded ir " << (int)userIRLoaded.compareAndSetBool(true, true) << "with length " << audioProcessor.irLoader.getCurrentIRSize());
+            //DBG("loaded ir " << (int)userIRLoaded.compareAndSetBool(true, true) << "with length " << audioProcessor.irLoader.getCurrentIRSize());
     };
 
-    outputGainSlider.onValueChange = [this] { audioProcessor.outputGain.setGainDecibels(outputGainSlider.getValue()); DBG("Output gain set to " << outputGainSlider.getValue()); };
+    outputGainSlider.onValueChange = [this] { audioProcessor.outputGain.setGainDecibels(outputGainSlider.getValue()); /*DBG("Output gain set to " << outputGainSlider.getValue());*/ };
 
     setSize (800, 600);
 

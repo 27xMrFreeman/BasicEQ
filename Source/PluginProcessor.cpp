@@ -321,9 +321,9 @@ juce::File BasicEQAudioProcessor::updateLoadedIR(int comboTypeID, int mikTypeID,
     irLoader.reset();
     // load IR, stereo, trimmed, normalized, size 0 = original IR size
     irLoader.loadImpulseResponse(impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos], juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
-    DBG("Loaded IR from array " << comboTypeID << " " << mikTypeID << " " << yPos << " " << xPos);
+    /*DBG("Loaded IR from array " << comboTypeID << " " << mikTypeID << " " << yPos << " " << xPos);
     DBG("File name is " << impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos].getFileName());
-    DBG("IR Size is " << irLoader.getCurrentIRSize());
+    DBG("IR Size is " << irLoader.getCurrentIRSize());*/
     return impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos];
 }
 
