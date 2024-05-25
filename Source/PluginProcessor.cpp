@@ -422,8 +422,9 @@ void BasicEQAudioProcessor::loadShippedImpulseResponses()
     DBG(impulseResponseArray[0][0][0].size());*/
 
     //DBG(juce::File::getSpecialLocation(juce::File::currentExecutableFile).getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getChildFile("Data").getFullPathName());
-    juce::File dataFolder = juce::File::getSpecialLocation(juce::File::currentExecutableFile).getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getChildFile("Data");
-
+    //juce::File dataFolder = juce::File::getSpecialLocation(juce::File::currentExecutableFile).getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getChildFile("Data");
+    juce::File dataFolder = juce::File::getSpecialLocation(juce::File::SpecialLocationType::commonApplicationDataDirectory).getChildFile("PechacekIRLoader").getChildFile("Data");
+    //DBG(dataFolder.getFullPathName());
     for (juce::DirectoryEntry entry : juce::RangedDirectoryIterator(/*juce::File("C:/Users/knize/Documents/VST_CODE/BasicEQ/Data")*/dataFolder, true, "*.wav", 2)) {
         juce::String filename = entry.getFile().getFileNameWithoutExtension();
         juce::StringArray filenameArray;
