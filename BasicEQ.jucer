@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="ch0Qbp" name="BasicEQ" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              pluginName="IRLoader" pluginDesc="IRLoader with 3band EQ" pluginManufacturer="Bartolom&#283;j Pech&#225;&#269;ek">
   <MAINGROUP id="mAuQQK" name="BasicEQ">
     <GROUP id="{F640BCEA-ABE8-5245-9F88-90E07B1587F1}" name="Assets">
       <FILE id="tW9MXV" name="dark-brushed-metal-texture-steel-black-stock-photo-scratch-wallpaper.png"
