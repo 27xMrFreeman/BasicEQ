@@ -112,6 +112,10 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = 1;
     spec.sampleRate = sampleRate;
+    
+    outputGain.reset();
+    outputGain.prepare(spec);
+    outputGain.setGainDecibels(0);
 
     leftChain.prepare(spec);
     rightChain.prepare(spec);
@@ -171,7 +175,7 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
-
+    auto settings = getChainSettings(apvts);
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
     // guaranteed to be empty - they may contain garbage).
@@ -201,7 +205,6 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     
     //input stereo block sent to irLoader
     // TODO: put irloader in series with EQ
-    auto settings = getChainSettings(apvts);
     //DBG((int)!settings.irBypassed);
     if (!settings.irBypassed)
     {
@@ -210,6 +213,9 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
             irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
         }
     }
+
+    outputGain.process(juce::dsp::ProcessContextReplacing<float>(block));
+
     leftChannelFifo.update(buffer);
     rightChannelFifo.update(buffer);
 
@@ -281,6 +287,7 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     settings.highCutBypassed = apvts.getRawParameterValue("HighCut Bypassed")->load() > 0.5f;
     settings.peakBypassed = apvts.getRawParameterValue("Peak Bypassed")->load() > 0.5f;
     settings.irBypassed = apvts.getRawParameterValue("IR Bypassed")->load() > 0.5f;
+    settings.outputGainInDecibels = apvts.getRawParameterValue("Output Gain")->load();
     return settings;
 }
 
@@ -393,6 +400,9 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         str << " db/Oct";
         stringArray.add(str);
     }
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Output Gain", "Output Gain",
+        juce::NormalisableRange<float>(-24.f, 24.f, 0.1f, 1.f), 0.0f));
 
     layout.add(std::make_unique<juce::AudioParameterChoice>("LowCut Slope", "LowCut Slope", stringArray, 0));
     layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut Slope", "HighCut Slope", stringArray, 0));

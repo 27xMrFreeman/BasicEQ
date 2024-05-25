@@ -885,6 +885,7 @@ highCutFreqSlider(*audioProcessor.apvts.getParameter("HighCut Freq"), "Hz"),
 highCutSlopeSlider(*audioProcessor.apvts.getParameter("HighCut Slope"), "dB/Oct"),
 xPosSlider(*audioProcessor.apvts.getParameter("X Position"), "cm"),
 yPosSlider(*audioProcessor.apvts.getParameter("Y Position"), "cm"),
+outputGainSlider(*audioProcessor.apvts.getParameter("Output Gain"), "dB"),
 responseCurveComponent(audioProcessor),
 irfftComponent(audioProcessor),
 peakFreqSliderAttachment(audioProcessor.apvts, "Peak Freq", peakFreqSlider),
@@ -896,6 +897,7 @@ highCutFreqSliderAttachment(audioProcessor.apvts, "HighCut Freq", highCutFreqSli
 highCutSlopeSliderAttachment(audioProcessor.apvts, "HighCut Slope", highCutSlopeSlider),
 xPosSliderAttachment(audioProcessor.apvts, "X Position", xPosSlider),
 yPosSliderAttachment(audioProcessor.apvts, "Y Position", yPosSlider),
+outputGainSliderAttachment(audioProcessor.apvts, "Output Gain", outputGainSlider),
 lowCutBypassButtonAttachment(audioProcessor.apvts, "LowCut Bypassed", lowCutBypassButton),
 highCutBypassButtonAttachment(audioProcessor.apvts, "HighCut Bypassed", highCutBypassButton),
 peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButton),
@@ -942,6 +944,7 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     peakQualitySlider.setLookAndFeel(&lnfg);
     xPosSlider.setLookAndFeel(&lnfk);
     yPosSlider.setLookAndFeel(&lnfk);
+    outputGainSlider.setLookAndFeel(&lnfk);
 
     comboTypeBox.addItem("Mar", 1);
     comboTypeBox.addItem("MM", 2);
@@ -1003,6 +1006,8 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
             DBG("loaded ir " << (int)userIRLoaded.compareAndSetBool(true, true) << "with length " << audioProcessor.irLoader.getCurrentIRSize());
     };
 
+    outputGainSlider.onValueChange = [this] { audioProcessor.outputGain.setGainDecibels(outputGainSlider.getValue()); DBG("Output gain set to " << outputGainSlider.getValue()); };
+
     setSize (800, 600);
 }
 
@@ -1021,6 +1026,7 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
     xPosSlider.setLookAndFeel(nullptr);
     yPosSlider.setLookAndFeel(nullptr);
     irBypassButton.setLookAndFeel(nullptr);
+    outputGainSlider.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -1044,6 +1050,7 @@ void BasicEQAudioProcessorEditor::resized()
     auto responseCurveComponentBounds = responseArea.removeFromRight(responseArea.getWidth() * 0.5);
     responseCurveComponent.setBounds(responseCurveComponentBounds.reduced(responseCurveComponentBounds.getWidth()*0.05, 0).removeFromBottom(responseCurveComponentBounds.getHeight()*0.95));
 
+    auto GainArea = bounds;
     auto IRArea = bounds.removeFromLeft(bounds.getWidth() * 0.5);
     auto IRSlidersArea = IRArea.removeFromBottom(IRArea.getHeight() * 0.7);
     IRSlidersArea.reduce(IRSlidersArea.getWidth()*0.05, 0);
@@ -1101,6 +1108,15 @@ void BasicEQAudioProcessorEditor::resized()
     loadBtn.setBounds(loadBtnArea.removeFromLeft(loadBtnArea.getWidth()*0.6).removeFromRight(loadBtnArea.getWidth()*0.5).removeFromBottom(loadBtnArea.getHeight()*0.9).removeFromTop(loadBtnArea.getHeight()*0.3));
     irNameLabel.setBounds(loadBtnArea);
 
+    GainArea.removeFromTop(GainArea.getHeight() * 0.5);
+    GainArea.removeFromTop(GainArea.getHeight() * 0.6);
+    GainArea.reduce(GainArea.getWidth() * 0.02, 0);
+    
+    auto OutputGainArea = GainArea;
+    OutputGainArea.reduce(OutputGainArea.getWidth() * 0.44, 0);
+    outputGainSlider.setBounds(OutputGainArea);
+
+
 }
 
 std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
@@ -1125,7 +1141,8 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &lowCutBypassButton,
         &peakBypassButton,
         &highCutBypassButton,
-        &irBypassButton
+        &irBypassButton,
+        &outputGainSlider
     };
 }
 

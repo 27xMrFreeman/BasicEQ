@@ -166,6 +166,7 @@ struct ChainSettings
     Slope lowCutSlope{ Slope::Slope_12 }, highCutSlope{ Slope::Slope_12 };
     int xPos{ 0 }, yPos{ Distance::Distance_0 };
     bool lowCutBypassed{ false }, peakBypassed{ false }, highCutBypassed{ false }, irBypassed{ false };
+    float outputGainInDecibels{ 0 };
 };
 
 ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts);
@@ -291,6 +292,7 @@ public:
     SingleChannelSampleFifo<BlockType> leftChannelFifo{ Channel::Left };
     SingleChannelSampleFifo<BlockType> rightChannelFifo{ Channel::Right };
 
+    juce::dsp::Gain<float> outputGain;
 private:
     MonoChain leftChain, rightChain;
     //ChainSettings chainSettings;
