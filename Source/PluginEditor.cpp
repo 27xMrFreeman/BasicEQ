@@ -898,7 +898,8 @@ xPosSliderAttachment(audioProcessor.apvts, "X Position", xPosSlider),
 yPosSliderAttachment(audioProcessor.apvts, "Y Position", yPosSlider),
 lowCutBypassButtonAttachment(audioProcessor.apvts, "LowCut Bypassed", lowCutBypassButton),
 highCutBypassButtonAttachment(audioProcessor.apvts, "HighCut Bypassed", highCutBypassButton),
-peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButton)
+peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButton),
+irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
 
 {
     // Make sure that before the constructor has finished, you've set the
@@ -931,6 +932,7 @@ peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButt
     lowCutBypassButton.setLookAndFeel(&lnf);
     highCutBypassButton.setLookAndFeel(&lnf);
     peakBypassButton.setLookAndFeel(&lnf);
+    irBypassButton.setLookAndFeel(&lnf);
     lowCutFreqSlider.setLookAndFeel(&lnfb);
     lowCutSlopeSlider.setLookAndFeel(&lnfb);
     highCutFreqSlider.setLookAndFeel(&lnf);
@@ -1018,6 +1020,7 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
     peakQualitySlider.setLookAndFeel(nullptr);
     xPosSlider.setLookAndFeel(nullptr);
     yPosSlider.setLookAndFeel(nullptr);
+    irBypassButton.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -1050,6 +1053,7 @@ void BasicEQAudioProcessorEditor::resized()
 
     auto comboBoxArea = IRArea;
     auto mikBoxArea = IRArea;
+    auto irBypassButtonArea = IRArea;
     comboBoxArea = comboBoxArea.removeFromLeft(comboBoxArea.getWidth() * 0.5);
     comboBoxArea = comboBoxArea.removeFromLeft(comboBoxArea.getWidth() * 0.75);
     comboBoxArea = comboBoxArea.removeFromRight(comboBoxArea.getWidth() * 0.67);
@@ -1061,6 +1065,10 @@ void BasicEQAudioProcessorEditor::resized()
     mikBoxArea = mikBoxArea.removeFromLeft(mikBoxArea.getWidth() * 0.67);
     mikBoxArea.reduce(0, mikBoxArea.getHeight() * 0.35);
     mikTypeBox.setBounds(mikBoxArea);
+
+    irBypassButtonArea.reduce(irBypassButtonArea.getWidth() * 0.37, irBypassButtonArea.getHeight() * 0.15);
+    irBypassButtonArea.removeFromTop(irBypassButtonArea.getHeight() * 0.55);
+    irBypassButton.setBounds(irBypassButtonArea);
 
     auto IrFFTComponentBounds = responseArea;
     irfftComponent.setBounds(IrFFTComponentBounds.reduced(IrFFTComponentBounds.getWidth() * 0.05, 0).removeFromBottom(IrFFTComponentBounds.getHeight() * 0.95));
@@ -1116,7 +1124,8 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &mikTypeBox,
         &lowCutBypassButton,
         &peakBypassButton,
-        &highCutBypassButton
+        &highCutBypassButton,
+        &irBypassButton
     };
 }
 

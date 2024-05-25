@@ -201,11 +201,15 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     
     //input stereo block sent to irLoader
     // TODO: put irloader in series with EQ
-    if (irLoader.getCurrentIRSize() > 0)
+    auto settings = getChainSettings(apvts);
+    //DBG((int)!settings.irBypassed);
+    if (!settings.irBypassed)
     {
-        irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
+        if (irLoader.getCurrentIRSize() > 0)
+        {
+            irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
+        }
     }
-
     leftChannelFifo.update(buffer);
     rightChannelFifo.update(buffer);
 
@@ -216,12 +220,12 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
+    //for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    //{
+    //    auto* channelData = buffer.getWritePointer (channel);
 
-        // ..do something to the data...
-    }
+    //    // ..do something to the data...
+    //}
 }
 
 //==============================================================================
@@ -276,6 +280,7 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     settings.lowCutBypassed = apvts.getRawParameterValue("LowCut Bypassed")->load() > 0.5f;
     settings.highCutBypassed = apvts.getRawParameterValue("HighCut Bypassed")->load() > 0.5f;
     settings.peakBypassed = apvts.getRawParameterValue("Peak Bypassed")->load() > 0.5f;
+    settings.irBypassed = apvts.getRawParameterValue("IR Bypassed")->load() > 0.5f;
     return settings;
 }
 
@@ -395,6 +400,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     layout.add(std::make_unique<juce::AudioParameterBool>("LowCut Bypassed", "LowCut Bypassed", false));
     layout.add(std::make_unique<juce::AudioParameterBool>("HighCut Bypassed", "HighCut Bypassed", false));
     layout.add(std::make_unique<juce::AudioParameterBool>("Peak Bypassed", "Peak Bypassed", false));
+    layout.add(std::make_unique<juce::AudioParameterBool>("IR Bypassed", "IR Bypassed", false));
 
     return layout;
 }

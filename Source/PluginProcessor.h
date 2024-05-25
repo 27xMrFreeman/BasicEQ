@@ -165,7 +165,7 @@ struct ChainSettings
     float lowCutFreq{ 0 }, highCutFreq{ 0 };
     Slope lowCutSlope{ Slope::Slope_12 }, highCutSlope{ Slope::Slope_12 };
     int xPos{ 0 }, yPos{ Distance::Distance_0 };
-    bool lowCutBypassed{ false }, peakBypassed{ false }, highCutBypassed{ false };
+    bool lowCutBypassed{ false }, peakBypassed{ false }, highCutBypassed{ false }, irBypassed{ false };
 };
 
 ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts);
@@ -293,7 +293,7 @@ public:
 
 private:
     MonoChain leftChain, rightChain;
-    
+    //ChainSettings chainSettings;
 
     void updatePeakFilter(const ChainSettings& chainSettings);
     void updateLowCutFilter(const ChainSettings& chainSettings);

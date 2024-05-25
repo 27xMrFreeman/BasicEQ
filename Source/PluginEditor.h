@@ -386,7 +386,7 @@ private:
         highCutFreqSlider,
         lowCutSlopeSlider,
         highCutSlopeSlider;
-    juce::ToggleButton lowCutBypassButton, peakBypassButton, highCutBypassButton;
+    juce::ToggleButton lowCutBypassButton, peakBypassButton, highCutBypassButton, irBypassButton;
         // rendered response curve of EQ filters line
     ResponseCurveComponent responseCurveComponent;
 
@@ -406,7 +406,7 @@ private:
         yPosSliderAttachment;
 
     using ButtonAttachment = APVTS::ButtonAttachment;
-    ButtonAttachment lowCutBypassButtonAttachment, peakBypassButtonAttachment, highCutBypassButtonAttachment;
+    ButtonAttachment lowCutBypassButtonAttachment, peakBypassButtonAttachment, highCutBypassButtonAttachment, irBypassButtonAttachment;
 
     std::vector<juce::Component*> getComps();
 
