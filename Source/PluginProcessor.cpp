@@ -117,6 +117,11 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     outputGain.prepare(spec);
     outputGain.setGainDecibels(0);
 
+    rmsLevelLeft.reset(sampleRate, 0.2);
+    rmsLevelRight.reset(sampleRate, 0.1);
+    rmsLevelLeft.setCurrentAndTargetValue(-100.f);
+    rmsLevelRight.setCurrentAndTargetValue(-100.f);
+
     leftChain.prepare(spec);
     rightChain.prepare(spec);
 
@@ -204,7 +209,6 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     rightChain.process(rightContext);
     
     //input stereo block sent to irLoader
-    // TODO: put irloader in series with EQ
     //DBG((int)!settings.irBypassed);
     if (!settings.irBypassed)
     {
@@ -214,7 +218,20 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
         }
     }
 
+    // APPLY GAIN KNOB
     outputGain.process(juce::dsp::ProcessContextReplacing<float>(block));
+
+    // CALC and SET RMS LEVEL OF L&R CHANNELS
+    rmsLevelLeft.skip(buffer.getNumSamples());
+    rmsLevelRight.skip(buffer.getNumSamples());
+    const auto valueLeft = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
+    if (valueLeft < rmsLevelLeft.getCurrentValue()) { rmsLevelLeft.setTargetValue(valueLeft); } // if the new value is lower than the current one, apply smoothing
+    else { rmsLevelLeft.setCurrentAndTargetValue(valueLeft); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
+
+    const auto valueRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+    if (valueRight < rmsLevelRight.getCurrentValue()) { rmsLevelRight.setTargetValue(valueRight); } // if the new value is lower than the current one, apply smoothing
+    else { rmsLevelRight.setCurrentAndTargetValue(valueRight); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
+    
 
     leftChannelFifo.update(buffer);
     rightChannelFifo.update(buffer);
@@ -476,4 +493,12 @@ void BasicEQAudioProcessor::loadShippedImpulseResponses()
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new BasicEQAudioProcessor();
+}
+
+float BasicEQAudioProcessor::getRMSValue(const int channel) const
+{
+    jassert(channel == 0 || channel == 1);
+    if (channel == 0) { return rmsLevelLeft.getCurrentValue(); }
+    else if (channel == 1) { return rmsLevelRight.getCurrentValue(); }
+    return 0.f;
 }

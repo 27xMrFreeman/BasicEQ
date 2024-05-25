@@ -1009,6 +1009,8 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     outputGainSlider.onValueChange = [this] { audioProcessor.outputGain.setGainDecibels(outputGainSlider.getValue()); DBG("Output gain set to " << outputGainSlider.getValue()); };
 
     setSize (800, 600);
+
+    startTimerHz(30);
 }
 
 BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
@@ -1030,6 +1032,14 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
 }
 
 //==============================================================================
+void BasicEQAudioProcessorEditor::timerCallback()
+{
+    meterLeft.setLevel(audioProcessor.getRMSValue(0));
+    meterRight.setLevel(audioProcessor.getRMSValue(1));
+    meterLeft.repaint();
+    meterRight.repaint();
+}
+
 void BasicEQAudioProcessorEditor::paint (juce::Graphics& g)
 {
     using namespace juce;
@@ -1116,6 +1126,19 @@ void BasicEQAudioProcessorEditor::resized()
     OutputGainArea.reduce(OutputGainArea.getWidth() * 0.44, 0);
     outputGainSlider.setBounds(OutputGainArea);
 
+    auto meterLeftArea = GainArea.removeFromLeft(GainArea.getWidth() * 0.5);
+    auto meterRightArea = GainArea;
+    meterLeftArea.removeFromRight(OutputGainArea.getWidth() * 0.6);
+    meterLeftArea.removeFromLeft(OutputGainArea.getWidth() * 0.6);
+    meterRightArea.removeFromLeft(OutputGainArea.getWidth() * 0.6);
+    meterRightArea.removeFromRight(OutputGainArea.getWidth() * 0.6);
+    meterLeftArea.reduce(0, meterLeftArea.getHeight() * 0.35);
+    meterRightArea.reduce(0, meterRightArea.getHeight() * 0.35);
+    meterLeftArea.translate(0, meterLeftArea.getHeight() * (-0.5));
+    meterRightArea.translate(0, meterRightArea.getHeight() * (-0.5));
+
+    meterLeft.setBounds(meterLeftArea);
+    meterRight.setBounds(meterRightArea);
 
 }
 
@@ -1142,7 +1165,9 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &peakBypassButton,
         &highCutBypassButton,
         &irBypassButton,
-        &outputGainSlider
+        &outputGainSlider,
+        &meterLeft,
+        &meterRight
     };
 }
 

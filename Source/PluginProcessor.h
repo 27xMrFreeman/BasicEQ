@@ -280,6 +280,7 @@ public:
 
     juce::File updateLoadedIR(int comboTypeID, int mikTypeID, int yPos, int xPos);
     void loadShippedImpulseResponses();
+    float getRMSValue(const int channel) const;
 
     juce::File root, savedFile;
     juce::dsp::Convolution irLoader;
@@ -304,7 +305,7 @@ private:
     void updateFilters();
 
     juce::dsp::Oscillator<float> osc;
-
+    juce::LinearSmoothedValue<float> rmsLevelLeft, rmsLevelRight;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BasicEQAudioProcessor)
 };

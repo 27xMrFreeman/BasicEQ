@@ -12,6 +12,10 @@
       <FILE id="l5XTvz" name="knob_red.png" compile="0" resource="1" file="F:/VUT/bakalarka/Zdroje/knob_red.png"/>
     </GROUP>
     <GROUP id="{738C76C2-F9DF-054B-1271-C9222DBDB02E}" name="Source">
+      <FILE id="ZkP7HP" name="HorizontalMeter.cpp" compile="1" resource="0"
+            file="Source/HorizontalMeter.cpp"/>
+      <FILE id="SHz9pe" name="HorizontalMeter.h" compile="0" resource="0"
+            file="Source/HorizontalMeter.h"/>
       <FILE id="NxhyJ6" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="cVBy8Y" name="PluginProcessor.h" compile="0" resource="0"

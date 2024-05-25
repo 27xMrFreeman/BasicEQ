@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "HorizontalMeter.h"
 
 enum FFTOrder
 {
@@ -349,13 +350,14 @@ private:
 //==============================================================================
 /**
 */
-class BasicEQAudioProcessorEditor  : public juce::AudioProcessorEditor
+class BasicEQAudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::Timer
 {
 public:
     BasicEQAudioProcessorEditor (BasicEQAudioProcessor&);
     ~BasicEQAudioProcessorEditor() override;
 
     //==============================================================================
+    void timerCallback() override;
     void paint (juce::Graphics&) override;
     void resized() override;
 
@@ -366,6 +368,10 @@ private:
 
     // background image
     juce::Image backgroundImage;
+
+    // meters
+    HorizontalMeterLeft meterLeft;
+    HorizontalMeterRight meterRight;
 
     // IR loader GUI:
     juce::TextButton loadBtn;
