@@ -34,7 +34,7 @@ void HorizontalMeterRight::paint(juce::Graphics& g)
     auto bounds = getLocalBounds().toFloat();
     auto r = bounds;
 
-    g.setColour(Colours::white.withBrightness(0.2f));
+    g.setColour(Colours::white.withBrightness(0.1f));
     g.fillRoundedRectangle(bounds, 5.f);
 
     g.setColour(Colours::lightgreen);
