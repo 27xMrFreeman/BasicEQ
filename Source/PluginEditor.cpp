@@ -71,7 +71,7 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
         {
             g.setFont(rswl->getTextHeight());                           // sets basic font with set height
             auto text = rswl->getDisplayString();                       // gets text to put in
-            auto strWidth = g.getCurrentFont().getStringWidth(text);    // gets width of text
+            auto strWidth = GlyphArrangement::getStringWidthInt(g.getCurrentFont(), text);  //g.getCurrentFont().getStringWidth(text);    // gets width of text
 
             r.setSize(strWidth + 4, rswl->getTextHeight() + 2);         // rectangle r is little bigger than the text
             r.setCentre(bounds.getCentre());                            // set centre of the rectangle to centre of bounds (slider)
@@ -185,7 +185,7 @@ void LookAndFeelBlue::drawRotarySlider(juce::Graphics& g, int x, int y, int widt
         {
             g.setFont(rswl->getTextHeight());                           // sets basic font with set height
             auto text = rswl->getDisplayString();                       // gets text to put in
-            auto strWidth = g.getCurrentFont().getStringWidth(text);    // gets width of text
+            auto strWidth = GlyphArrangement::getStringWidthInt(g.getCurrentFont(),text);    // gets width of text
 
             r.setSize(strWidth + 4, rswl->getTextHeight() + 2);         // rectangle r is little bigger than the text
             r.setCentre(bounds.getCentre());                            // set centre of the rectangle to centre of bounds (slider)
@@ -337,7 +337,7 @@ void LookAndFeelBlack::drawRotarySlider(juce::Graphics& g, int x, int y, int wid
         {
             g.setFont(rswl->getTextHeight());                           // sets basic font with set height
             auto text = rswl->getDisplayString();                       // gets text to put in
-            auto strWidth = g.getCurrentFont().getStringWidth(text);    // gets width of text
+            auto strWidth = GlyphArrangement::getStringWidthInt(g.getCurrentFont(),text);    // gets width of text
 
             r.setSize(strWidth + 4, rswl->getTextHeight() + 2);         // rectangle r is little bigger than the text
             r.setCentre(bounds.getCentre());                            // set centre of the rectangle to centre of bounds (slider)
@@ -398,7 +398,7 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
 
         Rectangle<float> r; // rectangle for bounding box of text
         auto str = labels[i].label; // get text from labels
-        r.setSize(g.getCurrentFont().getStringWidth(str), getTextHeight());     // set size of rectangle depending on font width and height
+        r.setSize(GlyphArrangement::getStringWidthInt(g.getCurrentFont(),str), getTextHeight());     // set size of rectangle depending on font width and height
         r.setCentre(c);     // set centre of rectangle to c -> text could be touching circle
         r.setY(r.getY() + getTextHeight());         // move rectangle down, so that text doesnt touch the circle
 
@@ -926,6 +926,30 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     yPosSlider.labels.add({ 0.f, "0cm" });
     yPosSlider.labels.add({ 1.f, "40cm" });
 
+    
+
+    comboTypeBox.addItem("Mar", 1);
+    comboTypeBox.addItem("MM", 2);
+    comboTypeBox.addItem("SV", 3);
+    comboTypeBox.setSelectedId(1);
+    comboTypeBox.onChange = [this]() { 
+        DBG("changed combo"); 
+        juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); 
+        userIRLoaded = false; 
+        irfftComponent.loadedIRChanged(newIR);
+        };
+
+    mikTypeBox.addItem("57A", 1);
+    mikTypeBox.addItem("kalib", 2);
+    mikTypeBox.addItem("sm57", 3);
+    mikTypeBox.setSelectedId(1);
+    mikTypeBox.onChange = [this]() {
+        DBG("changed mic");
+        juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
+        userIRLoaded = false;
+        irfftComponent.loadedIRChanged(newIR);
+        };
+
     for (auto* comp : getComps())
     {
         addAndMakeVisible(comp);
@@ -946,27 +970,8 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     yPosSlider.setLookAndFeel(&lnfk);
     outputGainSlider.setLookAndFeel(&lnfk);
 
-    comboTypeBox.addItem("Mar", 1);
-    comboTypeBox.addItem("MM", 2);
-    comboTypeBox.addItem("SV", 3);
-    comboTypeBox.setSelectedId(1);
-    comboTypeBox.onChange = [this]() { 
-        //DBG("changed combo"); 
-        juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); 
-        userIRLoaded = false; 
-        irfftComponent.loadedIRChanged(newIR);
-        };
-
-    mikTypeBox.addItem("57A", 1);
-    mikTypeBox.addItem("kalib", 2);
-    mikTypeBox.addItem("sm57", 3);
-    mikTypeBox.setSelectedId(1);
-    mikTypeBox.onChange = [this]() { 
-        //DBG("changed mic"); 
-        juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId()-1, mikTypeBox.getSelectedId()-1, yPosSlider.getValue(), xPosSlider.getValue());
-        userIRLoaded = false;
-        irfftComponent.loadedIRChanged(newIR);
-        };
+    comboTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Combo Type", comboTypeBox);
+    mikTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Mic Type", mikTypeBox);
 
     yPosSlider.onValueChange = [this]() { 
         //DBG("changed yPos to " << yPosSlider.getValue());
@@ -996,7 +1001,7 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
                     if (!result.existsAsFile()) { /*DBG("pressed cancel");*/ return; }
                     audioProcessor.savedFile = result;
                     audioProcessor.root = result.getParentDirectory().getFullPathName();    // set root directory to where the file was selected from
-                    irNameLabel.setText( result.getFileNameWithoutExtension(), juce::dontSendNotification );
+                    //irNameLabel.setText( result.getFileNameWithoutExtension(), juce::dontSendNotification );
                     audioProcessor.irLoader.reset();
                     // load IR, stereo, trimmed, normalized, size 0 = original IR size
                     audioProcessor.irLoader.loadImpulseResponse(result, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
@@ -1116,7 +1121,7 @@ void BasicEQAudioProcessorEditor::resized()
 
     auto loadBtnArea = IRArea;
     loadBtn.setBounds(loadBtnArea.removeFromLeft(loadBtnArea.getWidth()*0.6).removeFromRight(loadBtnArea.getWidth()*0.5).removeFromBottom(loadBtnArea.getHeight()*0.9).removeFromTop(loadBtnArea.getHeight()*0.3));
-    irNameLabel.setBounds(loadBtnArea);
+    //irNameLabel.setBounds(loadBtnArea);
 
     GainArea.removeFromTop(GainArea.getHeight() * 0.5);
     GainArea.removeFromTop(GainArea.getHeight() * 0.6);

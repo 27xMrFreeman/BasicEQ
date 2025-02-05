@@ -379,6 +379,7 @@ private:
     juce::Label irNameLabel;
     RotarySliderWithLabels xPosSlider, yPosSlider;
     juce::ComboBox comboTypeBox, mikTypeBox;
+    std::unique_ptr< juce::AudioProcessorValueTreeState::ComboBoxAttachment > comboTypeBoxAttachment, mikTypeBoxAttachment;
     juce::Atomic<bool> userIRLoaded{ false };
     
     IrFFTComponent irfftComponent;
