@@ -973,12 +973,35 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     comboTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Combo Type", comboTypeBox);
     mikTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Mic Type", mikTypeBox);
 
+
+    // TODO: Interpolate loaded IR, X and Y pos now floats
     yPosSlider.onValueChange = [this]() { 
         //DBG("changed yPos to " << yPosSlider.getValue());
-        juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
-        userIRLoaded = false;
-        irfftComponent.loadedIRChanged(newIR);
-        };
+        float yPosSliderValue = yPosSlider.getValue();
+        float xPosSliderValue = xPosSlider.getValue();
+        int yPosRoundDown = 0, yPosRoundUp = 0;
+        float maxDistance = 0, distance = 0, transposedDistance = 0;
+        // if Y and X are integer numbers, no need to interpolate
+        if (std::trunc(yPosSliderValue) == yPosSliderValue && std::trunc(xPosSliderValue) == xPosSliderValue) {
+            juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSliderValue, xPosSliderValue);
+            userIRLoaded = false;
+            irfftComponent.loadedIRChanged(newIR);
+            return;
+        }
+        // otherwise interpolate between floor of X Y and ceil of X Y, Y has to be rounded to 0 10 or 40 (recorded distances)
+        // 1. round Y to set values
+        if (yPosSliderValue < 10) { yPosRoundDown = 0; yPosRoundUp = 10; }
+        else if (std::trunc(yPosSliderValue) == yPosSliderValue) { yPosRoundDown = yPosSliderValue; yPosRoundUp = yPosSliderValue; }
+        else { yPosRoundDown = 10; yPosRoundUp = 40; }
+        // 2. find the total distance between floor(XY) and ceil(XY)
+        maxDistance = std::sqrt(std::pow((std::ceil(xPosSliderValue) - std::floor(xPosSliderValue)),2) + std::pow((yPosRoundUp - yPosRoundDown),2));
+        // 3. find the distance between floor(XY) and XY
+        distance = std::sqrt(std::pow(xPosSliderValue - std::floor(xPosSliderValue), 2) + std::pow(yPosSliderValue - std::floor(yPosSliderValue), 2));
+        // 4. map said distance to <0,1> where 0 is floor(XY) (0) and 1 is maxDistance
+        transposedDistance = distance / maxDistance;
+        // 5. interpolate
+
+    };
     xPosSlider.onValueChange = [this]() { 
         //DBG("changed xPos to " << xPosSlider.getValue());
         juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());

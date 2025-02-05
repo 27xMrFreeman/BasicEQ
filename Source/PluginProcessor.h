@@ -152,12 +152,12 @@ enum Slope
     Slope_48
 };
 
-enum Distance
-{
-    Distance_0,
-    Distance_10,
-    Distance_40
-};
+//enum Distance
+//{
+//    Distance_0,
+//    Distance_10,
+//    Distance_40
+//};
 
 enum comboTypeEnum {
     Mar,
@@ -176,7 +176,7 @@ struct ChainSettings
     float peakFreq{ 0 }, peakGainInDecibels{ 0 }, peakQuality{ 1.f };
     float lowCutFreq{ 0 }, highCutFreq{ 0 };
     Slope lowCutSlope{ Slope::Slope_12 }, highCutSlope{ Slope::Slope_12 };
-    int xPos{ 0 }, yPos{ Distance::Distance_0 };
+    float xPos{ 0 }, yPos{ 0 };
     comboTypeEnum comboType{comboTypeEnum::Mar};
     micTypeEnum micType{ micTypeEnum::a57 };
     bool lowCutBypassed{ false }, peakBypassed{ false }, highCutBypassed{ false }, irBypassed{ false };
