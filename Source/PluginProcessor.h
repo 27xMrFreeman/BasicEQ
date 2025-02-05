@@ -159,12 +159,26 @@ enum Distance
     Distance_40
 };
 
+enum comboTypeEnum {
+    Mar,
+    MM,
+    SV
+};
+
+enum micTypeEnum {
+    a57,
+    kalib,
+    sm57
+};
+
 struct ChainSettings
 {
     float peakFreq{ 0 }, peakGainInDecibels{ 0 }, peakQuality{ 1.f };
     float lowCutFreq{ 0 }, highCutFreq{ 0 };
     Slope lowCutSlope{ Slope::Slope_12 }, highCutSlope{ Slope::Slope_12 };
     int xPos{ 0 }, yPos{ Distance::Distance_0 };
+    comboTypeEnum comboType{comboTypeEnum::Mar};
+    micTypeEnum micType{ micTypeEnum::a57 };
     bool lowCutBypassed{ false }, peakBypassed{ false }, highCutBypassed{ false }, irBypassed{ false };
     float outputGainInDecibels{ 0 };
 };

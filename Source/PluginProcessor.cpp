@@ -284,6 +284,10 @@ void BasicEQAudioProcessor::setStateInformation (const void* data, int sizeInByt
     {
         apvts.replaceState(tree);
         updateFilters();
+        auto settings = getChainSettings(apvts);
+        loadShippedImpulseResponses();
+        updateLoadedIR(settings.comboType, settings.micType, settings.yPos, settings.xPos);
+        
     }
 }
 
@@ -305,6 +309,8 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     settings.peakBypassed = apvts.getRawParameterValue("Peak Bypassed")->load() > 0.5f;
     settings.irBypassed = apvts.getRawParameterValue("IR Bypassed")->load() > 0.5f;
     settings.outputGainInDecibels = apvts.getRawParameterValue("Output Gain")->load();
+    settings.micType = static_cast<micTypeEnum>(apvts.getRawParameterValue("Mic Type")->load());
+    settings.comboType = static_cast<comboTypeEnum>(apvts.getRawParameterValue("Combo Type")->load());
     return settings;
 }
 
@@ -417,6 +423,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         str << " db/Oct";
         stringArray.add(str);
     }
+
+    juce::StringArray comboChoices("Mar", "MM", "SV");
+    layout.add(std::make_unique<juce::AudioParameterChoice>("Combo Type", "Combo Type", comboChoices, 1));
+    juce::StringArray micChoices("57A", "kalib", "sm57");
+    layout.add(std::make_unique<juce::AudioParameterChoice>("Mic Type", "Mic Type", micChoices, 1));
 
     layout.add(std::make_unique<juce::AudioParameterFloat>("Output Gain", "Output Gain",
         juce::NormalisableRange<float>(-24.f, 24.f, 0.1f, 1.f), 0.0f));
