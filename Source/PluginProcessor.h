@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include <juce_core/juce_core.h>
+#include <cmath>
 
 template<typename T>
 struct Fifo
