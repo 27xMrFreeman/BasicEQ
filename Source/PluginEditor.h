@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <algorithm>
 #include "PluginProcessor.h"
 #include "HorizontalMeter.h"
 

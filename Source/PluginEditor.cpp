@@ -923,7 +923,7 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     highCutSlopeSlider.labels.add({ 0.f, "12" });
     highCutSlopeSlider.labels.add({ 1.f, "48" });
     xPosSlider.labels.add({ 0.f, "0cm" });
-    xPosSlider.labels.add({ 1.f, "8cm" });
+    xPosSlider.labels.add({ 1.f, "10cm" });
     yPosSlider.labels.add({ 0.f, "0cm" });
     yPosSlider.labels.add({ 1.f, "40cm" });
 
@@ -980,62 +980,16 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
         //DBG("changed yPos to " << yPosSlider.getValue());
         float yPosSliderValue = yPosSlider.getValue();
         float xPosSliderValue = xPosSlider.getValue();
-        int yPosRoundDown = 0, yPosRoundUp = 0, xPosRoundDown = 0, xPosRoundUp = 0;
-        float maxDistance = 0, distance = 0, transposedDistance = 0;
-    // if Y and X are integer numbers, no need to interpolate
-        if (std::trunc(yPosSliderValue) == yPosSliderValue && std::trunc(xPosSliderValue) == xPosSliderValue) {
-            juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSliderValue, xPosSliderValue);
-            userIRLoaded = false;
-            irfftComponent.loadedIRChanged(newIR);
-            return;
-        }
-    // otherwise interpolate between floor of X Y and ceil of X Y, Y has to be rounded to 0 10 or 40 (recorded distances) and X to even values
-    // 1. round Y to set values
-        if (yPosSliderValue < 10) { yPosRoundDown = 0; yPosRoundUp = 10; }
-        else if (std::trunc(yPosSliderValue) == yPosSliderValue) { yPosRoundDown = yPosSliderValue; yPosRoundUp = yPosSliderValue; }
-        else { yPosRoundDown = 10; yPosRoundUp = 40; }
-    // round X to even values
-        xPosRoundUp = std::ceil(xPosSliderValue);
-        xPosRoundDown = std::floor(xPosSliderValue);
-        if (xPosRoundUp % 2 == 0 && xPosRoundDown != xPosRoundUp) { xPosRoundDown -= 1; }
-        else if (xPosRoundDown != xPosRoundUp) { xPosRoundUp += 1; }
-    // 2. find the total distance between floor(XY) and ceil(XY)
-        maxDistance = std::sqrt(std::pow((xPosRoundUp - xPosRoundDown),2) + std::pow((yPosRoundUp - yPosRoundDown),2));
-    // 3. find the distance between floor(XY) and XY
-        distance = std::sqrt(std::pow((xPosSliderValue - xPosRoundDown), 2) + std::pow((yPosSliderValue - yPosRoundDown), 2));
-    // 4. map said distance to <0,1> where 0 is floor(XY) (0) and 1 is maxDistance
-        transposedDistance = distance / maxDistance;
-    // 5. interpolate
-    // (a * (1.0 - f)) + (b * f) where f = transposedDistance
-    // formatManager takes a file (wav in our case), returns AudioBuffer (could return float array tho)
-        juce::AudioFormatManager formatManager;
-        formatManager.registerBasicFormats();
-    // impulseResponseArray[typ komba][typ mikrofonu][pozice Y - 0=0, 1=10, 2=40]  [pozice X] 
-        auto* readerMin = formatManager.createReaderFor(audioProcessor.impulseResponseArray[comboTypeBox.getSelectedId() - 1][mikTypeBox.getSelectedId() - 1][std::ceil(yPosRoundDown/20)][xPosRoundDown]);
-        auto* readerMax = formatManager.createReaderFor(audioProcessor.impulseResponseArray[comboTypeBox.getSelectedId() - 1][mikTypeBox.getSelectedId() - 1][std::ceil(yPosRoundUp/20)][xPosRoundUp]);
-        juce::AudioBuffer<float> audioBufferMin, audioBufferMax, audioBufferInterp;
-        audioBufferMin.setSize(readerMin->numChannels, readerMin->lengthInSamples);
-        audioBufferMax.setSize(readerMax->numChannels, readerMax->lengthInSamples);
-        int sampleRate = readerMin->sampleRate;
-        readerMin->read(&audioBufferMin, 0, readerMin->lengthInSamples, 0, true, true);
-        readerMax->read(&audioBufferMax, 0, readerMax->lengthInSamples, 0, true, true);
-        delete readerMin, readerMax;
-    // check if both audioBuffers are equal length
-        if (audioBufferMax.getNumChannels() != audioBufferMin.getNumChannels() || audioBufferMax.getNumSamples() != audioBufferMin.getNumSamples()) { DBG("Not the same no of channels or samples"); return; }
-        audioBufferInterp.setSize(audioBufferMax.getNumChannels(), audioBufferMax.getNumSamples());
-        float interpValue = 0;
-        for (int ch = 0; ch < audioBufferMax.getNumChannels(); ++ch) {
-            for (int s = 0; s < audioBufferMax.getNumSamples(); ++s) {
-                interpValue = audioBufferMin.getSample(ch, s) * (1.0 - transposedDistance) + (audioBufferMax.getSample(ch, s) * transposedDistance);
-                audioBufferInterp.setSample(ch, s, interpValue);
-            }
-        }
-        audioProcessor.irLoader.loadImpulseResponse((juce::AudioBuffer <float>)audioBufferInterp, (double)sampleRate, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, juce::dsp::Convolution::Normalise::yes);
+        juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSliderValue, xPosSliderValue);
+        userIRLoaded = false;
+        if (newIR.getSize() == 0) return;
+        irfftComponent.loadedIRChanged(newIR);
     };
     xPosSlider.onValueChange = [this]() { 
         //DBG("changed xPos to " << xPosSlider.getValue());
         juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
         userIRLoaded = false;
+        if (newIR.getSize() == 0) return;
         irfftComponent.loadedIRChanged(newIR);
         };
 

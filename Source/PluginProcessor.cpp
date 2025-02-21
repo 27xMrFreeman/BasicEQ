@@ -325,8 +325,66 @@ Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRat
 juce::File BasicEQAudioProcessor::updateLoadedIR(int comboTypeID, int mikTypeID, int yPos, int xPos)
 {
     irLoader.reset();
+    // interpolate here instead of in PluginEditor
+    int yPosRoundDown = 0, yPosRoundUp = 0, xPosRoundDown = 0, xPosRoundUp = 0;
+    float maxDistance = 0, distance = 0, transposedDistance = 0;
+    int yPosArr[3] = { 0, 10, 40 };
+    int xPosArr[6] = { 0, 2, 4, 6, 8, 10 };
+
+    // if Y = {0,10,40} and X = {0,2,4,..,10}, no need to interpolate
+    if (std::any_of(std::begin(yPosArr), std::end(yPosArr), [&](int i) { return i == yPos; }) && std::any_of(std::begin(xPosArr), std::end(xPosArr), [&](int j) {return j == xPos; })) {
     // load IR, stereo, trimmed, normalized, size 0 = original IR size
-    irLoader.loadImpulseResponse(impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos], juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
+        irLoader.loadImpulseResponse(impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos], juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
+        return impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos];
+    }
+
+    // otherwise interpolate between floor of X Y and ceil of X Y, Y has to be rounded to 0 10 or 40 (recorded distances) and X to even values
+    // 1. round Y to set values
+    if (0 < yPos && yPos < 10) { yPosRoundDown = 0; yPosRoundUp = 10; }
+    else if (10 < yPos && yPos < 40) { yPosRoundDown = 10; yPosRoundUp = 40; }
+    else if (std::trunc(yPos) == yPos) { yPosRoundDown = yPos; yPosRoundUp = yPos; }
+    // round X to even values
+    xPosRoundUp = std::ceil(xPos);
+    xPosRoundDown = std::floor(xPos);
+    if (xPosRoundUp % 2 == 0 && xPosRoundDown != xPosRoundUp) { xPosRoundDown -= 1; }
+    else if (xPosRoundDown != xPosRoundUp) { xPosRoundUp += 1; }
+
+    // 2. find the total distance between floor(XY) and ceil(XY)
+    maxDistance = std::sqrt(std::pow((xPosRoundUp - xPosRoundDown), 2) + std::pow((yPosRoundUp - yPosRoundDown), 2));
+    // 3. find the distance between floor(XY) and XY
+    distance = std::sqrt(std::pow((xPos - xPosRoundDown), 2) + std::pow((yPos - yPosRoundDown), 2));
+    // 4. map said distance to <0,1> where 0 is floor(XY) (0) and 1 is maxDistance
+    transposedDistance = distance / maxDistance;
+
+    // 5. interpolate
+    // (a * (1.0 - f)) + (b * f) where f = transposedDistance
+    // formatManager takes a file (wav in our case), returns AudioBuffer (could return float array tho)
+    juce::AudioFormatManager formatManager;
+    formatManager.registerBasicFormats();
+    // impulseResponseArray[typ komba][typ mikrofonu][pozice Y - 0=0, 1=10, 2=40]  [pozice X] 
+    auto* readerMin = formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPosRoundDown / 20)][xPosRoundDown]);
+    auto* readerMax = formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPosRoundUp / 20)][xPosRoundUp]);
+    juce::AudioBuffer<float> audioBufferMin, audioBufferMax, audioBufferInterp;
+    audioBufferMin.setSize(readerMin->numChannels, readerMin->lengthInSamples);
+    audioBufferMax.setSize(readerMax->numChannels, readerMax->lengthInSamples);
+    int sampleRate = readerMin->sampleRate;
+    readerMin->read(&audioBufferMin, 0, readerMin->lengthInSamples, 0, true, true);
+    readerMax->read(&audioBufferMax, 0, readerMax->lengthInSamples, 0, true, true);
+    delete readerMin, readerMax;
+    // check if both audioBuffers are equal length
+    if (audioBufferMax.getNumChannels() != audioBufferMin.getNumChannels() || audioBufferMax.getNumSamples() != audioBufferMin.getNumSamples()) { DBG("Not the same no of channels or samples"); juce::File emptyFile; return emptyFile; }
+    audioBufferInterp.setSize(audioBufferMax.getNumChannels(), audioBufferMax.getNumSamples());
+    float interpValue = 0;
+    for (int ch = 0; ch < audioBufferMax.getNumChannels(); ++ch) {
+        for (int s = 0; s < audioBufferMax.getNumSamples(); ++s) {
+            interpValue = audioBufferMin.getSample(ch, s) * (1.0 - transposedDistance) + (audioBufferMax.getSample(ch, s) * transposedDistance);
+            audioBufferInterp.setSample(ch, s, interpValue);
+        }
+    }
+    // load IR, stereo, trimmed, normalized, size 0 = original IR size
+    irLoader.loadImpulseResponse((juce::AudioBuffer <float>)audioBufferInterp, (double)sampleRate, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, juce::dsp::Convolution::Normalise::yes);
+    
+    
     /*DBG("Loaded IR from array " << comboTypeID << " " << mikTypeID << " " << yPos << " " << xPos);
     DBG("File name is " << impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos].getFileName());
     DBG("IR Size is " << irLoader.getCurrentIRSize());*/
@@ -410,11 +468,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Q", "Peak Q",
         juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.f), 7.f));
 
-    layout.add(std::make_unique<juce::AudioParameterFloat>("X Position", "X Position", juce::NormalisableRange<float>(0, 8, 2), 0));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("X Position", "X Position", juce::NormalisableRange<float>(0, 10, 2), 0));
 
     juce::StringArray yPosChoices("0 cm", "10 cm", "40 cm");
     
-    layout.add(std::make_unique<juce::AudioParameterFloat>("Y Position", "Y Position", juce::NormalisableRange<float>(0.0f, 10.f, 0.05f, 1.f), 0));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Y Position", "Y Position", juce::NormalisableRange<float>(0.0f, 40.f, 0.05f, 1.f), 0));
 
     juce::StringArray stringArray; // String array containing 4 choices for slope setting
     for (int i = 0; i < 4; i++) {
