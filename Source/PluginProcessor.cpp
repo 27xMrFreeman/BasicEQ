@@ -334,8 +334,8 @@ juce::File BasicEQAudioProcessor::updateLoadedIR(int comboTypeID, int mikTypeID,
     // if Y = {0,10,40} and X = {0,2,4,..,10}, no need to interpolate
     if (std::any_of(std::begin(yPosArr), std::end(yPosArr), [&](int i) { return i == yPos; }) && std::any_of(std::begin(xPosArr), std::end(xPosArr), [&](int j) {return j == xPos; })) {
     // load IR, stereo, trimmed, normalized, size 0 = original IR size
-        irLoader.loadImpulseResponse(impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos], juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
-        return impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos];
+        irLoader.loadImpulseResponse(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPos/20)][xPos], juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
+        return impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPos / 20)][xPos];
     }
 
     // otherwise interpolate between floor of X Y and ceil of X Y, Y has to be rounded to 0 10 or 40 (recorded distances) and X to even values
@@ -362,15 +362,16 @@ juce::File BasicEQAudioProcessor::updateLoadedIR(int comboTypeID, int mikTypeID,
     juce::AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
     // impulseResponseArray[typ komba][typ mikrofonu][pozice Y - 0=0, 1=10, 2=40]  [pozice X] 
-    auto* readerMin = formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPosRoundDown / 20)][xPosRoundDown]);
-    auto* readerMax = formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPosRoundUp / 20)][xPosRoundUp]);
+    std::unique_ptr<juce::AudioFormatReader> readerMin;
+    std::unique_ptr<juce::AudioFormatReader> readerMax;
+    readerMin.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPosRoundDown / 20)][xPosRoundDown]));
+    readerMax.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPosRoundUp / 20)][xPosRoundUp]));
     juce::AudioBuffer<float> audioBufferMin, audioBufferMax, audioBufferInterp;
     audioBufferMin.setSize(readerMin->numChannels, readerMin->lengthInSamples);
     audioBufferMax.setSize(readerMax->numChannels, readerMax->lengthInSamples);
     int sampleRate = readerMin->sampleRate;
     readerMin->read(&audioBufferMin, 0, readerMin->lengthInSamples, 0, true, true);
     readerMax->read(&audioBufferMax, 0, readerMax->lengthInSamples, 0, true, true);
-    delete readerMin, readerMax;
     // check if both audioBuffers are equal length
     if (audioBufferMax.getNumChannels() != audioBufferMin.getNumChannels() || audioBufferMax.getNumSamples() != audioBufferMin.getNumSamples()) { DBG("Not the same no of channels or samples"); juce::File emptyFile; return emptyFile; }
     audioBufferInterp.setSize(audioBufferMax.getNumChannels(), audioBufferMax.getNumSamples());
@@ -384,11 +385,18 @@ juce::File BasicEQAudioProcessor::updateLoadedIR(int comboTypeID, int mikTypeID,
     // load IR, stereo, trimmed, normalized, size 0 = original IR size
     irLoader.loadImpulseResponse((juce::AudioBuffer <float>)audioBufferInterp, (double)sampleRate, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, juce::dsp::Convolution::Normalise::yes);
     
-    
+    // write audiobuffer into wave file for further fft analysis in plugineditor
+    juce::WavAudioFormat format;
+    std::unique_ptr<juce::AudioFormatWriter> writer;
+    juce::File file;
+    writer.reset(format.createWriterFor(new juce::FileOutputStream(file), sampleRate, audioBufferInterp.getNumChannels(), 24, {}, 0));
+    if (writer != nullptr)
+        writer->writeFromAudioSampleBuffer(audioBufferInterp, 0, audioBufferInterp.getNumSamples());
+    return file;
     /*DBG("Loaded IR from array " << comboTypeID << " " << mikTypeID << " " << yPos << " " << xPos);
     DBG("File name is " << impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos].getFileName());
     DBG("IR Size is " << irLoader.getCurrentIRSize());*/
-    return impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos];
+    //return impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos];
 }
 
 void BasicEQAudioProcessor::updatePeakFilter(const ChainSettings& chainSettings)
