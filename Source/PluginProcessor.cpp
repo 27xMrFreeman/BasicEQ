@@ -286,7 +286,8 @@ void BasicEQAudioProcessor::setStateInformation (const void* data, int sizeInByt
         updateFilters();
         auto settings = getChainSettings(apvts);
         loadShippedImpulseResponses();
-        updateLoadedIR(settings.comboType, settings.micType, settings.yPos, settings.xPos);
+        juce::TemporaryFile tempFile;
+        updateLoadedIR(tempFile, settings.comboType, settings.micType, settings.yPos, settings.xPos);
         
     }
 }
@@ -322,8 +323,10 @@ Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRat
                                                                 juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
 }
 
-juce::File BasicEQAudioProcessor::updateLoadedIR(int comboTypeID, int mikTypeID, int yPos, int xPos)
+void BasicEQAudioProcessor::updateLoadedIR(juce::TemporaryFile& tempFile, int comboTypeID, int mikTypeID, float yPos, float xPos)
 {
+    // this might take a while, need to turn off processing
+    suspendProcessing(true);
     irLoader.reset();
     // interpolate here instead of in PluginEditor
     int yPosRoundDown = 0, yPosRoundUp = 0, xPosRoundDown = 0, xPosRoundUp = 0;
@@ -335,7 +338,7 @@ juce::File BasicEQAudioProcessor::updateLoadedIR(int comboTypeID, int mikTypeID,
     if (std::any_of(std::begin(yPosArr), std::end(yPosArr), [&](int i) { return i == yPos; }) && std::any_of(std::begin(xPosArr), std::end(xPosArr), [&](int j) {return j == xPos; })) {
     // load IR, stereo, trimmed, normalized, size 0 = original IR size
         irLoader.loadImpulseResponse(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPos/20)][xPos], juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
-        return impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPos / 20)][xPos];
+        impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPos / 20)][xPos].copyFileTo(tempFile.getFile());
     }
 
     // otherwise interpolate between floor of X Y and ceil of X Y, Y has to be rounded to 0 10 or 40 (recorded distances) and X to even values
@@ -373,7 +376,7 @@ juce::File BasicEQAudioProcessor::updateLoadedIR(int comboTypeID, int mikTypeID,
     readerMin->read(&audioBufferMin, 0, readerMin->lengthInSamples, 0, true, true);
     readerMax->read(&audioBufferMax, 0, readerMax->lengthInSamples, 0, true, true);
     // check if both audioBuffers are equal length
-    if (audioBufferMax.getNumChannels() != audioBufferMin.getNumChannels() || audioBufferMax.getNumSamples() != audioBufferMin.getNumSamples()) { DBG("Not the same no of channels or samples"); juce::File emptyFile; return emptyFile; }
+    if (audioBufferMax.getNumChannels() != audioBufferMin.getNumChannels() || audioBufferMax.getNumSamples() != audioBufferMin.getNumSamples()) { DBG("Not the same no of channels or samples"); }
     audioBufferInterp.setSize(audioBufferMax.getNumChannels(), audioBufferMax.getNumSamples());
     float interpValue = 0;
     for (int ch = 0; ch < audioBufferMax.getNumChannels(); ++ch) {
@@ -388,11 +391,20 @@ juce::File BasicEQAudioProcessor::updateLoadedIR(int comboTypeID, int mikTypeID,
     // write audiobuffer into wave file for further fft analysis in plugineditor
     juce::WavAudioFormat format;
     std::unique_ptr<juce::AudioFormatWriter> writer;
-    juce::File file;
-    writer.reset(format.createWriterFor(new juce::FileOutputStream(file), sampleRate, audioBufferInterp.getNumChannels(), 24, {}, 0));
-    if (writer != nullptr)
-        writer->writeFromAudioSampleBuffer(audioBufferInterp, 0, audioBufferInterp.getNumSamples());
-    return file;
+    /*juce::File file;
+    juce::TemporaryFile tempFile;*/
+    {
+        if (auto outStream = std::unique_ptr<juce::FileOutputStream> (tempFile.getFile().createOutputStream())) {
+            writer.reset(format.createWriterFor(outStream.get(), sampleRate, audioBufferInterp.getNumChannels(), 24, {}, 0));
+            if (writer != nullptr) {
+                outStream.release();
+                writer->writeFromAudioSampleBuffer(audioBufferInterp, 0, audioBufferInterp.getNumSamples());
+            }
+            writer = nullptr;
+        }
+    }
+    suspendProcessing(false);
+    //return file;
     /*DBG("Loaded IR from array " << comboTypeID << " " << mikTypeID << " " << yPos << " " << xPos);
     DBG("File name is " << impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos].getFileName());
     DBG("IR Size is " << irLoader.getCurrentIRSize());*/

@@ -934,10 +934,11 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     comboTypeBox.addItem("SV", 3);
     comboTypeBox.setSelectedId(1);
     comboTypeBox.onChange = [this]() { 
-        DBG("changed combo"); 
-        juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); 
+        DBG("changed combo");
+        juce::TemporaryFile tempFile;
+        audioProcessor.updateLoadedIR(tempFile, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); 
         userIRLoaded = false; 
-        irfftComponent.loadedIRChanged(newIR);
+        irfftComponent.loadedIRChanged(tempFile.getFile());
         };
 
     mikTypeBox.addItem("57A", 1);
@@ -946,9 +947,10 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     mikTypeBox.setSelectedId(1);
     mikTypeBox.onChange = [this]() {
         DBG("changed mic");
-        juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
+        juce::TemporaryFile tempFile;
+        audioProcessor.updateLoadedIR(tempFile, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
         userIRLoaded = false;
-        irfftComponent.loadedIRChanged(newIR);
+        irfftComponent.loadedIRChanged(tempFile.getFile());
         };
 
     for (auto* comp : getComps())
@@ -978,19 +980,19 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     // TODO: Interpolate loaded IR, X and Y pos now floats
     yPosSlider.onValueChange = [this]() { 
         //DBG("changed yPos to " << yPosSlider.getValue());
-        float yPosSliderValue = yPosSlider.getValue();
-        float xPosSliderValue = xPosSlider.getValue();
-        juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSliderValue, xPosSliderValue);
+        juce::TemporaryFile tempFile;
+        audioProcessor.updateLoadedIR(tempFile, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
         userIRLoaded = false;
-        if (newIR.getSize() == 0) return;
-        irfftComponent.loadedIRChanged(newIR);
+        if (tempFile.getFile().getSize() == 0) return;
+        irfftComponent.loadedIRChanged(tempFile.getFile());
     };
     xPosSlider.onValueChange = [this]() { 
         //DBG("changed xPos to " << xPosSlider.getValue());
-        juce::File newIR = audioProcessor.updateLoadedIR(comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
+        juce::TemporaryFile tempFile;
+        audioProcessor.updateLoadedIR(tempFile, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
         userIRLoaded = false;
-        if (newIR.getSize() == 0) return;
-        irfftComponent.loadedIRChanged(newIR);
+        if (tempFile.getFile().getSize() == 0) return;
+        irfftComponent.loadedIRChanged(tempFile.getFile());
         };
 
     loadBtn.setButtonText("Load IR");

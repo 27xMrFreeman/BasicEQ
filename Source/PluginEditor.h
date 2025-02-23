@@ -331,7 +331,7 @@ struct IrFFTComponent : juce::Component/*,
 
     /*void parameterValueChanged(int parameterIndex, float newValue) override;
     void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;*/
-    void loadedIRChanged(juce::File newIR);
+    void loadedIRChanged(juce::File& newIR);
     void loadedIRChanged(juce::AudioBuffer<float> newIR);
     void paint(juce::Graphics& g) override;
     void resized() override;

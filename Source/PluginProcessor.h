@@ -293,7 +293,7 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    juce::File updateLoadedIR(int comboTypeID, int mikTypeID, int yPos, int xPos);
+    void updateLoadedIR(juce::TemporaryFile& tempFile, int comboTypeID, int mikTypeID, float yPos, float xPos);
     void loadShippedImpulseResponses();
     float getRMSValue(const int channel) const;
 
