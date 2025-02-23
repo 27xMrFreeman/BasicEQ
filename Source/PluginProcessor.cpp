@@ -339,6 +339,8 @@ void BasicEQAudioProcessor::updateLoadedIR(juce::TemporaryFile& tempFile, int co
     // load IR, stereo, trimmed, normalized, size 0 = original IR size
         irLoader.loadImpulseResponse(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPos/20)][xPos], juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
         impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPos / 20)][xPos].copyFileTo(tempFile.getFile());
+        suspendProcessing(false);
+        return;
     }
 
     // otherwise interpolate between floor of X Y and ceil of X Y, Y has to be rounded to 0 10 or 40 (recorded distances) and X to even values
