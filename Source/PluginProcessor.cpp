@@ -286,8 +286,9 @@ void BasicEQAudioProcessor::setStateInformation (const void* data, int sizeInByt
         updateFilters();
         auto settings = getChainSettings(apvts);
         loadShippedImpulseResponses();
-        juce::TemporaryFile tempFile;
-        updateLoadedIR(tempFile, settings.comboType, settings.micType, settings.yPos, settings.xPos);
+        juce::AudioBuffer<float> irBuffer;
+        int sampleRate = 0;
+        updateLoadedIR(irBuffer, sampleRate, settings.comboType, settings.micType, settings.yPos, settings.xPos);
         
     }
 }
@@ -323,7 +324,7 @@ Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRat
                                                                 juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
 }
 
-void BasicEQAudioProcessor::updateLoadedIR(juce::TemporaryFile& tempFile, int comboTypeID, int mikTypeID, float yPos, float xPos)
+void BasicEQAudioProcessor::updateLoadedIR(juce::AudioBuffer<float>& bufferInterp, int& sampleRate, int comboTypeID, int mikTypeID, float yPos, float xPos)
 {
     // this might take a while, need to turn off processing
     suspendProcessing(true);
@@ -333,12 +334,21 @@ void BasicEQAudioProcessor::updateLoadedIR(juce::TemporaryFile& tempFile, int co
     float maxDistance = 0, distance = 0, transposedDistance = 0;
     int yPosArr[3] = { 0, 10, 40 };
     int xPosArr[6] = { 0, 2, 4, 6, 8, 10 };
-
+    // formatManager takes a file (wav in our case), returns AudioBuffer (could return float array tho)
+    juce::AudioFormatManager formatManager;
+    formatManager.registerBasicFormats();
     // if Y = {0,10,40} and X = {0,2,4,..,10}, no need to interpolate
     if (std::any_of(std::begin(yPosArr), std::end(yPosArr), [&](int i) { return i == yPos; }) && std::any_of(std::begin(xPosArr), std::end(xPosArr), [&](int j) {return j == xPos; })) {
     // load IR, stereo, trimmed, normalized, size 0 = original IR size
         irLoader.loadImpulseResponse(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPos/20)][xPos], juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
-        impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPos / 20)][xPos].copyFileTo(tempFile.getFile());
+        // TODO: file -> audiobuffer, get samplerate from file
+        std::unique_ptr<juce::AudioFormatReader> reader;
+        reader.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPos / 20)][xPos]));
+        bufferInterp.setSize(reader->numChannels, reader->lengthInSamples);
+        if (!reader->read(&bufferInterp, 0, reader->lengthInSamples, 0, true, true)) { DBG("Reader for non-interpolated file failed to write to buffer"); }
+        
+        sampleRate = reader->sampleRate;
+        
         suspendProcessing(false);
         return;
     }
@@ -363,48 +373,54 @@ void BasicEQAudioProcessor::updateLoadedIR(juce::TemporaryFile& tempFile, int co
 
     // 5. interpolate
     // (a * (1.0 - f)) + (b * f) where f = transposedDistance
-    // formatManager takes a file (wav in our case), returns AudioBuffer (could return float array tho)
-    juce::AudioFormatManager formatManager;
-    formatManager.registerBasicFormats();
+    
+    
     // impulseResponseArray[typ komba][typ mikrofonu][pozice Y - 0=0, 1=10, 2=40]  [pozice X] 
-    std::unique_ptr<juce::AudioFormatReader> readerMin;
-    std::unique_ptr<juce::AudioFormatReader> readerMax;
+    std::unique_ptr<juce::AudioFormatReader> readerMin, readerMax;
+
     readerMin.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPosRoundDown / 20)][xPosRoundDown]));
     readerMax.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPosRoundUp / 20)][xPosRoundUp]));
+
     juce::AudioBuffer<float> audioBufferMin, audioBufferMax, audioBufferInterp;
+
     audioBufferMin.setSize(readerMin->numChannels, readerMin->lengthInSamples);
     audioBufferMax.setSize(readerMax->numChannels, readerMax->lengthInSamples);
-    int sampleRate = readerMin->sampleRate;
+    
+    sampleRate = readerMin->sampleRate;
+    
     readerMin->read(&audioBufferMin, 0, readerMin->lengthInSamples, 0, true, true);
     readerMax->read(&audioBufferMax, 0, readerMax->lengthInSamples, 0, true, true);
+    
     // check if both audioBuffers are equal length
     if (audioBufferMax.getNumChannels() != audioBufferMin.getNumChannels() || audioBufferMax.getNumSamples() != audioBufferMin.getNumSamples()) { DBG("Not the same no of channels or samples"); }
-    audioBufferInterp.setSize(audioBufferMax.getNumChannels(), audioBufferMax.getNumSamples());
+    
+    bufferInterp.setSize(audioBufferMax.getNumChannels(), audioBufferMax.getNumSamples());
+    
     float interpValue = 0;
+    
     for (int ch = 0; ch < audioBufferMax.getNumChannels(); ++ch) {
         for (int s = 0; s < audioBufferMax.getNumSamples(); ++s) {
             interpValue = audioBufferMin.getSample(ch, s) * (1.0 - transposedDistance) + (audioBufferMax.getSample(ch, s) * transposedDistance);
-            audioBufferInterp.setSample(ch, s, interpValue);
+            bufferInterp.setSample(ch, s, interpValue);
         }
     }
     // load IR, stereo, trimmed, normalized, size 0 = original IR size
     irLoader.loadImpulseResponse((juce::AudioBuffer <float>)audioBufferInterp, (double)sampleRate, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, juce::dsp::Convolution::Normalise::yes);
-    
-    // write audiobuffer into wave file for further fft analysis in plugineditor
-    juce::WavAudioFormat format;
-    std::unique_ptr<juce::AudioFormatWriter> writer;
-    /*juce::File file;
-    juce::TemporaryFile tempFile;*/
-    {
-        if (auto outStream = std::unique_ptr<juce::FileOutputStream> (tempFile.getFile().createOutputStream())) {
-            writer.reset(format.createWriterFor(outStream.get(), sampleRate, audioBufferInterp.getNumChannels(), 24, {}, 0));
-            if (writer != nullptr) {
-                outStream.release();
-                writer->writeFromAudioSampleBuffer(audioBufferInterp, 0, audioBufferInterp.getNumSamples());
-            }
-            writer = nullptr;
-        }
-    }
+    //// write audiobuffer into wave file for further fft analysis in plugineditor
+    //juce::WavAudioFormat format;
+    //std::unique_ptr<juce::AudioFormatWriter> writer;
+    ///*juce::File file;
+    //juce::TemporaryFile tempFile;*/
+    //{
+    //    if (auto outStream = std::unique_ptr<juce::FileOutputStream> (tempFile.getFile().createOutputStream())) {
+    //        writer.reset(format.createWriterFor(outStream.get(), sampleRate, audioBufferInterp.getNumChannels(), 24, {}, 0));
+    //        if (writer != nullptr) {
+    //            outStream.release();
+    //            writer->writeFromAudioSampleBuffer(audioBufferInterp, 0, audioBufferInterp.getNumSamples());
+    //        }
+    //        writer = nullptr;
+    //    }
+    //}
     suspendProcessing(false);
     //return file;
     /*DBG("Loaded IR from array " << comboTypeID << " " << mikTypeID << " " << yPos << " " << xPos);

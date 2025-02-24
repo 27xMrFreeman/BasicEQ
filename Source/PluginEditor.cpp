@@ -795,57 +795,58 @@ void IrFFTComponent::loadedIRChanged(juce::File newIR)
     repaint();
 }
 
-//void IrFFTComponent::loadedIRChanged(juce::AudioBuffer<float> newIR)
-//{
-//    //juce::AudioFormatManager formatManager;
-//    //formatManager.registerBasicFormats();
-//
-//    //if (!newIR.existsAsFile()) { /*DBG("loadedIRChanged: loaded file is not a file");*/ return; }
-//
-//    //std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(newIR));
-//    //if (reader.get() == nullptr) { /*DBG("loadedIRChanged: nullptr in reader");*/ return; }
-//
-//    //leftPathProducer.leftChannelFFTDataGenerator.changeOrder(FFTOrder::order16384);
-//
-//    //auto fileSampleRate = reader->sampleRate;
-//    //auto lengthInSamples = reader->lengthInSamples;
-//    auto fftBounds = getAnalysisArea().toFloat();
-//    const auto fftSize = leftPathProducer.leftChannelFFTDataGenerator.getFFTSize();
-//    //const auto binWidth = fileSampleRate / (double)fftSize; // e.g. 48000 / 2048 = 23 Hz - frequency width of one fft bin, casting fftSize to double because sampleRate is double
-//
-//    //// 
-//    ////juce::AudioBuffer<float> audioBuffer(reader->numChannels, lengthInSamples);
-//    ////reader->read(&audioBuffer, 0, 8192, 0, true, true); // reader should return zeros if the file it reads is shorter than 4096 samples, this size must be 2 * FFT size
-//
-//    //// THIS IS FOR LEFT CH ONLY
-//    //juce::AudioBuffer<float> audioBuffer(1, fftSize); // allocate buffer for 1 channel with how many samples are needed for FFT
-//    //reader->read(&audioBuffer, 0, fftSize, 0, true, false);
-//
-//    //fft.performFrequencyOnlyForwardTransform(audioBuffer.getWritePointer(Channel::Left), false);
-//
-//    leftPathProducer.leftChannelFFTDataGenerator.produceFFTDataForRendering(newIR, -130.f);
-//
-//    // if there are FFT data buffers to pull, try to pull it and generate path from it
-//    // fftBounds is where it should draw the path
-//
-//
-//    while (leftPathProducer.leftChannelFFTDataGenerator.getNumAvailableFFTDataBlocks() > 0)
-//    {
-//        std::vector<float> fftData;
-//        if (leftPathProducer.leftChannelFFTDataGenerator.getFFTData(fftData))
-//        {
-//            leftPathProducer.pathProducer.generatePath(fftData, fftBounds, fftSize, binWidth, -90.f);
-//        }
-//    }
-//
-//    // if there are paths that can be pulled, pull as many as possible, display the most recent one
-//    while (leftPathProducer.pathProducer.getNumPathsAvailable())
-//    {
-//        leftPathProducer.pathProducer.getPath(leftPathProducer.leftChannelFFTPath);
-//    }
-//
-//    repaint();
-//}
+// const reference since we dont need to change original objects
+void IrFFTComponent::loadedIRChanged(const juce::AudioBuffer<float>& newIR, const int& sampleRate)
+{
+    //juce::AudioFormatManager formatManager;
+    //formatManager.registerBasicFormats();
+
+    //if (!newIR.existsAsFile()) { /*DBG("loadedIRChanged: loaded file is not a file");*/ return; }
+
+    //std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(newIR));
+    //if (reader.get() == nullptr) { /*DBG("loadedIRChanged: nullptr in reader");*/ return; }
+
+    //leftPathProducer.leftChannelFFTDataGenerator.changeOrder(FFTOrder::order16384);
+
+    //auto fileSampleRate = reader->sampleRate;
+    //auto lengthInSamples = reader->lengthInSamples;
+    auto fftBounds = getAnalysisArea().toFloat();
+    const auto fftSize = leftPathProducer.leftChannelFFTDataGenerator.getFFTSize();
+    const auto binWidth = sampleRate / (double)fftSize; // e.g. 48000 / 2048 = 23 Hz - frequency width of one fft bin, casting fftSize to double because sampleRate is double
+
+    //// 
+    ////juce::AudioBuffer<float> audioBuffer(reader->numChannels, lengthInSamples);
+    ////reader->read(&audioBuffer, 0, 8192, 0, true, true); // reader should return zeros if the file it reads is shorter than 4096 samples, this size must be 2 * FFT size
+
+    //// THIS IS FOR LEFT CH ONLY
+    //juce::AudioBuffer<float> audioBuffer(1, fftSize); // allocate buffer for 1 channel with how many samples are needed for FFT
+    //reader->read(&audioBuffer, 0, fftSize, 0, true, false);
+
+    //fft.performFrequencyOnlyForwardTransform(audioBuffer.getWritePointer(Channel::Left), false);
+
+    leftPathProducer.leftChannelFFTDataGenerator.produceFFTDataForRendering(newIR, -130.f);
+
+    // if there are FFT data buffers to pull, try to pull it and generate path from it
+    // fftBounds is where it should draw the path
+
+
+    while (leftPathProducer.leftChannelFFTDataGenerator.getNumAvailableFFTDataBlocks() > 0)
+    {
+        std::vector<float> fftData;
+        if (leftPathProducer.leftChannelFFTDataGenerator.getFFTData(fftData))
+        {
+            leftPathProducer.pathProducer.generatePath(fftData, fftBounds, fftSize, binWidth, -90.f);
+        }
+    }
+
+    // if there are paths that can be pulled, pull as many as possible, display the most recent one
+    while (leftPathProducer.pathProducer.getNumPathsAvailable())
+    {
+        leftPathProducer.pathProducer.getPath(leftPathProducer.leftChannelFFTPath);
+    }
+
+    repaint();
+}
 
 void IrFFTComponent::paint(juce::Graphics& g)
 {
@@ -987,10 +988,11 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     comboTypeBox.setSelectedId(1);
     comboTypeBox.onChange = [this]() { 
         DBG("changed combo");
-        juce::TemporaryFile tempFile;
-        audioProcessor.updateLoadedIR(tempFile, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue()); 
+        juce::AudioBuffer<float> irBuffer;
+        int sampleRate = 0;
+        audioProcessor.updateLoadedIR(irBuffer, sampleRate, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
         userIRLoaded = false; 
-        irfftComponent.loadedIRChanged(tempFile.getFile());
+        irfftComponent.loadedIRChanged(irBuffer, sampleRate);
         };
 
     mikTypeBox.addItem("57A", 1);
@@ -999,10 +1001,11 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     mikTypeBox.setSelectedId(1);
     mikTypeBox.onChange = [this]() {
         DBG("changed mic");
-        juce::TemporaryFile tempFile;
-        audioProcessor.updateLoadedIR(tempFile, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
+        juce::AudioBuffer<float> irBuffer;
+        int sampleRate = 0;
+        audioProcessor.updateLoadedIR(irBuffer, sampleRate, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
         userIRLoaded = false;
-        irfftComponent.loadedIRChanged(tempFile.getFile());
+        irfftComponent.loadedIRChanged(irBuffer, sampleRate);
         };
 
     for (auto* comp : getComps())
@@ -1032,19 +1035,21 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     // TODO: Interpolate loaded IR, X and Y pos now floats
     yPosSlider.onValueChange = [this]() { 
         //DBG("changed yPos to " << yPosSlider.getValue());
-        juce::TemporaryFile tempFile;
-        audioProcessor.updateLoadedIR(tempFile, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
+        juce::AudioBuffer<float> irBuffer;
+        int sampleRate = 0;
+        audioProcessor.updateLoadedIR(irBuffer, sampleRate, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
         userIRLoaded = false;
-        if (tempFile.getFile().getSize() == 0) return;
-        irfftComponent.loadedIRChanged(tempFile.getFile());
+        //if (tempFile.getFile().getSize() == 0) return;
+        irfftComponent.loadedIRChanged(irBuffer, sampleRate);
     };
     xPosSlider.onValueChange = [this]() { 
         //DBG("changed xPos to " << xPosSlider.getValue());
-        juce::TemporaryFile tempFile;
-        audioProcessor.updateLoadedIR(tempFile, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
+        juce::AudioBuffer<float> irBuffer;
+        int sampleRate = 0;
+        audioProcessor.updateLoadedIR(irBuffer, sampleRate, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
         userIRLoaded = false;
-        if (tempFile.getFile().getSize() == 0) return;
-        irfftComponent.loadedIRChanged(tempFile.getFile());
+        //if (tempFile.getFile().getSize() == 0) return;
+        irfftComponent.loadedIRChanged(irBuffer, sampleRate);
         };
 
     loadBtn.setButtonText("Load IR");
