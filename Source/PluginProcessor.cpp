@@ -340,7 +340,7 @@ void BasicEQAudioProcessor::updateLoadedIR(juce::AudioBuffer<float>& bufferInter
     // if Y = {0,10,40} and X = {0,2,4,..,10}, no need to interpolate
     if (std::any_of(std::begin(yPosArr), std::end(yPosArr), [&](int i) { return i == yPos; }) && std::any_of(std::begin(xPosArr), std::end(xPosArr), [&](int j) {return j == xPos; })) {
     // load IR, stereo, trimmed, normalized, size 0 = original IR size
-        irLoader.loadImpulseResponse(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPos/20)][xPos], juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
+        irLoader.loadImpulseResponse(impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPos/20)][xPos], juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
         // TODO: file -> audiobuffer, get samplerate from file
         std::unique_ptr<juce::AudioFormatReader> reader;
         reader.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPos / 20)][xPos]));
@@ -378,8 +378,8 @@ void BasicEQAudioProcessor::updateLoadedIR(juce::AudioBuffer<float>& bufferInter
     // impulseResponseArray[typ komba][typ mikrofonu][pozice Y - 0=0, 1=10, 2=40]  [pozice X] 
     std::unique_ptr<juce::AudioFormatReader> readerMin, readerMax;
 
-    readerMin.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPosRoundDown / 20)][xPosRoundDown]));
-    readerMax.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPosRoundUp / 20)][xPosRoundUp]));
+    readerMin.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPosRoundDown / 20)][xPosRoundDown]));
+    readerMax.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPosRoundUp / 20)][xPosRoundUp]));
 
     juce::AudioBuffer<float> audioBufferMin, audioBufferMax, audioBufferInterp;
 
