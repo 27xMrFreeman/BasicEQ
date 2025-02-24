@@ -361,8 +361,9 @@ void BasicEQAudioProcessor::updateLoadedIR(juce::AudioBuffer<float>& bufferInter
     // round X to even values
     xPosRoundUp = std::ceil(xPos);
     xPosRoundDown = std::floor(xPos);
-    if (xPosRoundUp % 2 == 0 && xPosRoundDown != xPosRoundUp) { xPosRoundDown -= 1; }
-    else if (xPosRoundDown != xPosRoundUp) { xPosRoundUp += 1; }
+    if (xPosRoundUp % 2 == 0 && xPosRoundDown != xPosRoundUp) { xPosRoundDown -= 1; } // when x = (1,2), (3,4), ...
+    else if (xPosRoundUp % 2 != 0 && xPosRoundUp == xPosRoundDown) { xPosRoundDown -= 1; xPosRoundUp += 1; } // when x = 1, 3, 5...
+    else if (xPosRoundDown != xPosRoundUp) { xPosRoundUp += 1; } // when x = (0,1), (2,3), ...
 
     // 2. find the total distance between floor(XY) and ceil(XY)
     maxDistance = std::sqrt(std::pow((xPosRoundUp - xPosRoundDown), 2) + std::pow((yPosRoundUp - yPosRoundDown), 2));
@@ -506,7 +507,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Q", "Peak Q",
         juce::NormalisableRange<float>(0.1f, 10.f, 0.05f, 1.f), 7.f));
 
-    layout.add(std::make_unique<juce::AudioParameterFloat>("X Position", "X Position", juce::NormalisableRange<float>(0, 10, 2), 0));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("X Position", "X Position", juce::NormalisableRange<float>(0.f, 10.f, 0.05f), 0));
 
     juce::StringArray yPosChoices("0 cm", "10 cm", "40 cm");
     
