@@ -182,36 +182,36 @@ struct LookAndFeel : juce::LookAndFeel_V4
                             bool shouldDrawButtonAsHighlighted,
                             bool shouldDrawButtonAsDown) override;
 };
-
-struct LookAndFeelBlue : juce::LookAndFeel_V4
-{
-    void drawRotarySlider(juce::Graphics&,
-        int x, int y, int width, int height,
-        float sliderPosProportional,
-        float rotaryStartAngle,
-        float rotaryEndAngle,
-        juce::Slider&) override;
-};
-
-struct LookAndFeelGreen : juce::LookAndFeel_V4
-{
-    void drawRotarySlider(juce::Graphics&,
-        int x, int y, int width, int height,
-        float sliderPosProportional,
-        float rotaryStartAngle,
-        float rotaryEndAngle,
-        juce::Slider&) override;
-};
-
-struct LookAndFeelBlack : juce::LookAndFeel_V4
-{
-    void drawRotarySlider(juce::Graphics&,
-        int x, int y, int width, int height,
-        float sliderPosProportional,
-        float rotaryStartAngle,
-        float rotaryEndAngle,
-        juce::Slider&) override;
-};
+//
+//struct LookAndFeelBlue : juce::LookAndFeel_V4
+//{
+//    void drawRotarySlider(juce::Graphics&,
+//        int x, int y, int width, int height,
+//        float sliderPosProportional,
+//        float rotaryStartAngle,
+//        float rotaryEndAngle,
+//        juce::Slider&) override;
+//};
+//
+//struct LookAndFeelGreen : juce::LookAndFeel_V4
+//{
+//    void drawRotarySlider(juce::Graphics&,
+//        int x, int y, int width, int height,
+//        float sliderPosProportional,
+//        float rotaryStartAngle,
+//        float rotaryEndAngle,
+//        juce::Slider&) override;
+//};
+//
+//struct LookAndFeelBlack : juce::LookAndFeel_V4
+//{
+//    void drawRotarySlider(juce::Graphics&,
+//        int x, int y, int width, int height,
+//        float sliderPosProportional,
+//        float rotaryStartAngle,
+//        float rotaryEndAngle,
+//        juce::Slider&) override;
+//};
 
 struct RotarySliderWithLabels : juce::Slider
 {
@@ -243,9 +243,9 @@ struct RotarySliderWithLabels : juce::Slider
     juce::String getDisplayString() const;
 private:
     LookAndFeel lnf;
-    LookAndFeelBlue lnfb;
+    /*LookAndFeelBlue lnfb;
     LookAndFeelGreen lnfg;
-    LookAndFeelBlack lnfk;
+    LookAndFeelBlack lnfk;*/
 
     juce::RangedAudioParameter* param;
     juce::String suffix;
@@ -422,9 +422,9 @@ private:
     std::vector<juce::Component*> getComps();
 
     LookAndFeel lnf;
-    LookAndFeelBlue lnfb;
+    /*LookAndFeelBlue lnfb;
     LookAndFeelGreen lnfg;
-    LookAndFeelBlack lnfk;
+    LookAndFeelBlack lnfk;*/
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BasicEQAudioProcessorEditor)
 };
