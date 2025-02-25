@@ -1,0 +1,57 @@
+/*
+  ==============================================================================
+
+    ResponseCurveComponent.h
+    Created: 25 Feb 2025 7:24:23pm
+    Author:  knize
+
+  ==============================================================================
+*/
+
+#pragma once
+#include <JuceHeader.h>
+#include "../PluginProcessor.h"
+#include "PathProducer.h"
+
+struct ResponseCurveComponent : juce::Component,
+    juce::AudioProcessorParameter::Listener,
+    juce::Timer
+{
+    ResponseCurveComponent(BasicEQAudioProcessor&);
+    ~ResponseCurveComponent();
+
+    void parameterValueChanged(int parameterIndex, float newValue) override;
+
+    /** Indicates that a parameter change gesture has started.
+
+        E.g. if the user is dragging a slider, this would be called with gestureIsStarting
+        being true when they first press the mouse button, and it will be called again with
+        gestureIsStarting being false when they release it.
+
+        IMPORTANT NOTE: This will be called synchronously, and many audio processors will
+        call it during their audio callback. This means that not only has your handler code
+        got to be completely thread-safe, but it's also got to be VERY fast, and avoid
+        blocking. If you need to handle this event on your message thread, use this callback
+        to trigger an AsyncUpdater or ChangeBroadcaster which you can respond to later on the
+        message thread.
+    */
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
+
+    void timerCallback() override;
+
+    void paint(juce::Graphics& g) override;
+    void resized() override;
+private:
+    BasicEQAudioProcessor& audioProcessor;
+    juce::Atomic<bool> parametersChanged{ false };
+    MonoChain monoChain;
+
+    void updateChain();
+
+    juce::Image background;
+
+    PathProducer leftPathProducer, rightPathProducer;
+
+    juce::Rectangle<int> getRenderArea();
+    juce::Rectangle<int> getAnalysisArea();
+};

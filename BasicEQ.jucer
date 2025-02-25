@@ -13,6 +13,39 @@
       <FILE id="l5XTvz" name="knob_red.png" compile="0" resource="1" file="F:/VUT/bakalarka/Zdroje/knob_red.png"/>
     </GROUP>
     <GROUP id="{738C76C2-F9DF-054B-1271-C9222DBDB02E}" name="Source">
+      <GROUP id="{7736E6C6-E69B-2196-95B8-E06560E35405}" name="Components">
+        <FILE id="U2OFYw" name="AnalyzerPathGenerator.cpp" compile="1" resource="0"
+              file="Source/Components/AnalyzerPathGenerator.cpp"/>
+        <FILE id="s469Fp" name="AnalyzerPathGenerator.h" compile="0" resource="0"
+              file="Source/Components/AnalyzerPathGenerator.h"/>
+        <FILE id="ytLgPq" name="Channel.h" compile="0" resource="0" file="Source/Components/Channel.h"/>
+        <FILE id="vJ84yr" name="FFTDataGenerator.cpp" compile="1" resource="0"
+              file="Source/Components/FFTDataGenerator.cpp"/>
+        <FILE id="YzujZr" name="FFTDataGenerator.h" compile="0" resource="0"
+              file="Source/Components/FFTDataGenerator.h"/>
+        <FILE id="p533m5" name="FFTOrder.h" compile="0" resource="0" file="Source/Components/FFTOrder.h"/>
+        <FILE id="ugbo1R" name="Fifo.cpp" compile="1" resource="0" file="Source/Components/Fifo.cpp"/>
+        <FILE id="jho5tu" name="Fifo.h" compile="0" resource="0" file="Source/Components/Fifo.h"/>
+        <FILE id="ys8KvU" name="IrFFTComponent.cpp" compile="1" resource="0"
+              file="Source/Components/IrFFTComponent.cpp"/>
+        <FILE id="GTMSDj" name="IrFFTComponent.h" compile="0" resource="0"
+              file="Source/Components/IrFFTComponent.h"/>
+        <FILE id="auFKKc" name="LookAndFeel.cpp" compile="1" resource="0" file="Source/Components/LookAndFeel.cpp"/>
+        <FILE id="D5Jp4z" name="LookAndFeel.h" compile="0" resource="0" file="Source/Components/LookAndFeel.h"/>
+        <FILE id="Z5LNHP" name="PathProducer.cpp" compile="1" resource="0"
+              file="Source/Components/PathProducer.cpp"/>
+        <FILE id="q6QF0M" name="PathProducer.h" compile="0" resource="0" file="Source/Components/PathProducer.h"/>
+        <FILE id="re1UHi" name="ResponseCurveComponent.cpp" compile="1" resource="0"
+              file="Source/Components/ResponseCurveComponent.cpp"/>
+        <FILE id="PDpwmz" name="ResponseCurveComponent.h" compile="0" resource="0"
+              file="Source/Components/ResponseCurveComponent.h"/>
+        <FILE id="F4C8P9" name="RotarySliderWithLabels.cpp" compile="1" resource="0"
+              file="Source/Components/RotarySliderWithLabels.cpp"/>
+        <FILE id="Cp2nTg" name="RotarySliderWithLabels.h" compile="0" resource="0"
+              file="Source/Components/RotarySliderWithLabels.h"/>
+        <FILE id="p4OJdI" name="SingleChannelSampleFifo.h" compile="0" resource="0"
+              file="Source/Components/SingleChannelSampleFifo.h"/>
+      </GROUP>
       <FILE id="ZkP7HP" name="HorizontalMeter.cpp" compile="1" resource="0"
             file="Source/HorizontalMeter.cpp"/>
       <FILE id="SHz9pe" name="HorizontalMeter.h" compile="0" resource="0"

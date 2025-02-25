@@ -1,0 +1,69 @@
+/*
+  ==============================================================================
+
+    Fifo.cpp
+    Created: 25 Feb 2025 8:49:57pm
+    Author:  knize
+
+  ==============================================================================
+*/
+
+#include "Fifo.h"
+template <class T>
+void Fifo<T>::prepare(int numChannels, int numSamples)
+{
+    static_assert(std::is_same_v<T, juce::AudioBuffer<float>>,
+        "prepare(numChannels, numSamples) should only be used when the Fifo is holding juce::AudioBuffer<float>");
+    for (auto& buffer : buffers)
+    {
+        buffer.setSize(numChannels,
+            numSamples,
+            false,   //clear everything?
+            true,    //including the extra space?
+            true);   //avoid reallocating if you can?
+        buffer.clear();
+    }
+}
+
+template <class T>
+void Fifo<T>::prepare(size_t numElements)
+{
+    static_assert(std::is_same_v<T, std::vector<float>>,
+        "prepare(numElements) should only be used when the Fifo is holding std::vector<float>");
+    for (auto& buffer : buffers)
+    {
+        buffer.clear();
+        buffer.resize(numElements, 0); // resize buffer and fill with zeros
+    }
+}
+// two prepare function depending on what type is passed, either AudioBuffer or vector
+template <class T>
+bool Fifo<T>::push(const T& t)
+{
+    auto write = fifo.write(1);
+    if (write.blockSize1 > 0)
+    {
+        buffers[write.startIndex1] = t;
+        return true;
+    }
+
+    return false;
+}
+
+template <class T>
+bool Fifo<T>::pull(T& t)
+{
+    auto read = fifo.read(1);
+    if (read.blockSize1 > 0)
+    {
+        t = buffers[read.startIndex1];
+        return true;
+    }
+
+    return false;
+}
+template <class T>
+int Fifo<T>::getNumAvailableForReading() const
+{
+    return fifo.getNumReady();
+}
