@@ -14,13 +14,9 @@
     </GROUP>
     <GROUP id="{738C76C2-F9DF-054B-1271-C9222DBDB02E}" name="Source">
       <GROUP id="{7736E6C6-E69B-2196-95B8-E06560E35405}" name="Components">
-        <FILE id="U2OFYw" name="AnalyzerPathGenerator.cpp" compile="1" resource="0"
-              file="Source/Components/AnalyzerPathGenerator.cpp"/>
         <FILE id="s469Fp" name="AnalyzerPathGenerator.h" compile="0" resource="0"
               file="Source/Components/AnalyzerPathGenerator.h"/>
         <FILE id="ytLgPq" name="Channel.h" compile="0" resource="0" file="Source/Components/Channel.h"/>
-        <FILE id="vJ84yr" name="FFTDataGenerator.cpp" compile="1" resource="0"
-              file="Source/Components/FFTDataGenerator.cpp"/>
         <FILE id="YzujZr" name="FFTDataGenerator.h" compile="0" resource="0"
               file="Source/Components/FFTDataGenerator.h"/>
         <FILE id="p533m5" name="FFTOrder.h" compile="0" resource="0" file="Source/Components/FFTOrder.h"/>
@@ -45,6 +41,8 @@
               file="Source/Components/RotarySliderWithLabels.h"/>
         <FILE id="p4OJdI" name="SingleChannelSampleFifo.h" compile="0" resource="0"
               file="Source/Components/SingleChannelSampleFifo.h"/>
+        <FILE id="L5cicb" name="XYPad.cpp" compile="1" resource="0" file="Source/Components/XYPad.cpp"/>
+        <FILE id="Pa5qwW" name="XYPad.h" compile="0" resource="0" file="Source/Components/XYPad.h"/>
       </GROUP>
       <FILE id="ZkP7HP" name="HorizontalMeter.cpp" compile="1" resource="0"
             file="Source/HorizontalMeter.cpp"/>
