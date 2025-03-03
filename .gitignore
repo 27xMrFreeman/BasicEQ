@@ -2,3 +2,4 @@
 **/JuceLibraryCode
 **/.DS_Store
 **/.vs
+!**\Builds\VisualStudio2022\x64\Debug\VST3\BasicEQ.vst3\Contents\x86_64-win\BasicEQ.vst3
