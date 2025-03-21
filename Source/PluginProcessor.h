@@ -174,6 +174,9 @@ public:
 private:
     MonoChain leftChain, rightChain;
     //ChainSettings chainSettings;
+    juce::AudioBuffer<float> bufferBPContour, bufferHPContour;
+    juce::dsp::IIR::Filter <float> LcontourBP, RcontourBP, LcontourHP, RcontourHP;
+    juce::dsp::Gain<float> contourBPGain, contourHPGain;
 
     void updatePeakFilter(const ChainSettings& chainSettings);
     void updateLowCutFilter(const ChainSettings& chainSettings);

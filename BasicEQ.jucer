@@ -20,7 +20,6 @@
         <FILE id="YzujZr" name="FFTDataGenerator.h" compile="0" resource="0"
               file="Source/Components/FFTDataGenerator.h"/>
         <FILE id="p533m5" name="FFTOrder.h" compile="0" resource="0" file="Source/Components/FFTOrder.h"/>
-        <FILE id="ugbo1R" name="Fifo.cpp" compile="1" resource="0" file="Source/Components/Fifo.cpp"/>
         <FILE id="jho5tu" name="Fifo.h" compile="0" resource="0" file="Source/Components/Fifo.h"/>
         <FILE id="ys8KvU" name="IrFFTComponent.cpp" compile="1" resource="0"
               file="Source/Components/IrFFTComponent.cpp"/>

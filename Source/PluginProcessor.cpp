@@ -113,6 +113,25 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     spec.numChannels = 1;
     spec.sampleRate = sampleRate;
     
+    //bufferBPContour.setSize(2, samplesPerBlock);
+    //bufferHPContour.setSize(2, samplesPerBlock);
+    //// filter design according to Will Pirkle Addendum chapter A19.26.3
+    //LcontourBP.coefficients = juce::dsp::IIR::Coefficients<float>::makeBandPass(sampleRate, 50.f, 0.222);
+    //RcontourBP.coefficients = LcontourBP.coefficients;
+    //LcontourHP.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 750.f);
+    //RcontourHP.coefficients = LcontourHP.coefficients;
+    //LcontourHP.prepare(spec);
+    //RcontourHP.prepare(spec);
+    //LcontourBP.prepare(spec);
+    //RcontourBP.prepare(spec);
+
+    //contourBPGain.reset();
+    //contourBPGain.prepare(spec);
+    //contourBPGain.setGainDecibels(3.5);
+    //contourHPGain.reset();
+    //contourHPGain.prepare(spec);
+    //contourHPGain.setGainDecibels(2);
+    
     outputGain.reset();
     outputGain.prepare(spec);
     outputGain.setGainDecibels(0);
@@ -192,8 +211,29 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
 
     updateFilters();
 
-    juce::dsp::AudioBlock<float> block(buffer);
+    //bufferBPContour = buffer;
+    //bufferHPContour = buffer;
+    //// blocks for parallel processing of contour filters in tone stack
+    juce::dsp::AudioBlock<float> /*blockBP(bufferBPContour), blockHP(bufferHPContour),*/ block(buffer);
+    //auto LblockBP = blockBP.getSingleChannelBlock(0);
+    //auto RblockBP = blockBP.getSingleChannelBlock(1);
+    //auto LblockHP = blockHP.getSingleChannelBlock(0);
+    //auto RblockHP = blockHP.getSingleChannelBlock(1);
 
+    //// filtering in parallel, filters have 0 gain, using dsp::Gain after filtering to boost filter
+    //juce::dsp::ProcessContextReplacing<float> LcontextBP(LblockBP), RcontextBP(RblockBP), LcontextHP(LblockHP), RcontextHP(RblockHP);
+    //LcontourBP.process(LcontextBP);
+    //RcontourBP.process(RcontextBP);
+    //contourBPGain.process(LcontextBP);
+    //contourBPGain.process(RcontextBP);
+    //LcontourHP.process(LcontextHP);
+    //RcontourHP.process(RcontextHP);
+    //contourHPGain.process(LcontextHP);
+    //contourHPGain.process(RcontextHP);
+
+    //// adding processed blocks together, divided by 2 to keep level same
+    //block.replaceWithSumOf(blockBP, blockHP);
+    //block.multiplyBy(0.5);
     //buffer.clear(); // for testing FFT with oscillator
     //juce::dsp::ProcessContextReplacing<float> stereoContext(block);
     //osc.process(stereoContext);
