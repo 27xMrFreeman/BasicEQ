@@ -43,7 +43,7 @@ struct ChainSettings
     comboTypeEnum comboType{comboTypeEnum::Mar};
     micTypeEnum micType{ micTypeEnum::a57 };
     bool lowCutBypassed{ false }, peakBypassed{ false }, highCutBypassed{ false }, irBypassed{ false };
-    float outputGainInDecibels{ 0 };
+    float inputGainInDecibels{0}, outputGainInDecibels{0};
 };
 
 ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts);
@@ -157,7 +157,8 @@ public:
 
     void updateLoadedIR(juce::AudioBuffer<float>& buffer, int& sampleRate, int comboTypeID, int mikTypeID, float yPos, float xPos);
     void loadShippedImpulseResponses();
-    float getRMSValue(const int channel) const;
+    float getInputRMSValue(const int channel) const;
+    float getOutputRMSValue(const int channel) const;
 
     juce::File root, savedFile;
     juce::dsp::Convolution irLoader;
@@ -170,7 +171,7 @@ public:
     SingleChannelSampleFifo<BlockType> leftChannelFifo{ Channel::Left };
     SingleChannelSampleFifo<BlockType> rightChannelFifo{ Channel::Right };
 
-    juce::dsp::Gain<float> outputGain;
+    juce::dsp::Gain<float> inputGain, outputGain;
 private:
     MonoChain leftChain, rightChain;
     //ChainSettings chainSettings;
@@ -188,7 +189,7 @@ private:
     void updateFilters();
 
     juce::dsp::Oscillator<float> osc;
-    juce::LinearSmoothedValue<float> rmsLevelLeft, rmsLevelRight;
+    juce::LinearSmoothedValue<float> rmsLevelInputLeft, rmsLevelInputRight, rmsLevelOutputLeft, rmsLevelOutputRight;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BasicEQAudioProcessor)
 };

@@ -44,8 +44,10 @@ private:
     juce::Image backgroundImage;
 
     // meters
-    HorizontalMeterLeft meterLeft;
-    HorizontalMeterRight meterRight;
+    HorizontalMeterLeft meterInLeft;
+    HorizontalMeterLeft meterOutLeft;
+    HorizontalMeterRight meterInRight;
+    HorizontalMeterRight meterOutRight;
 
     // IR loader GUI:
     juce::TextButton loadBtn;
@@ -67,6 +69,7 @@ private:
         highCutFreqSlider,
         lowCutSlopeSlider,
         highCutSlopeSlider,
+        inputGainSlider,
         outputGainSlider;
     juce::ToggleButton lowCutBypassButton, peakBypassButton, highCutBypassButton, irBypassButton;
         // rendered response curve of EQ filters line
@@ -86,6 +89,7 @@ private:
         highCutSlopeSliderAttachment,
         xPosSliderAttachment,
         yPosSliderAttachment,
+        inputGainSliderAttachment,
         outputGainSliderAttachment;
 
     using ButtonAttachment = APVTS::ButtonAttachment;

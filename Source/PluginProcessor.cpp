@@ -135,14 +135,21 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     contourHPGain.prepare(spec);
     contourHPGain.setGainDecibels(2);
     
+    inputGain.reset();
+    inputGain.prepare(spec);
+    inputGain.setGainDecibels(0);
     outputGain.reset();
     outputGain.prepare(spec);
     outputGain.setGainDecibels(0);
 
-    rmsLevelLeft.reset(sampleRate, 0.2);
-    rmsLevelRight.reset(sampleRate, 0.1);
-    rmsLevelLeft.setCurrentAndTargetValue(-100.f);
-    rmsLevelRight.setCurrentAndTargetValue(-100.f);
+    rmsLevelInputLeft.reset(sampleRate, 0.2);
+    rmsLevelInputRight.reset(sampleRate, 0.1);
+    rmsLevelInputLeft.setCurrentAndTargetValue(-100.f);
+    rmsLevelInputRight.setCurrentAndTargetValue(-100.f);
+    rmsLevelOutputLeft.reset(sampleRate, 0.2);
+    rmsLevelOutputRight.reset(sampleRate, 0.1);
+    rmsLevelOutputLeft.setCurrentAndTargetValue(-100.f);
+    rmsLevelOutputRight.setCurrentAndTargetValue(-100.f);
 
     leftChain.prepare(spec);
     rightChain.prepare(spec);
@@ -216,6 +223,7 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     auto settings = getChainSettings(apvts);
+    juce::dsp::AudioBlock<float> block(buffer);
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
     // guaranteed to be empty - they may contain garbage).
@@ -225,14 +233,41 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
    /* for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());*/
 
+    // TODO: Input gain with visualisation
+    // APPLY GAIN KNOB
+    inputGain.process(juce::dsp::ProcessContextReplacing<float>(block));
+    // CALC and SET RMS LEVEL OF L&R CHANNELS
+    rmsLevelInputLeft.skip(buffer.getNumSamples());
+    rmsLevelInputRight.skip(buffer.getNumSamples());
+    const auto valueInLeft = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
+    if (valueInLeft < rmsLevelInputLeft.getCurrentValue()) { rmsLevelInputLeft.setTargetValue(valueInLeft); } // if the new value is lower than the current one, apply smoothing
+    else { rmsLevelInputLeft.setCurrentAndTargetValue(valueInLeft); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
+
+    const auto valueInRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+    if (valueInRight < rmsLevelInputRight.getCurrentValue()) { rmsLevelInputRight.setTargetValue(valueInRight); } // if the new value is lower than the current one, apply smoothing
+    else { rmsLevelInputRight.setCurrentAndTargetValue(valueInRight); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
+
+    // TODO: Poletti algorithm processing
+    //          needs 2 parallel processing lines
+    //          2 asymetric waveshapers with switched limits and 2 symetric waveshapers
+    //              Pirkle coeff: asymPosLim = 23.6, asymNegLim = 0.5, symLim = 1.01
+    //          after asym waveshape DC blocking HP filter
+    //          then sym waveshape, combine the two lines, DC filter
+    //          if (xn <= 0)
+    //              yn = (g * xn) / (1.0 - ((g * xn) / Ln));
+    //          else
+    //              yn = (g * xn) / (1.0 + ((g * xn) / Lp));
+
+
+
     updateFilters();
 
     //buffer.clear(); // for testing FFT with oscillator
-    juce::dsp::AudioBlock<float> blockBP(buffer), blockHP(buffer), block(buffer);
+    
     /*juce::dsp::ProcessContextReplacing<float> stereoContextBP(blockBP), stereoContextHP(blockHP);
     osc.process(stereoContextBP);
     osc.process(stereoContextHP);*/
-
+    juce::dsp::AudioBlock<float> blockBP(block), blockHP(block);
     bufferBPContour = buffer;
     bufferHPContour = buffer;
     // blocks for parallel processing of contour filters in tone stack
@@ -281,15 +316,15 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     outputGain.process(juce::dsp::ProcessContextReplacing<float>(block));
 
     // CALC and SET RMS LEVEL OF L&R CHANNELS
-    rmsLevelLeft.skip(buffer.getNumSamples());
-    rmsLevelRight.skip(buffer.getNumSamples());
-    const auto valueLeft = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
-    if (valueLeft < rmsLevelLeft.getCurrentValue()) { rmsLevelLeft.setTargetValue(valueLeft); } // if the new value is lower than the current one, apply smoothing
-    else { rmsLevelLeft.setCurrentAndTargetValue(valueLeft); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
+    rmsLevelOutputLeft.skip(buffer.getNumSamples());
+    rmsLevelOutputRight.skip(buffer.getNumSamples());
+    const auto valueOutLeft = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
+    if (valueOutLeft < rmsLevelOutputLeft.getCurrentValue()) { rmsLevelOutputLeft.setTargetValue(valueOutLeft); } // if the new value is lower than the current one, apply smoothing
+    else { rmsLevelOutputLeft.setCurrentAndTargetValue(valueOutLeft); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
 
-    const auto valueRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
-    if (valueRight < rmsLevelRight.getCurrentValue()) { rmsLevelRight.setTargetValue(valueRight); } // if the new value is lower than the current one, apply smoothing
-    else { rmsLevelRight.setCurrentAndTargetValue(valueRight); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
+    const auto valueOutRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+    if (valueOutRight < rmsLevelOutputRight.getCurrentValue()) { rmsLevelOutputRight.setTargetValue(valueOutRight); } // if the new value is lower than the current one, apply smoothing
+    else { rmsLevelOutputRight.setCurrentAndTargetValue(valueOutRight); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
     
 
     leftChannelFifo.update(buffer);
@@ -369,6 +404,7 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     settings.highCutBypassed = apvts.getRawParameterValue("HighCut Bypassed")->load() > 0.5f;
     settings.peakBypassed = apvts.getRawParameterValue("Peak Bypassed")->load() > 0.5f;
     settings.irBypassed = apvts.getRawParameterValue("IR Bypassed")->load() > 0.5f;
+    settings.inputGainInDecibels = apvts.getRawParameterValue("Input Gain")->load();
     settings.outputGainInDecibels = apvts.getRawParameterValue("Output Gain")->load();
     settings.micType = static_cast<micTypeEnum>(apvts.getRawParameterValue("Mic Type")->load());
     settings.comboType = static_cast<comboTypeEnum>(apvts.getRawParameterValue("Combo Type")->load());
@@ -600,6 +636,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     juce::StringArray micChoices("57A", "kalib", "sm57");
     layout.add(std::make_unique<juce::AudioParameterChoice>("Mic Type", "Mic Type", micChoices, 1));
 
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Input Gain", "Input Gain",
+        juce::NormalisableRange<float>(-24.f, 24.f, 0.1f, 1.f), 0.0f));
     layout.add(std::make_unique<juce::AudioParameterFloat>("Output Gain", "Output Gain",
         juce::NormalisableRange<float>(-24.f, 24.f, 0.1f, 1.f), 0.0f));
 
@@ -677,10 +715,18 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new BasicEQAudioProcessor();
 }
 
-float BasicEQAudioProcessor::getRMSValue(const int channel) const
+float BasicEQAudioProcessor::getInputRMSValue(const int channel) const
 {
     jassert(channel == 0 || channel == 1);
-    if (channel == 0) { return rmsLevelLeft.getCurrentValue(); }
-    else if (channel == 1) { return rmsLevelRight.getCurrentValue(); }
+    if (channel == 0) { return rmsLevelInputLeft.getCurrentValue(); }
+    else if (channel == 1) { return rmsLevelInputRight.getCurrentValue(); }
+    return 0.f;
+}
+
+float BasicEQAudioProcessor::getOutputRMSValue(const int channel) const
+{
+    jassert(channel == 0 || channel == 1);
+    if (channel == 0) { return rmsLevelOutputLeft.getCurrentValue(); }
+    else if (channel == 1) { return rmsLevelOutputRight.getCurrentValue(); }
     return 0.f;
 }

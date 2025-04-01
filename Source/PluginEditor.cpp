@@ -21,6 +21,7 @@ highCutFreqSlider(*audioProcessor.apvts.getParameter("HighCut Freq"), "Hz"),
 highCutSlopeSlider(*audioProcessor.apvts.getParameter("HighCut Slope"), "dB/Oct"),
 xPosSlider(*audioProcessor.apvts.getParameter("X Position"), "cm"),
 yPosSlider(*audioProcessor.apvts.getParameter("Y Position"), "cm"),
+inputGainSlider(*audioProcessor.apvts.getParameter("Input Gain"), "dB"),
 outputGainSlider(*audioProcessor.apvts.getParameter("Output Gain"), "dB"),
 responseCurveComponent(audioProcessor),
 irfftComponent(audioProcessor),
@@ -33,6 +34,7 @@ highCutFreqSliderAttachment(audioProcessor.apvts, "HighCut Freq", highCutFreqSli
 highCutSlopeSliderAttachment(audioProcessor.apvts, "HighCut Slope", highCutSlopeSlider),
 xPosSliderAttachment(audioProcessor.apvts, "X Position", xPosSlider),
 yPosSliderAttachment(audioProcessor.apvts, "Y Position", yPosSlider),
+inputGainSliderAttachment(audioProcessor.apvts, "Input Gain", inputGainSlider),
 outputGainSliderAttachment(audioProcessor.apvts, "Output Gain", outputGainSlider),
 lowCutBypassButtonAttachment(audioProcessor.apvts, "LowCut Bypassed", lowCutBypassButton),
 highCutBypassButtonAttachment(audioProcessor.apvts, "HighCut Bypassed", highCutBypassButton),
@@ -159,6 +161,7 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
             //DBG("loaded ir " << (int)userIRLoaded.compareAndSetBool(true, true) << "with length " << audioProcessor.irLoader.getCurrentIRSize());
     };
 
+    inputGainSlider.onValueChange = [this] { audioProcessor.inputGain.setGainDecibels(inputGainSlider.getValue()); };
     outputGainSlider.onValueChange = [this] { audioProcessor.outputGain.setGainDecibels(outputGainSlider.getValue()); /*DBG("Output gain set to " << outputGainSlider.getValue());*/ };
 
     setSize (1000, 600);
@@ -181,16 +184,21 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
     xPosSlider.setLookAndFeel(nullptr);
     yPosSlider.setLookAndFeel(nullptr);
     irBypassButton.setLookAndFeel(nullptr);
+    inputGainSlider.setLookAndFeel(nullptr);
     outputGainSlider.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
 void BasicEQAudioProcessorEditor::timerCallback()
 {
-    meterLeft.setLevel(audioProcessor.getRMSValue(0));
-    meterRight.setLevel(audioProcessor.getRMSValue(1));
-    meterLeft.repaint();
-    meterRight.repaint();
+    meterInLeft.setLevel(audioProcessor.getInputRMSValue(0));
+    meterInRight.setLevel(audioProcessor.getInputRMSValue(1));
+    meterInLeft.repaint();
+    meterInRight.repaint();
+    meterOutLeft.setLevel(audioProcessor.getOutputRMSValue(0));
+    meterOutRight.setLevel(audioProcessor.getOutputRMSValue(1));
+    meterOutLeft.repaint();
+    meterOutRight.repaint();
 }
 
 void BasicEQAudioProcessorEditor::paint (juce::Graphics& g)
@@ -208,6 +216,21 @@ void BasicEQAudioProcessorEditor::resized()
     // subcomponents in your editor..
 
     auto bounds = getLocalBounds();
+    bounds.reduce(bounds.getWidth() * 0.01, bounds.getHeight() * 0.01);
+    auto meterWidth = bounds.getWidth() * 0.1;
+    auto meterHeight = bounds.getHeight() * 0.2;
+    auto inputMeterArea = bounds.removeFromLeft(meterWidth);
+    auto outputMeterArea = bounds.removeFromRight(meterWidth);
+    auto inputGainArea = inputMeterArea.removeFromBottom(meterHeight);
+    auto outputGainArea = outputMeterArea.removeFromBottom(meterHeight);
+    inputGainSlider.setBounds(inputGainArea);
+    outputGainSlider.setBounds(outputGainArea);
+    meterInLeft.setBounds(inputMeterArea.removeFromLeft(inputMeterArea.getWidth()*0.5));
+    meterInRight.setBounds(inputMeterArea);
+    meterOutLeft.setBounds(outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.5));
+    meterOutRight.setBounds(outputMeterArea);
+
+
     auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.33);
 
     auto responseCurveComponentBounds = responseArea.removeFromRight(responseArea.getWidth() * 0.5);
@@ -275,11 +298,13 @@ void BasicEQAudioProcessorEditor::resized()
     GainArea.removeFromTop(GainArea.getHeight() * 0.6);
     GainArea.reduce(GainArea.getWidth() * 0.02, 0);
     
-    auto OutputGainArea = GainArea;
-    OutputGainArea.reduce(OutputGainArea.getWidth() * 0.44, 0);
-    outputGainSlider.setBounds(OutputGainArea);
+    //auto OutputGainArea = GainArea;
+    //OutputGainArea.reduce(OutputGainArea.getWidth() * 0.44, 0);
+    //inputGainSlider.setBounds(OutputGainArea.removeFromLeft(OutputGainArea.getWidth() * 0.5));
+    //OutputGainArea.reduce(OutputGainArea.getWidth() * 0.44, 0);
+    //outputGainSlider.setBounds(OutputGainArea);
 
-    auto meterLeftArea = GainArea.removeFromLeft(GainArea.getWidth() * 0.5);
+    /*auto meterLeftArea = GainArea.removeFromLeft(GainArea.getWidth() * 0.5);
     auto meterRightArea = GainArea;
     meterLeftArea.removeFromRight(OutputGainArea.getWidth() * 0.6);
     meterLeftArea.removeFromLeft(OutputGainArea.getWidth() * 0.6);
@@ -291,7 +316,7 @@ void BasicEQAudioProcessorEditor::resized()
     meterRightArea.translate(0, meterRightArea.getHeight() * (-0.5));
 
     meterLeft.setBounds(meterLeftArea);
-    meterRight.setBounds(meterRightArea);
+    meterRight.setBounds(meterRightArea);*/
 
 }
 
@@ -318,9 +343,12 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &peakBypassButton,
         &highCutBypassButton,
         &irBypassButton,
+        &inputGainSlider,
         &outputGainSlider,
-        &meterLeft,
-        &meterRight
+        &meterInLeft,
+        &meterInRight,
+        &meterOutLeft,
+        &meterOutRight
     };
 }
 
