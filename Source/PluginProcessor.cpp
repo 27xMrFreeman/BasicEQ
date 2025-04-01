@@ -233,7 +233,7 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
    /* for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());*/
 
-    // TODO: Input gain with visualisation
+    // DONE: Input gain with visualisation
     // APPLY GAIN KNOB
     inputGain.process(juce::dsp::ProcessContextReplacing<float>(block));
     // CALC and SET RMS LEVEL OF L&R CHANNELS
@@ -246,6 +246,7 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     const auto valueInRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
     if (valueInRight < rmsLevelInputRight.getCurrentValue()) { rmsLevelInputRight.setTargetValue(valueInRight); } // if the new value is lower than the current one, apply smoothing
     else { rmsLevelInputRight.setCurrentAndTargetValue(valueInRight); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
+    // TODO: make meters vertical instead of horizontal
 
     // TODO: Poletti algorithm processing
     //          needs 2 parallel processing lines
@@ -326,7 +327,6 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     if (valueOutRight < rmsLevelOutputRight.getCurrentValue()) { rmsLevelOutputRight.setTargetValue(valueOutRight); } // if the new value is lower than the current one, apply smoothing
     else { rmsLevelOutputRight.setCurrentAndTargetValue(valueOutRight); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
     
-
     leftChannelFifo.update(buffer);
     rightChannelFifo.update(buffer);
 
