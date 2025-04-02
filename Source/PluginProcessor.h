@@ -13,6 +13,7 @@
 #include <cmath>
 #include "Components/FFTDataGenerator.h"
 #include "Components/SingleChannelSampleFifo.h"
+#include "Components/AmpDrive.h"
 
 enum Slope
 {

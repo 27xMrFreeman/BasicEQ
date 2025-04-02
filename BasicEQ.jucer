@@ -14,9 +14,13 @@
     </GROUP>
     <GROUP id="{738C76C2-F9DF-054B-1271-C9222DBDB02E}" name="Source">
       <GROUP id="{7736E6C6-E69B-2196-95B8-E06560E35405}" name="Components">
+        <FILE id="i6iSjz" name="AmpDrive.cpp" compile="1" resource="0" file="Source/Components/AmpDrive.cpp"/>
+        <FILE id="SElEhZ" name="AmpDrive.h" compile="0" resource="0" file="Source/Components/AmpDrive.h"/>
         <FILE id="s469Fp" name="AnalyzerPathGenerator.h" compile="0" resource="0"
               file="Source/Components/AnalyzerPathGenerator.h"/>
         <FILE id="ytLgPq" name="Channel.h" compile="0" resource="0" file="Source/Components/Channel.h"/>
+        <FILE id="ChWPUt" name="CustomWaveShaper.cpp" compile="1" resource="0"
+              file="Source/Components/CustomWaveShaper.cpp"/>
         <FILE id="YzujZr" name="FFTDataGenerator.h" compile="0" resource="0"
               file="Source/Components/FFTDataGenerator.h"/>
         <FILE id="p533m5" name="FFTOrder.h" compile="0" resource="0" file="Source/Components/FFTOrder.h"/>
