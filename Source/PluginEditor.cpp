@@ -23,6 +23,14 @@ xPosSlider(*audioProcessor.apvts.getParameter("X Position"), "cm"),
 yPosSlider(*audioProcessor.apvts.getParameter("Y Position"), "cm"),
 inputGainSlider(*audioProcessor.apvts.getParameter("Input Gain"), "dB"),
 outputGainSlider(*audioProcessor.apvts.getParameter("Output Gain"), "dB"),
+asymPosGainSlider(*audioProcessor.apvts.getParameter("AsymPosGain"), ""),
+asymNegGainSlider(*audioProcessor.apvts.getParameter("AsymNegGain"), ""),
+symGainSlider(*audioProcessor.apvts.getParameter("SymGain"), ""),
+symLPLNSlider(*audioProcessor.apvts.getParameter("SymLPLN"), ""),
+asymPosLPSlider(*audioProcessor.apvts.getParameter("AsymPosLP"), ""),
+asymPosLNSlider(*audioProcessor.apvts.getParameter("AsymPosLN"), ""),
+asymNegLPSlider(*audioProcessor.apvts.getParameter("AsymNegLP"), ""),
+asymNegLNSlider(*audioProcessor.apvts.getParameter("AsymNegLN"), ""),
 responseCurveComponent(audioProcessor),
 irfftComponent(audioProcessor),
 peakFreqSliderAttachment(audioProcessor.apvts, "Peak Freq", peakFreqSlider),
@@ -39,7 +47,16 @@ outputGainSliderAttachment(audioProcessor.apvts, "Output Gain", outputGainSlider
 lowCutBypassButtonAttachment(audioProcessor.apvts, "LowCut Bypassed", lowCutBypassButton),
 highCutBypassButtonAttachment(audioProcessor.apvts, "HighCut Bypassed", highCutBypassButton),
 peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButton),
-irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
+ampBypassButtonAttachment(audioProcessor.apvts, "Amp Bypassed", ampBypassButton),
+irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton),
+asymPosGainSliderAttachment(audioProcessor.apvts, "AsymPosGain", asymPosGainSlider),
+asymNegGainSliderAttachment(audioProcessor.apvts, "AsymNegGain", asymNegGainSlider),
+symGainSliderAttachment(audioProcessor.apvts, "SymGain", symGainSlider),
+symLPLNSliderAttachment(audioProcessor.apvts, "SymLPLN", symLPLNSlider),
+asymPosLPSliderAttachment(audioProcessor.apvts, "AsymPosLP", asymPosLPSlider),
+asymPosLNSliderAttachment(audioProcessor.apvts, "AsymPosLN", asymPosLNSlider),
+asymNegLPSliderAttachment(audioProcessor.apvts, "AsymNegLP", asymNegLPSlider),
+asymNegLNSliderAttachment(audioProcessor.apvts, "AsymNegLN", asymNegLNSlider)
 
 {
     // Make sure that before the constructor has finished, you've set the
@@ -63,6 +80,14 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     xPosSlider.labels.add({ 1.f, "10cm" });
     yPosSlider.labels.add({ 0.f, "0cm" });
     yPosSlider.labels.add({ 1.f, "40cm" });
+    symGainSlider.labels.add({ 0.f, "SG" });
+    asymNegGainSlider.labels.add({ 0.f, "ANG" });
+    asymPosGainSlider.labels.add({ 0.f, "APG" });
+    asymNegLNSlider.labels.add({ 0.f, "ANLN" });
+    asymNegLPSlider.labels.add({ 0.f, "ANLP" });
+    asymPosLNSlider.labels.add({ 0.f, "APLN" });
+    asymPosLPSlider.labels.add({ 0.f, "APLP" });
+    symLPLNSlider.labels.add({ 0.f, "SLPLN" });
 
     
 
@@ -92,6 +117,13 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
         irfftComponent.loadedIRChanged(irBuffer, sampleRate);
         };
 
+    ampTypeBox.addItem("Poletti", 1);
+    ampTypeBox.addItem("Placeholder", 2);
+    ampTypeBox.setSelectedId(1);
+    ampTypeBox.onChange = [this]() {
+        audioProcessor.ampDrive.simTypeChanged(ampTypeBox.getSelectedId());
+        };
+
     for (auto* comp : getComps())
     {
         addAndMakeVisible(comp);
@@ -101,6 +133,7 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     highCutBypassButton.setLookAndFeel(&lnf);
     peakBypassButton.setLookAndFeel(&lnf);
     irBypassButton.setLookAndFeel(&lnf);
+    ampBypassButton.setLookAndFeel(&lnf);
     //lowCutFreqSlider.setLookAndFeel(&lnf);
     //lowCutSlopeSlider.setLookAndFeel(&lnf);
     //highCutFreqSlider.setLookAndFeel(&lnf);
@@ -114,7 +147,7 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
 
     comboTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Combo Type", comboTypeBox);
     mikTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Mic Type", mikTypeBox);
-
+    ampTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Amp Type", ampTypeBox);
 
     // TODO: Interpolate loaded IR, X and Y pos now floats
     yPosSlider.onValueChange = [this]() { 
@@ -186,6 +219,15 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
     irBypassButton.setLookAndFeel(nullptr);
     inputGainSlider.setLookAndFeel(nullptr);
     outputGainSlider.setLookAndFeel(nullptr);
+    asymPosGainSlider.setLookAndFeel(nullptr);
+    asymNegGainSlider.setLookAndFeel(nullptr);
+    symGainSlider.setLookAndFeel(nullptr);
+    symLPLNSlider.setLookAndFeel(nullptr);
+    asymPosLPSlider.setLookAndFeel(nullptr);
+    asymPosLNSlider.setLookAndFeel(nullptr);
+    asymNegLPSlider.setLookAndFeel(nullptr);
+    asymNegLNSlider.setLookAndFeel(nullptr);
+    ampBypassButton.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -231,10 +273,25 @@ void BasicEQAudioProcessorEditor::resized()
     meterOutRight.setBounds(outputMeterArea);
 
 
-    auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.33);
+    auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.2);
 
     auto responseCurveComponentBounds = responseArea.removeFromRight(responseArea.getWidth() * 0.5);
     responseCurveComponent.setBounds(responseCurveComponentBounds.reduced(responseCurveComponentBounds.getWidth()*0.05, 0).removeFromBottom(responseCurveComponentBounds.getHeight()*0.95));
+
+    auto AmpArea = bounds.removeFromBottom(bounds.getHeight() * 0.5);
+    auto AmpAreaWidth = AmpArea.getWidth();
+    auto WidthOfOneSlider = AmpAreaWidth / 10;
+    ampBypassButton.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
+    asymPosGainSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
+    asymNegGainSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
+    symGainSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
+    asymPosLPSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
+    asymPosLNSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
+    asymNegLPSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
+    asymNegLNSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
+    symLPLNSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
+    ampTypeBox.setBounds(AmpArea);
+
 
     auto GainArea = bounds;
     auto IRArea = bounds.removeFromLeft(bounds.getWidth() * 0.5);
@@ -348,7 +405,17 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &meterInLeft,
         &meterInRight,
         &meterOutLeft,
-        &meterOutRight
+        &meterOutRight,
+        &asymPosGainSlider,
+        &asymNegGainSlider,
+        &symGainSlider,
+        &symLPLNSlider,
+        &asymPosLPSlider,
+        &asymPosLNSlider,
+        &asymNegLPSlider,
+        &asymNegLNSlider,
+        &ampBypassButton,
+        &ampTypeBox
     };
 }
 

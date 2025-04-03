@@ -37,13 +37,24 @@ enum micTypeEnum {
 
 struct ChainSettings
 {
+    //EQ
     float peakFreq{ 0 }, peakGainInDecibels{ 0 }, peakQuality{ 1.f };
     float lowCutFreq{ 0 }, highCutFreq{ 0 };
     Slope lowCutSlope{ Slope::Slope_12 }, highCutSlope{ Slope::Slope_12 };
+    bool lowCutBypassed{ false }, peakBypassed{ false }, highCutBypassed{ false };
+    //============================================================================================================================================
+    //IR
     float xPos{ 0 }, yPos{ 0 };
     comboTypeEnum comboType{comboTypeEnum::Mar};
     micTypeEnum micType{ micTypeEnum::a57 };
-    bool lowCutBypassed{ false }, peakBypassed{ false }, highCutBypassed{ false }, irBypassed{ false };
+    bool irBypassed{ false };
+    //============================================================================================================================================
+    //AMP
+    AmpTypeEnum ampType{ AmpTypeEnum::poletti };
+    float asymPosGain, asymNegGain, symGain, asymPosLP, asymPosLN, asymNegLP, asymNegLN, symLPLN;
+    bool ampBypassed{ false };
+    //============================================================================================================================================
+    //Gain
     float inputGainInDecibels{0}, outputGainInDecibels{0};
 };
 
@@ -173,6 +184,7 @@ public:
     SingleChannelSampleFifo<BlockType> rightChannelFifo{ Channel::Right };
 
     juce::dsp::Gain<float> inputGain, outputGain;
+    AmpDrive ampDrive;
 private:
     MonoChain leftChain, rightChain;
     //ChainSettings chainSettings;

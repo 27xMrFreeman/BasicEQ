@@ -49,6 +49,18 @@ private:
     HorizontalMeterRight meterInRight;
     HorizontalMeterRight meterOutRight;
 
+    // Amp GUI
+    RotarySliderWithLabels asymPosGainSlider,
+        asymNegGainSlider,
+        symGainSlider,
+        symLPLNSlider,
+        asymPosLPSlider,
+        asymPosLNSlider,
+        asymNegLPSlider,
+        asymNegLNSlider;
+    juce::ComboBox ampTypeBox;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> ampTypeBoxAttachment;
+    juce::ToggleButton ampBypassButton;
     // IR loader GUI:
     juce::TextButton loadBtn;
     std::unique_ptr<juce::FileChooser> fileChooser;
@@ -90,10 +102,18 @@ private:
         xPosSliderAttachment,
         yPosSliderAttachment,
         inputGainSliderAttachment,
-        outputGainSliderAttachment;
+        outputGainSliderAttachment,
+        asymPosGainSliderAttachment,
+        asymNegGainSliderAttachment,
+        symGainSliderAttachment,
+        symLPLNSliderAttachment,
+        asymPosLPSliderAttachment,
+        asymPosLNSliderAttachment,
+        asymNegLPSliderAttachment,
+        asymNegLNSliderAttachment;
 
     using ButtonAttachment = APVTS::ButtonAttachment;
-    ButtonAttachment lowCutBypassButtonAttachment, peakBypassButtonAttachment, highCutBypassButtonAttachment, irBypassButtonAttachment;
+    ButtonAttachment lowCutBypassButtonAttachment, peakBypassButtonAttachment, highCutBypassButtonAttachment, irBypassButtonAttachment, ampBypassButtonAttachment;
 
     std::vector<juce::Component*> getComps();
 

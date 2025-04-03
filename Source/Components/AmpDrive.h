@@ -6,6 +6,11 @@
 //==============================================================================
 /*
 */
+
+enum AmpTypeEnum {
+    poletti,
+    placeholder
+};
 class AmpDrive  : public juce::Component
 {
 public:
@@ -14,16 +19,17 @@ public:
 
     void reset();
     void prepare(const juce::dsp::ProcessSpec& spec);
-    template <typename ProcessContext>
-    void process(const ProcessContext& context);
+    //template <typename ProcessContext>
+    void process(juce::dsp::AudioBlock<float>& block);
 
     void simTypeChanged(int simTypeID);
 
     void paint (juce::Graphics&) override;
     void resized() override;
-
+    AmpTypeEnum simType;
+    juce::AudioBuffer<float> posBuffer, negBuffer, sumBuffer;
+    juce::dsp::LinkwitzRileyFilter<float> LDCfilter, RDCfilter;
 private:
     CustomWaveShaper<float, std::function<float (float)>> wsPolettiAsymPos, wsPolettiAsymNeg, wsPolettiSym;
-    float asymPosGain, asymNegGain, symGain, asymPosLP, asymPosLN, asymNegLP, asymNegLN, symLPLN;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmpDrive)
 };
