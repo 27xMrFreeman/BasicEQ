@@ -24,14 +24,14 @@
 //==============================================================================
 /**
 */
-class BasicEQAudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::Timer
+class BasicEQAudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::MultiTimer
 {
 public:
     BasicEQAudioProcessorEditor (BasicEQAudioProcessor&);
     ~BasicEQAudioProcessorEditor() override;
 
     //==============================================================================
-    void timerCallback() override;
+    void timerCallback(int timerID) override;
     void paint (juce::Graphics&) override;
     void resized() override;
 
@@ -69,6 +69,7 @@ private:
     juce::ComboBox comboTypeBox, mikTypeBox;
     std::unique_ptr< juce::AudioProcessorValueTreeState::ComboBoxAttachment > comboTypeBoxAttachment, mikTypeBoxAttachment;
     juce::Atomic<bool> userIRLoaded{ false };
+    bool needIRUpdate{ false };
     
     IrFFTComponent irfftComponent;
 

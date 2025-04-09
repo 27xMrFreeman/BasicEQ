@@ -30,6 +30,6 @@ public:
     juce::AudioBuffer<float> posBuffer, negBuffer, sumBuffer;
     juce::dsp::LinkwitzRileyFilter<float> LDCfilter, RDCfilter;
 private:
-    CustomWaveShaper<float, std::function<float (float)>> wsPolettiAsymPos, wsPolettiAsymNeg, wsPolettiSym;
+    CustomWaveShaper<float, std::function<float(float)>> wsPolettiAsymPos, wsPolettiAsymNeg, wsPolettiSym;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmpDrive)
 };

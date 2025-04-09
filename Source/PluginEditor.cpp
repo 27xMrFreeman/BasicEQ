@@ -151,22 +151,24 @@ asymNegLNSliderAttachment(audioProcessor.apvts, "AsymNegLN", asymNegLNSlider)
 
     // TODO: Interpolate loaded IR, X and Y pos now floats
     yPosSlider.onValueChange = [this]() { 
-        //DBG("changed yPos to " << yPosSlider.getValue());
-        juce::AudioBuffer<float> irBuffer;
-        int sampleRate = 0;
-        audioProcessor.updateLoadedIR(irBuffer, sampleRate, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
-        userIRLoaded = false;
-        //if (tempFile.getFile().getSize() == 0) return;
-        irfftComponent.loadedIRChanged(irBuffer, sampleRate);
+        ////DBG("changed yPos to " << yPosSlider.getValue());
+        //juce::AudioBuffer<float> irBuffer;
+        //int sampleRate = 0;
+        //audioProcessor.updateLoadedIR(irBuffer, sampleRate, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
+        //userIRLoaded = false;
+        ////if (tempFile.getFile().getSize() == 0) return;
+        //irfftComponent.loadedIRChanged(irBuffer, sampleRate);
+        needIRUpdate = true;
     };
     xPosSlider.onValueChange = [this]() { 
-        //DBG("changed xPos to " << xPosSlider.getValue());
-        juce::AudioBuffer<float> irBuffer;
-        int sampleRate = 0;
-        audioProcessor.updateLoadedIR(irBuffer, sampleRate, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
-        userIRLoaded = false;
-        //if (tempFile.getFile().getSize() == 0) return;
-        irfftComponent.loadedIRChanged(irBuffer, sampleRate);
+        ////DBG("changed xPos to " << xPosSlider.getValue());
+        //juce::AudioBuffer<float> irBuffer;
+        //int sampleRate = 0;
+        //audioProcessor.updateLoadedIR(irBuffer, sampleRate, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
+        //userIRLoaded = false;
+        ////if (tempFile.getFile().getSize() == 0) return;
+        //irfftComponent.loadedIRChanged(irBuffer, sampleRate);
+        needIRUpdate = true;
         };
 
     loadBtn.setButtonText("Load IR");
@@ -199,7 +201,8 @@ asymNegLNSliderAttachment(audioProcessor.apvts, "AsymNegLN", asymNegLNSlider)
 
     setSize (1000, 600);
 
-    startTimerHz(30);
+    startTimer(0, 33);
+    startTimer(1, 200);
 }
 
 BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
@@ -231,16 +234,29 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
 }
 
 //==============================================================================
-void BasicEQAudioProcessorEditor::timerCallback()
+void BasicEQAudioProcessorEditor::timerCallback(int timerID)
 {
-    meterInLeft.setLevel(audioProcessor.getInputRMSValue(0));
-    meterInRight.setLevel(audioProcessor.getInputRMSValue(1));
-    meterInLeft.repaint();
-    meterInRight.repaint();
-    meterOutLeft.setLevel(audioProcessor.getOutputRMSValue(0));
-    meterOutRight.setLevel(audioProcessor.getOutputRMSValue(1));
-    meterOutLeft.repaint();
-    meterOutRight.repaint();
+    if (timerID == 0) {
+        meterInLeft.setLevel(audioProcessor.getInputRMSValue(0));
+        meterInRight.setLevel(audioProcessor.getInputRMSValue(1));
+        meterInLeft.repaint();
+        meterInRight.repaint();
+        meterOutLeft.setLevel(audioProcessor.getOutputRMSValue(0));
+        meterOutRight.setLevel(audioProcessor.getOutputRMSValue(1));
+        meterOutLeft.repaint();
+        meterOutRight.repaint();
+    }
+    else if (timerID == 1) {
+        if (needIRUpdate) {
+            juce::AudioBuffer<float> irBuffer;
+            int sampleRate = 0;
+            audioProcessor.updateLoadedIR(irBuffer, sampleRate, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
+            userIRLoaded = false;
+            //if (tempFile.getFile().getSize() == 0) return;
+            irfftComponent.loadedIRChanged(irBuffer, sampleRate);
+            needIRUpdate = false;
+        }
+    }
 }
 
 void BasicEQAudioProcessorEditor::paint (juce::Graphics& g)
@@ -278,7 +294,7 @@ void BasicEQAudioProcessorEditor::resized()
     auto responseCurveComponentBounds = responseArea.removeFromRight(responseArea.getWidth() * 0.5);
     responseCurveComponent.setBounds(responseCurveComponentBounds.reduced(responseCurveComponentBounds.getWidth()*0.05, 0).removeFromBottom(responseCurveComponentBounds.getHeight()*0.95));
 
-    auto AmpArea = bounds.removeFromBottom(bounds.getHeight() * 0.5);
+    /*auto AmpArea = bounds.removeFromBottom(bounds.getHeight() * 0.5);
     auto AmpAreaWidth = AmpArea.getWidth();
     auto WidthOfOneSlider = AmpAreaWidth / 10;
     ampBypassButton.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
@@ -290,7 +306,7 @@ void BasicEQAudioProcessorEditor::resized()
     asymNegLPSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
     asymNegLNSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
     symLPLNSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
-    ampTypeBox.setBounds(AmpArea);
+    ampTypeBox.setBounds(AmpArea);*/
 
 
     auto GainArea = bounds;
@@ -405,7 +421,7 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &meterInLeft,
         &meterInRight,
         &meterOutLeft,
-        &meterOutRight,
+        &meterOutRight/*,
         &asymPosGainSlider,
         &asymNegGainSlider,
         &symGainSlider,
@@ -415,7 +431,7 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &asymNegLPSlider,
         &asymNegLNSlider,
         &ampBypassButton,
-        &ampTypeBox
+        &ampTypeBox*/
     };
 }
 

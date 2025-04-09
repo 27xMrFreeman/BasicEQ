@@ -190,6 +190,7 @@ private:
     //ChainSettings chainSettings;
     juce::AudioBuffer<float> bufferBPContour, bufferHPContour;
     juce::dsp::IIR::Filter <float> LcontourBP, RcontourBP, LcontourHP, RcontourHP;
+    juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>> contourHP, contourBP;
     juce::dsp::Gain<float> contourBPGain, contourHPGain;
     // AudioBuffers for data to interpolate and interpolants, 2D interpolation between 4 data points + 2 intermediate interpolants + 1 finished interpolant
     juce::AudioBuffer<float> audioBufferInterpBL, audioBufferInterpBR, audioBufferInterpTL, audioBufferInterpTR, /*audioBufferInterpBottom, audioBufferInterpTop,*/ audioBufferInterpFin;

@@ -23,7 +23,7 @@ void HorizontalMeterLeft::paint(juce::Graphics& g)
     const auto scaledX = jmap(level, -60.f, +6.f, 0.f, static_cast<float>(getWidth()));
     g.fillRoundedRectangle(bounds.removeFromRight(scaledX), 5.f);
 
-    g.setColour(Colours::red);
+    g.setColour(Colours::silver);
     g.drawRoundedRectangle(r, 5.f, 5.f);
 
 }

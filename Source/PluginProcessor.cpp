@@ -111,23 +111,30 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     juce::dsp::ProcessSpec spec;
 
     spec.maximumBlockSize = samplesPerBlock;
-    spec.numChannels = 1;
+    spec.numChannels = 2;
     spec.sampleRate = sampleRate;
 
-    ampDrive.reset();
-    ampDrive.prepare(spec);
+    /*ampDrive.reset();
+    ampDrive.prepare(spec);*/
     
     bufferBPContour.setSize(2, samplesPerBlock);
     bufferHPContour.setSize(2, samplesPerBlock);
     // filter design according to Will Pirkle Addendum chapter A19.26.3
-    LcontourBP.coefficients = juce::dsp::IIR::Coefficients<float>::makeBandPass(sampleRate, 50.f, 0.222);
+    /*LcontourBP.coefficients = juce::dsp::IIR::Coefficients<float>::makeBandPass(sampleRate, 50.f, 0.222);
     RcontourBP.coefficients = LcontourBP.coefficients;
     LcontourHP.coefficients = juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 750.f);
     RcontourHP.coefficients = LcontourHP.coefficients;
     LcontourHP.prepare(spec);
     RcontourHP.prepare(spec);
     LcontourBP.prepare(spec);
-    RcontourBP.prepare(spec);
+    RcontourBP.prepare(spec);*/
+    contourBP.reset();
+    contourBP.prepare(spec);
+    contourBP.state = juce::dsp::IIR::Coefficients<float>::makeBandPass(sampleRate, 50.f, 0.222);
+
+    contourHP.reset();
+    contourHP.prepare(spec);
+    contourHP.state = juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 750.f);
 
     contourBPGain.reset();
     contourBPGain.prepare(spec);
@@ -142,6 +149,8 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     outputGain.reset();
     outputGain.prepare(spec);
     outputGain.setGainDecibels(0);
+
+    spec.numChannels = 1;
 
     rmsLevelInputLeft.reset(sampleRate, 0.2);
     rmsLevelInputRight.reset(sampleRate, 0.1);
@@ -264,9 +273,9 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     //              yn = (g * xn) / (1.0 - ((g * xn) / Ln));
     //          else
     //              yn = (g * xn) / (1.0 + ((g * xn) / Lp));
-    if (!settings.ampBypassed) {
+    /*if (!settings.ampBypassed) {
         ampDrive.process(block);
-    }
+    }*/
     updateFilters();
 
     //buffer.clear(); // for testing FFT with oscillator
@@ -274,17 +283,17 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     /*juce::dsp::ProcessContextReplacing<float> stereoContextBP(blockBP), stereoContextHP(blockHP);
     osc.process(stereoContextBP);
     osc.process(stereoContextHP);*/
-    juce::dsp::AudioBlock<float> blockBP(block), blockHP(block);
-    bufferBPContour = buffer;
-    bufferHPContour = buffer;
+    //juce::dsp::AudioBlock<float> blockBP(block), blockHP(block);
+    /*bufferBPContour = buffer;
+    bufferHPContour = buffer;*/
     // blocks for parallel processing of contour filters in tone stack
-    auto LblockBP = blockBP.getSingleChannelBlock(0);
+    /*auto LblockBP = blockBP.getSingleChannelBlock(0);
     auto RblockBP = blockBP.getSingleChannelBlock(1);
     auto LblockHP = blockHP.getSingleChannelBlock(0);
-    auto RblockHP = blockHP.getSingleChannelBlock(1);
+    auto RblockHP = blockHP.getSingleChannelBlock(1);*/
 
     // filtering in parallel, filters have 0 gain, using dsp::Gain after filtering to boost filter
-    juce::dsp::ProcessContextReplacing<float> LcontextBP(LblockBP), RcontextBP(RblockBP), LcontextHP(LblockHP), RcontextHP(RblockHP);
+    /*juce::dsp::ProcessContextReplacing<float> LcontextBP(LblockBP), RcontextBP(RblockBP), LcontextHP(LblockHP), RcontextHP(RblockHP);
     LcontourBP.process(LcontextBP);
     RcontourBP.process(RcontextBP);
     contourBPGain.process(LcontextBP);
@@ -292,11 +301,18 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     LcontourHP.process(LcontextHP);
     RcontourHP.process(RcontextHP);
     contourHPGain.process(LcontextHP);
-    contourHPGain.process(RcontextHP);
+    contourHPGain.process(RcontextHP);*/
+    
+    //juce::dsp::AudioBlock<float> blockBP(block), blockHP(block);
+    //juce::dsp::ProcessContextReplacing<float> contextBP(blockBP), contextHP(blockHP);
+    //contourBP.process(contextBP);
+    //contourHP.process(contextHP);
+    //contourBPGain.process(contextBP);
+    //contourHPGain.process(contextHP);
 
-    // adding processed blocks together, divided by 2 to keep level same
-    block.replaceWithSumOf(blockBP, blockHP);
-    block.multiplyBy(0.5);
+    //// adding processed blocks together, divided by 2 to keep level same
+    //block.replaceWithSumOf(blockBP, blockHP);
+    //block.multiplyBy(0.5);
     
 
     // input block divided to mono L/R for EQ processing
