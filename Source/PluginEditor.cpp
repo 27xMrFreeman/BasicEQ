@@ -289,7 +289,7 @@ void BasicEQAudioProcessorEditor::resized()
     meterOutRight.setBounds(outputMeterArea);
 
 
-    auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.2);
+    auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.4);
 
     auto responseCurveComponentBounds = responseArea.removeFromRight(responseArea.getWidth() * 0.5);
     responseCurveComponent.setBounds(responseCurveComponentBounds.reduced(responseCurveComponentBounds.getWidth()*0.05, 0).removeFromBottom(responseCurveComponentBounds.getHeight()*0.95));

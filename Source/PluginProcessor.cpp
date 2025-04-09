@@ -303,17 +303,21 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     contourHPGain.process(LcontextHP);
     contourHPGain.process(RcontextHP);*/
     
-    //juce::dsp::AudioBlock<float> blockBP(block), blockHP(block);
-    //juce::dsp::ProcessContextReplacing<float> contextBP(blockBP), contextHP(blockHP);
-    //contourBP.process(contextBP);
-    //contourHP.process(contextHP);
-    //contourBPGain.process(contextBP);
-    //contourHPGain.process(contextHP);
+    juce::dsp::AudioBlock<float> blockBP(bufferBPContour), blockHP(bufferHPContour);
+    blockBP = block;
+    blockHP = block;
+    juce::dsp::ProcessContextReplacing<float> contextBP(blockBP), contextHP(blockHP);
+    contourBPGain.process(contextBP);
+    contourHPGain.process(contextHP);
+    /*contourBP.process(contextBP);
+    contourHP.process(contextHP);*/
 
-    //// adding processed blocks together, divided by 2 to keep level same
-    //block.replaceWithSumOf(blockBP, blockHP);
-    //block.multiplyBy(0.5);
-    
+    // adding processed blocks together, divided by 2 to keep level same
+    /*block.replaceWithSumOf(blockBP, blockHP);
+    block.multiplyBy(0.5);*/
+    block = blockBP;
+    block += blockHP;
+    block.multiplyBy(0.5);
 
     // input block divided to mono L/R for EQ processing
     auto leftBlock = block.getSingleChannelBlock(0);

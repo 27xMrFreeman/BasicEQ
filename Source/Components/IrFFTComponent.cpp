@@ -163,8 +163,8 @@ void IrFFTComponent::paint(juce::Graphics& g)
     g.setColour(Colours::white);
     g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));
 
-    /*g.setColour(Colours::silver);
-    g.drawRoundedRectangle(irArea.toFloat(), 6.f, 5.f);*/
+    g.setColour(Colours::silver);
+    g.drawRoundedRectangle(irArea.toFloat(), 6.f, 5.f);
 
     //g.setColour(Colours::aqua);
     //g.strokePath(rightChannelFFTPath, PathStrokeType(1.f));
