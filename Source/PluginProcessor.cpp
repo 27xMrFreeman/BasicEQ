@@ -128,13 +128,26 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     RcontourHP.prepare(spec);
     LcontourBP.prepare(spec);
     RcontourBP.prepare(spec);*/
-    contourBP.reset();
+    /*contourBP.reset();
     contourBP.prepare(spec);
     contourBP.state = juce::dsp::IIR::Coefficients<float>::makeBandPass(sampleRate, 50.f, 0.222);
+    contourBP.reset();*/
 
-    contourHP.reset();
+    TPTcontourBP.reset();
+    TPTcontourBP.prepare(spec);
+    TPTcontourBP.setType(juce::dsp::StateVariableTPTFilterType::bandpass);
+    TPTcontourBP.setCutoffFrequency(50);
+    TPTcontourBP.setResonance(0.222);
+
+    /*contourHP.reset();
     contourHP.prepare(spec);
     contourHP.state = juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 750.f);
+    contourHP.reset();*/
+
+    TPTcontourHP.reset();
+    TPTcontourHP.prepare(spec);
+    TPTcontourHP.setType(juce::dsp::FirstOrderTPTFilterType::highpass);
+    TPTcontourHP.setCutoffFrequency(750);
 
     contourBPGain.reset();
     contourBPGain.prepare(spec);
@@ -302,21 +315,25 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     RcontourHP.process(RcontextHP);
     contourHPGain.process(LcontextHP);
     contourHPGain.process(RcontextHP);*/
-    
+    bufferBPContour = buffer;
+    bufferHPContour = buffer;
     juce::dsp::AudioBlock<float> blockBP(bufferBPContour), blockHP(bufferHPContour);
-    blockBP = block;
-    blockHP = block;
+    //blockBP = block;
+    //blockHP = block;
     juce::dsp::ProcessContextReplacing<float> contextBP(blockBP), contextHP(blockHP);
+    TPTcontourBP.process(contextBP);
+    TPTcontourHP.process(contextHP);
     contourBPGain.process(contextBP);
     contourHPGain.process(contextHP);
-    /*contourBP.process(contextBP);
-    contourHP.process(contextHP);*/
 
     // adding processed blocks together, divided by 2 to keep level same
     /*block.replaceWithSumOf(blockBP, blockHP);
     block.multiplyBy(0.5);*/
-    block = blockBP;
-    block += blockHP;
+    //buffer = bufferHPContour;
+    //block = blockBP;
+    //block += blockHP;
+    block.copyFrom(blockBP);
+    block.add(blockHP);
     block.multiplyBy(0.5);
 
     // input block divided to mono L/R for EQ processing
