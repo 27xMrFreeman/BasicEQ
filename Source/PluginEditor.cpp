@@ -31,6 +31,9 @@ asymPosLPSlider(*audioProcessor.apvts.getParameter("AsymPosLP"), ""),
 asymPosLNSlider(*audioProcessor.apvts.getParameter("AsymPosLN"), ""),
 asymNegLPSlider(*audioProcessor.apvts.getParameter("AsymNegLP"), ""),
 asymNegLNSlider(*audioProcessor.apvts.getParameter("AsymNegLN"), ""),
+toneStackLowSlider(*audioProcessor.apvts.getParameter("StackLowGain"), "dB"),
+toneStackMidSlider(*audioProcessor.apvts.getParameter("StackMidGain"), "dB"),
+toneStackHighSlider(*audioProcessor.apvts.getParameter("StackHighGain"), "dB"),
 responseCurveComponent(audioProcessor),
 irfftComponent(audioProcessor),
 peakFreqSliderAttachment(audioProcessor.apvts, "Peak Freq", peakFreqSlider),
@@ -56,8 +59,10 @@ symLPLNSliderAttachment(audioProcessor.apvts, "SymLPLN", symLPLNSlider),
 asymPosLPSliderAttachment(audioProcessor.apvts, "AsymPosLP", asymPosLPSlider),
 asymPosLNSliderAttachment(audioProcessor.apvts, "AsymPosLN", asymPosLNSlider),
 asymNegLPSliderAttachment(audioProcessor.apvts, "AsymNegLP", asymNegLPSlider),
-asymNegLNSliderAttachment(audioProcessor.apvts, "AsymNegLN", asymNegLNSlider)
-
+asymNegLNSliderAttachment(audioProcessor.apvts, "AsymNegLN", asymNegLNSlider),
+toneStackLowSliderAttachment(audioProcessor.apvts, "StackLowGain", toneStackLowSlider),
+toneStackMidSliderAttachment(audioProcessor.apvts, "StackMidGain", toneStackMidSlider),
+toneStackHighSliderAttachment(audioProcessor.apvts, "StackHighGain", toneStackHighSlider)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -88,6 +93,9 @@ asymNegLNSliderAttachment(audioProcessor.apvts, "AsymNegLN", asymNegLNSlider)
     asymPosLNSlider.labels.add({ 0.f, "APLN" });
     asymPosLPSlider.labels.add({ 0.f, "APLP" });
     symLPLNSlider.labels.add({ 0.f, "SLPLN" });
+    toneStackLowSlider.labels.add({ 0.f, "Low" });
+    toneStackMidSlider.labels.add({ 0.f, "Mid" });
+    toneStackHighSlider.labels.add({ 0.f, "High" });
 
     
 
@@ -340,7 +348,9 @@ void BasicEQAudioProcessorEditor::resized()
     irfftComponent.setBounds(IrFFTComponentBounds.reduced(IrFFTComponentBounds.getWidth() * 0.05, 0).removeFromBottom(IrFFTComponentBounds.getHeight() * 0.95));
 
     //bounds.removeFromTop(5);
-    auto EQArea = bounds.removeFromRight(bounds.getWidth());
+    //================================================================================================================
+    //EQ just commented out for testing
+    /*auto EQArea = bounds.removeFromRight(bounds.getWidth());
     EQArea.reduce(EQArea.getWidth() * 0.05, 0);
     EQArea.removeFromBottom(EQArea.getHeight() * 0.279);
     EQArea.removeFromTop(EQArea.getHeight() * 0.05);
@@ -361,7 +371,17 @@ void BasicEQAudioProcessorEditor::resized()
     EQArea.removeFromTop(EQArea.getHeight() * 0.02);
     peakFreqSlider.setBounds(EQArea.removeFromTop(EQArea.getHeight() * 0.33));
     peakGainSlider.setBounds(EQArea.removeFromTop(EQArea.getHeight() * 0.5));
-    peakQualitySlider.setBounds(EQArea);
+    peakQualitySlider.setBounds(EQArea);*/
+    //================================================================================================================
+    //ToneStack
+    auto ToneStackArea = bounds.removeFromRight(bounds.getWidth());
+    toneStackLowSlider.setBounds(ToneStackArea.removeFromLeft(ToneStackArea.getWidth() * 0.33));
+    toneStackMidSlider.setBounds(ToneStackArea.removeFromLeft(ToneStackArea.getWidth() * 0.5));
+    toneStackHighSlider.setBounds(ToneStackArea);
+
+
+    //================================================================================================================
+
 
     auto loadBtnArea = IRArea;
     loadBtn.setBounds(loadBtnArea.removeFromLeft(loadBtnArea.getWidth()*0.6).removeFromRight(loadBtnArea.getWidth()*0.5).removeFromBottom(loadBtnArea.getHeight()*0.9).removeFromTop(loadBtnArea.getHeight()*0.3));
@@ -404,6 +424,9 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &highCutFreqSlider,
         &lowCutSlopeSlider,
         &highCutSlopeSlider,
+        &toneStackLowSlider,
+        &toneStackMidSlider,
+        &toneStackHighSlider,
         &responseCurveComponent,
         &irfftComponent,
         &loadBtn,

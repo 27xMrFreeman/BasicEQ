@@ -132,17 +132,19 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     contourBP.prepare(spec);
     contourBP.state = juce::dsp::IIR::Coefficients<float>::makeBandPass(sampleRate, 50.f, 0.222);
     contourBP.reset();*/
+    /*contourHP.reset();
+    contourHP.prepare(spec);
+    contourHP.state = juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 750.f);
+    contourHP.reset();*/
 
+    //==============================================================================================================================================
+    // contour filters before tone stack
     TPTcontourBP.reset();
     TPTcontourBP.prepare(spec);
     TPTcontourBP.setType(juce::dsp::StateVariableTPTFilterType::bandpass);
     TPTcontourBP.setCutoffFrequency(50);
     TPTcontourBP.setResonance(0.222);
 
-    /*contourHP.reset();
-    contourHP.prepare(spec);
-    contourHP.state = juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 750.f);
-    contourHP.reset();*/
 
     TPTcontourHP.reset();
     TPTcontourHP.prepare(spec);
@@ -155,7 +157,16 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     contourHPGain.reset();
     contourHPGain.prepare(spec);
     contourHPGain.setGainDecibels(2);
-    
+
+    //==============================================================================================================================================
+    // tone stack filters 
+    toneStackFilters.reset();
+    toneStackFilters.prepare(spec);
+    toneStackFilters.get<0>().state = IIRFilterCoeff::makeLowShelf(getSampleRate(), 62, 1/(std::sqrt(2)), juce::Decibels::decibelsToGain(0));
+    toneStackFilters.get<1>().state = IIRFilterCoeff::makePeakFilter(getSampleRate(), 700, 1 / (std::sqrt(2)), juce::Decibels::decibelsToGain(0));
+    toneStackFilters.get<2>().state = IIRFilterCoeff::makeHighShelf(getSampleRate(), 1400, 1 / (std::sqrt(2)), juce::Decibels::decibelsToGain(0));
+
+    //==============================================================================================================================================
     inputGain.reset();
     inputGain.prepare(spec);
     inputGain.setGainDecibels(0);
@@ -336,6 +347,9 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     block.add(blockHP);
     block.multiplyBy(0.5);
 
+
+    toneStackFilters.process(juce::dsp::ProcessContextReplacing<float>(block));
+
     // input block divided to mono L/R for EQ processing
     auto leftBlock = block.getSingleChannelBlock(0);
     auto rightBlock = block.getSingleChannelBlock(1);
@@ -463,6 +477,9 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     settings.symGain = apvts.getRawParameterValue("SymGain")->load();
     settings.symLPLN = apvts.getRawParameterValue("SymLPLN")->load();
     settings.ampType = static_cast<AmpTypeEnum>(apvts.getRawParameterValue("Amp Type")->load());
+    settings.stackLowGain = apvts.getRawParameterValue("StackLowGain")->load();
+    settings.stackMidGain = apvts.getRawParameterValue("StackMidGain")->load();
+    settings.stackHighGain = apvts.getRawParameterValue("StackHighGain")->load();
     return settings;
 }
 
@@ -643,6 +660,24 @@ void BasicEQAudioProcessor::updateHighCutFilter(const ChainSettings& chainSettin
     updateCutFilter(rightHighCut, highCutCoefficients, chainSettings.highCutSlope);
 }
 
+void BasicEQAudioProcessor::updateToneStackLow(const ChainSettings& chainSettings)
+{
+    auto lowShelfCoefficients = IIRFilterCoeff::makeLowShelf(getSampleRate(), 62, 1 / (std::sqrt(2)), juce::Decibels::decibelsToGain(chainSettings.stackLowGain));
+    updateCoefficients(toneStackFilters.get<0>().state, lowShelfCoefficients);
+}
+
+void BasicEQAudioProcessor::updateToneStackMid(const ChainSettings& chainSettings)
+{
+    auto midPeakCoefficients = IIRFilterCoeff::makePeakFilter(getSampleRate(), 700, 1 / (std::sqrt(2)), juce::Decibels::decibelsToGain(chainSettings.stackMidGain));
+    updateCoefficients(toneStackFilters.get<1>().state, midPeakCoefficients);
+}
+
+void BasicEQAudioProcessor::updateToneStackHigh(const ChainSettings& chainSettings)
+{
+    auto highShelfCoefficients = IIRFilterCoeff::makeHighShelf(getSampleRate(), 1400, 1 / (std::sqrt(2)), juce::Decibels::decibelsToGain(chainSettings.stackHighGain));
+    updateCoefficients(toneStackFilters.get<2>().state, highShelfCoefficients);
+}
+
 void BasicEQAudioProcessor::updateFilters()
 {
     auto chainSettings = getChainSettings(apvts);
@@ -650,6 +685,9 @@ void BasicEQAudioProcessor::updateFilters()
     updateLowCutFilter(chainSettings);
     updateHighCutFilter(chainSettings);
     updatePeakFilter(chainSettings);
+    updateToneStackLow(chainSettings);
+    updateToneStackMid(chainSettings);
+    updateToneStackHigh(chainSettings);
 }
 
     // Here are parameters defined
@@ -682,6 +720,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     }
     layout.add(std::make_unique<juce::AudioParameterChoice>("LowCut Slope", "LowCut Slope", stringArray, 0));
     layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut Slope", "HighCut Slope", stringArray, 0));
+    //============================================================================================================================================
+    // ToneStack
+    layout.add(std::make_unique<juce::AudioParameterFloat>("StackLowGain", "StackLowGain",
+        juce::NormalisableRange<float>(-10.f, 10.f, 0.1f, 1.f), 0.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("StackMidGain", "StackMidGain",
+        juce::NormalisableRange<float>(-10.f, 10.f, 0.1f, 1.f), 0.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("StackHighGain", "StackHighGain",
+        juce::NormalisableRange<float>(-10.f, 10.f, 0.1f, 1.f), 0.0f));    
+    
     //============================================================================================================================================
     // IR
     layout.add(std::make_unique<juce::AudioParameterFloat>("X Position", "X Position", juce::NormalisableRange<float>(0.f, 10.f, 0.05f), 0));
