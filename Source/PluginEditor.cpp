@@ -280,9 +280,10 @@ void BasicEQAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-
+    // Padding from sides
     auto bounds = getLocalBounds();
     bounds.reduce(bounds.getWidth() * 0.01, bounds.getHeight() * 0.01);
+    // Input/Output meters and sliders
     auto meterWidth = bounds.getWidth() * 0.1;
     auto meterHeight = bounds.getHeight() * 0.2;
     auto inputMeterArea = bounds.removeFromLeft(meterWidth);
@@ -296,11 +297,38 @@ void BasicEQAudioProcessorEditor::resized()
     meterOutLeft.setBounds(outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.5));
     meterOutRight.setBounds(outputMeterArea);
 
+    // Space for buffer if it will be implemented
+    auto bufferArea = bounds.removeFromBottom(bounds.getHeight() * 0.2);
 
-    auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.4);
+    // Main knobs - gain sliders will be replaced with one, additional filters will replace the rightmost two slots
+    auto mainKnobsArea = bounds.removeFromBottom(bounds.getHeight() * 0.4).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);
+    auto knobWidth = mainKnobsArea.getWidth() / 7;
+    symGainSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    ampTypeBox.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    toneStackLowSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    toneStackMidSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    toneStackHighSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    asymPosGainSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    asymNegGainSlider.setBounds(mainKnobsArea);
 
-    auto responseCurveComponentBounds = responseArea.removeFromRight(responseArea.getWidth() * 0.5);
-    responseCurveComponent.setBounds(responseCurveComponentBounds.reduced(responseCurveComponentBounds.getWidth()*0.05, 0).removeFromBottom(responseCurveComponentBounds.getHeight()*0.95));
+    // bounds are now only top "half"
+    auto xyPadArea = bounds.removeFromLeft(bounds.getWidth() * 0.25).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);;
+    auto irChoicesArea = bounds.removeFromLeft(bounds.getWidth() * 0.33).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);;
+    auto responseArea = bounds.reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);;
+
+    xPosSlider.setBounds(xyPadArea.removeFromLeft(xyPadArea.getWidth()*0.5));
+    yPosSlider.setBounds(xyPadArea);
+
+    loadBtn.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.33).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
+    mikTypeBox.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.5).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
+    comboTypeBox.setBounds(irChoicesArea.reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
+
+    irfftComponent.setBounds(responseArea);
+
+    //auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.4);
+
+    //auto responseCurveComponentBounds = responseArea.removeFromRight(responseArea.getWidth() * 0.5);
+    //responseCurveComponent.setBounds(responseCurveComponentBounds.reduced(responseCurveComponentBounds.getWidth()*0.05, 0).removeFromBottom(responseCurveComponentBounds.getHeight()*0.95));
 
     /*auto AmpArea = bounds.removeFromBottom(bounds.getHeight() * 0.5);
     auto AmpAreaWidth = AmpArea.getWidth();
@@ -317,7 +345,7 @@ void BasicEQAudioProcessorEditor::resized()
     ampTypeBox.setBounds(AmpArea);*/
 
 
-    auto GainArea = bounds;
+    /*auto GainArea = bounds;
     auto IRArea = bounds.removeFromLeft(bounds.getWidth() * 0.5);
     auto IRSlidersArea = IRArea.removeFromBottom(IRArea.getHeight() * 0.7);
     IRSlidersArea.reduce(IRSlidersArea.getWidth()*0.05, 0);
@@ -345,7 +373,7 @@ void BasicEQAudioProcessorEditor::resized()
     irBypassButton.setBounds(irBypassButtonArea);
 
     auto IrFFTComponentBounds = responseArea;
-    irfftComponent.setBounds(IrFFTComponentBounds.reduced(IrFFTComponentBounds.getWidth() * 0.05, 0).removeFromBottom(IrFFTComponentBounds.getHeight() * 0.95));
+    irfftComponent.setBounds(IrFFTComponentBounds.reduced(IrFFTComponentBounds.getWidth() * 0.05, 0).removeFromBottom(IrFFTComponentBounds.getHeight() * 0.95));*/
 
     //bounds.removeFromTop(5);
     //================================================================================================================
@@ -374,22 +402,22 @@ void BasicEQAudioProcessorEditor::resized()
     peakQualitySlider.setBounds(EQArea);*/
     //================================================================================================================
     //ToneStack
-    auto ToneStackArea = bounds.removeFromRight(bounds.getWidth());
+    /*auto ToneStackArea = bounds.removeFromRight(bounds.getWidth());
     toneStackLowSlider.setBounds(ToneStackArea.removeFromLeft(ToneStackArea.getWidth() * 0.33));
     toneStackMidSlider.setBounds(ToneStackArea.removeFromLeft(ToneStackArea.getWidth() * 0.5));
-    toneStackHighSlider.setBounds(ToneStackArea);
+    toneStackHighSlider.setBounds(ToneStackArea);*/
 
 
     //================================================================================================================
 
 
-    auto loadBtnArea = IRArea;
-    loadBtn.setBounds(loadBtnArea.removeFromLeft(loadBtnArea.getWidth()*0.6).removeFromRight(loadBtnArea.getWidth()*0.5).removeFromBottom(loadBtnArea.getHeight()*0.9).removeFromTop(loadBtnArea.getHeight()*0.3));
+    //auto loadBtnArea = IRArea;
+    //loadBtn.setBounds(loadBtnArea.removeFromLeft(loadBtnArea.getWidth()*0.6).removeFromRight(loadBtnArea.getWidth()*0.5).removeFromBottom(loadBtnArea.getHeight()*0.9).removeFromTop(loadBtnArea.getHeight()*0.3));
     //irNameLabel.setBounds(loadBtnArea);
 
-    GainArea.removeFromTop(GainArea.getHeight() * 0.5);
-    GainArea.removeFromTop(GainArea.getHeight() * 0.6);
-    GainArea.reduce(GainArea.getWidth() * 0.02, 0);
+    //GainArea.removeFromTop(GainArea.getHeight() * 0.5);
+    //GainArea.removeFromTop(GainArea.getHeight() * 0.6);
+    //GainArea.reduce(GainArea.getWidth() * 0.02, 0);
     
     //auto OutputGainArea = GainArea;
     //OutputGainArea.reduce(OutputGainArea.getWidth() * 0.44, 0);
@@ -444,17 +472,17 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &meterInLeft,
         &meterInRight,
         &meterOutLeft,
-        &meterOutRight/*,
+        &meterOutRight,
         &asymPosGainSlider,
         &asymNegGainSlider,
         &symGainSlider,
-        &symLPLNSlider,
-        &asymPosLPSlider,
-        &asymPosLNSlider,
-        &asymNegLPSlider,
-        &asymNegLNSlider,
-        &ampBypassButton,
-        &ampTypeBox*/
+        //&symLPLNSlider,
+        //&asymPosLPSlider,
+        //&asymPosLNSlider,
+        //&asymNegLPSlider,
+        //&asymNegLNSlider,
+        //&ampBypassButton,
+        &ampTypeBox
     };
 }
 
