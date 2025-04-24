@@ -158,7 +158,7 @@ toneStackHighSliderAttachment(audioProcessor.apvts, "StackHighGain", toneStackHi
     ampTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Amp Type", ampTypeBox);
 
     // TODO: Interpolate loaded IR, X and Y pos now floats
-    yPosSlider.onValueChange = [this]() { 
+    yPosSlider.onValueChange = [this]() {
         ////DBG("changed yPos to " << yPosSlider.getValue());
         //juce::AudioBuffer<float> irBuffer;
         //int sampleRate = 0;
@@ -166,7 +166,7 @@ toneStackHighSliderAttachment(audioProcessor.apvts, "StackHighGain", toneStackHi
         //userIRLoaded = false;
         ////if (tempFile.getFile().getSize() == 0) return;
         //irfftComponent.loadedIRChanged(irBuffer, sampleRate);
-        needIRUpdate = true;
+        needIRUpdate.set(true);
     };
     xPosSlider.onValueChange = [this]() { 
         ////DBG("changed xPos to " << xPosSlider.getValue());
@@ -176,7 +176,7 @@ toneStackHighSliderAttachment(audioProcessor.apvts, "StackHighGain", toneStackHi
         //userIRLoaded = false;
         ////if (tempFile.getFile().getSize() == 0) return;
         //irfftComponent.loadedIRChanged(irBuffer, sampleRate);
-        needIRUpdate = true;
+        needIRUpdate.set(true);
         };
 
     loadBtn.setButtonText("Load IR");
@@ -255,14 +255,17 @@ void BasicEQAudioProcessorEditor::timerCallback(int timerID)
         meterOutRight.repaint();
     }
     else if (timerID == 1) {
-        if (needIRUpdate) {
+        if (needIRUpdate.get()) {
             juce::AudioBuffer<float> irBuffer;
             int sampleRate = 0;
+            // should compute interpolation here, then pass interpolated IR buffer to audioprocessor, where it is checked each buffer, if new IR is ready to be loaded -> need another atomic bool
+
+
             audioProcessor.updateLoadedIR(irBuffer, sampleRate, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
             userIRLoaded = false;
             //if (tempFile.getFile().getSize() == 0) return;
             irfftComponent.loadedIRChanged(irBuffer, sampleRate);
-            needIRUpdate = false;
+            needIRUpdate.set(false);
         }
     }
 }

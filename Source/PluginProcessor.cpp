@@ -366,6 +366,11 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     {
         if (irLoader.getCurrentIRSize() > 0)
         {
+            // check if new IR is ready
+            if (newIRReady.get())
+            {
+                // set new IR in ir loader
+            }
             irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
         }
     }

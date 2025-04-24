@@ -20,7 +20,7 @@ struct RotarySliderWithLabels : juce::Slider
         param(&rap),
         suffix(unitSuffix)
     {
-        //setLookAndFeel(&lnf); // set lnf as the look and feel object
+        setLookAndFeel(&lnf); // set lnf as the look and feel object
     }
 
     ~RotarySliderWithLabels()

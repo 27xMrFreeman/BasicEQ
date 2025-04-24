@@ -189,6 +189,8 @@ public:
 
     juce::dsp::Gain<float> inputGain, outputGain;
     AmpDrive ampDrive;
+
+    juce::Atomic<bool> newIRReady{ false };
 private:
     MonoChain leftChain, rightChain;
     //ChainSettings chainSettings;
