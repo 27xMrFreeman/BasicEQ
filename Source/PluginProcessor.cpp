@@ -353,7 +353,7 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
             if (newIRReady.get())
             {
                 // set new IR in ir loader
-                irLoader.loadImpulseResponse(std::move(newIRAudioBuffer), getSampleRate(), juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, juce::dsp::Convolution::Normalise::yes);
+                irLoader.loadImpulseResponse((juce::AudioBuffer<float>)newIRAudioBuffer, interpIRSampleRate, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, juce::dsp::Convolution::Normalise::yes);
             }
             irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
         }

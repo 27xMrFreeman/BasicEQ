@@ -338,6 +338,7 @@ void BasicEQAudioProcessorEditor::timerCallback(int timerID)
             audioBufferTR.setSize(readerTR->numChannels, readerTR->lengthInSamples);*/
 
             sampleRate = readerBL->sampleRate;
+            audioProcessor.interpIRSampleRate = sampleRate;
 
             readerBL->read(&audioProcessor.audioBufferInterpBL, 0, readerBL->lengthInSamples, 0, true, true);
             readerBR->read(&audioProcessor.audioBufferInterpBR, 0, readerBR->lengthInSamples, 0, true, true);
