@@ -171,7 +171,7 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    void updateLoadedIR(juce::AudioBuffer<float>& buffer, int& sampleRate, int comboTypeID, int mikTypeID, float yPos, float xPos);
+    //void updateLoadedIR(juce::AudioBuffer<float>& buffer, int& sampleRate, int comboTypeID, int mikTypeID, float yPos, float xPos);
     void loadShippedImpulseResponses();
     float getInputRMSValue(const int channel) const;
     float getOutputRMSValue(const int channel) const;
@@ -191,6 +191,14 @@ public:
     AmpDrive ampDrive;
 
     juce::Atomic<bool> newIRReady{ false };
+
+    juce::AudioFormatManager formatManager;
+
+    // AudioBuffers for data to interpolate and interpolants, 2D interpolation between 4 data points + 2 intermediate interpolants + 1 finished interpolant
+    juce::AudioBuffer<float> audioBufferInterpBL, audioBufferInterpBR, audioBufferInterpTL, audioBufferInterpTR, /*audioBufferInterpBottom, audioBufferInterpTop,*/ audioBufferInterpFin, newIRAudioBuffer;
+
+    float interpIRSampleRate{ 0 };
+
 private:
     MonoChain leftChain, rightChain;
     //ChainSettings chainSettings;
@@ -205,9 +213,6 @@ private:
     using IIRFilter = juce::dsp::IIR::Filter<float>;
     using IIRFilterCoeff = juce::dsp::IIR::Coefficients<float>;
     juce::dsp::ProcessorChain<juce::dsp::ProcessorDuplicator<IIRFilter, IIRFilterCoeff>, juce::dsp::ProcessorDuplicator<IIRFilter, IIRFilterCoeff>, juce::dsp::ProcessorDuplicator<IIRFilter, IIRFilterCoeff>> toneStackFilters;
-    // AudioBuffers for data to interpolate and interpolants, 2D interpolation between 4 data points + 2 intermediate interpolants + 1 finished interpolant
-    juce::AudioBuffer<float> audioBufferInterpBL, audioBufferInterpBR, audioBufferInterpTL, audioBufferInterpTR, /*audioBufferInterpBottom, audioBufferInterpTop,*/ audioBufferInterpFin;
-    juce::AudioFormatManager formatManager;
 
     void updatePeakFilter(const ChainSettings& chainSettings);
     void updateLowCutFilter(const ChainSettings& chainSettings);

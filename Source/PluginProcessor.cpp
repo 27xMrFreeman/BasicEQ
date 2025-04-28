@@ -212,6 +212,7 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     /*audioBufferInterpBottom.setSize(numChannels, numSamples);
     audioBufferInterpTop.setSize(numChannels, numSamples);*/
     audioBufferInterpFin.setSize(numChannels, numSamples);
+    newIRAudioBuffer.setSize(numChannels, numSamples);
 
     //osc.initialise([](float x) { return std::sin(x); });
     //osc.prepare(spec);
@@ -259,7 +260,7 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     auto settings = getChainSettings(apvts);
     juce::dsp::AudioBlock<float> block(buffer);
 
-    //TODO: Oversampling
+    //DONE: Oversampling in Amp Class
 
 
 
@@ -285,70 +286,52 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     const auto valueInRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
     if (valueInRight < rmsLevelInputRight.getCurrentValue()) { rmsLevelInputRight.setTargetValue(valueInRight); } // if the new value is lower than the current one, apply smoothing
     else { rmsLevelInputRight.setCurrentAndTargetValue(valueInRight); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
-    // TODO: make meters vertical instead of horizontal
+    // DONE: make meters vertical instead of horizontal
 
-    // TODO: Poletti algorithm processing
-    //          needs 2 parallel processing lines
-    //          2 asymetric waveshapers with switched limits and 2 symetric waveshapers
-    //              Pirkle coeff: asymPosLim = 23.6, asymNegLim = 0.5, symLim = 1.01
-    //          after asym waveshape DC blocking HP filter
-    //          then sym waveshape, combine the two lines, DC filter
-    //          if (xn <= 0)
-    //              yn = (g * xn) / (1.0 - ((g * xn) / Ln));
-    //          else
-    //              yn = (g * xn) / (1.0 + ((g * xn) / Lp));
-    /*if (!settings.ampBypassed) {
-        ampDrive.process(block);
-    }*/
     updateFilters();
 
     //buffer.clear(); // for testing FFT with oscillator
     
-    /*juce::dsp::ProcessContextReplacing<float> stereoContextBP(blockBP), stereoContextHP(blockHP);
-    osc.process(stereoContextBP);
-    osc.process(stereoContextHP);*/
+    //juce::dsp::ProcessContextReplacing<float> stereoContextBP(blockBP), stereoContextHP(blockHP);
+    //osc.process(stereoContextBP);
+    //osc.process(stereoContextHP);
     //juce::dsp::AudioBlock<float> blockBP(block), blockHP(block);
-    /*bufferBPContour = buffer;
-    bufferHPContour = buffer;*/
-    // blocks for parallel processing of contour filters in tone stack
-    /*auto LblockBP = blockBP.getSingleChannelBlock(0);
-    auto RblockBP = blockBP.getSingleChannelBlock(1);
-    auto LblockHP = blockHP.getSingleChannelBlock(0);
-    auto RblockHP = blockHP.getSingleChannelBlock(1);*/
+    //bufferBPContour = buffer;
+    //bufferHPContour = buffer;
 
     // filtering in parallel, filters have 0 gain, using dsp::Gain after filtering to boost filter
-    /*juce::dsp::ProcessContextReplacing<float> LcontextBP(LblockBP), RcontextBP(RblockBP), LcontextHP(LblockHP), RcontextHP(RblockHP);
-    LcontourBP.process(LcontextBP);
-    RcontourBP.process(RcontextBP);
-    contourBPGain.process(LcontextBP);
-    contourBPGain.process(RcontextBP);
-    LcontourHP.process(LcontextHP);
-    RcontourHP.process(RcontextHP);
-    contourHPGain.process(LcontextHP);
-    contourHPGain.process(RcontextHP);*/
-    bufferBPContour = buffer;
-    bufferHPContour = buffer;
-    juce::dsp::AudioBlock<float> blockBP(bufferBPContour), blockHP(bufferHPContour);
+  
+    // TOTO BYLO ODKOMENTOVANE
+    //bufferBPContour = buffer;
+    //bufferHPContour = buffer;
+    //juce::dsp::AudioBlock<float> blockBP(bufferBPContour), blockHP(bufferHPContour);
+    // TOTO BYLO ODKOMENTOVANE
+    
     //blockBP = block;
     //blockHP = block;
-    juce::dsp::ProcessContextReplacing<float> contextBP(blockBP), contextHP(blockHP);
-    TPTcontourBP.process(contextBP);
-    TPTcontourHP.process(contextHP);
-    contourBPGain.process(contextBP);
-    contourHPGain.process(contextHP);
-
+    
+    // TOTO BYLO ODKOMENTOVANE
+    //juce::dsp::ProcessContextReplacing<float> contextBP(blockBP), contextHP(blockHP);
+    //TPTcontourBP.process(contextBP);
+    //TPTcontourHP.process(contextHP);
+    //contourBPGain.process(contextBP);
+    //contourHPGain.process(contextHP);
+    // TOTO BYLO ODKOMENTOVANE
+    
     // adding processed blocks together, divided by 2 to keep level same
-    /*block.replaceWithSumOf(blockBP, blockHP);
-    block.multiplyBy(0.5);*/
+    //block.replaceWithSumOf(blockBP, blockHP);
+    //block.multiplyBy(0.5);
     //buffer = bufferHPContour;
     //block = blockBP;
     //block += blockHP;
-    block.copyFrom(blockBP);
-    block.add(blockHP);
-    block.multiplyBy(0.5);
+    
+    // TOTO BYLO ODKOMENTOVANE
+    //block.copyFrom(blockBP);
+    //block.add(blockHP);
+    //block.multiplyBy(0.5);
+    // TOTO BYLO ODKOMENTOVANE
 
-
-    toneStackFilters.process(juce::dsp::ProcessContextReplacing<float>(block));
+    //toneStackFilters.process(juce::dsp::ProcessContextReplacing<float>(block));
 
     // input block divided to mono L/R for EQ processing
     auto leftBlock = block.getSingleChannelBlock(0);
@@ -370,6 +353,7 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
             if (newIRReady.get())
             {
                 // set new IR in ir loader
+                irLoader.loadImpulseResponse(std::move(newIRAudioBuffer), getSampleRate(), juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, juce::dsp::Convolution::Normalise::yes);
             }
             irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
         }
@@ -467,7 +451,7 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     settings.lowCutBypassed = apvts.getRawParameterValue("LowCut Bypassed")->load() > 0.5f;
     settings.highCutBypassed = apvts.getRawParameterValue("HighCut Bypassed")->load() > 0.5f;
     settings.peakBypassed = apvts.getRawParameterValue("Peak Bypassed")->load() > 0.5f;
-    settings.irBypassed = apvts.getRawParameterValue("IR Bypassed")->load() > 0.5f;
+    settings.irBypassed = /*apvts.getRawParameterValue("IR Bypassed")->load() > 0.5f*/false;
     settings.inputGainInDecibels = apvts.getRawParameterValue("Input Gain")->load();
     settings.outputGainInDecibels = apvts.getRawParameterValue("Output Gain")->load();
     settings.micType = static_cast<micTypeEnum>(apvts.getRawParameterValue("Mic Type")->load());
@@ -496,126 +480,126 @@ Coefficients makePeakFilter(const ChainSettings& chainSettings, double sampleRat
                                                                 juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels));
 }
 
-void BasicEQAudioProcessor::updateLoadedIR(juce::AudioBuffer<float>& bufferInterp, int& sampleRate, int comboTypeID, int mikTypeID, float yPos, float xPos)
-{
-    // this might take a while, need to turn off processing
-    suspendProcessing(true);
-    irLoader.reset();
-    // interpolate here instead of in PluginEditor
-    int yPosRoundDown = 0, yPosRoundUp = 0, xPosRoundDown = 0, xPosRoundUp = 0;
-    float XmaxDistance = 0, Xdistance = 0, XtransposedDistance = 0, YmaxDistance = 0, Ydistance = 0, YtransposedDistance = 0;
-    int yPosArr[3] = { 0, 10, 40 };
-    int xPosArr[6] = { 0, 2, 4, 6, 8, 10 };
-    // formatManager takes a file (wav in our case), returns AudioBuffer (could return float array tho)
-    
-    
-    // if Y = {0,10,40} and X = {0,2,4,..,10}, no need to interpolate
-    if (std::any_of(std::begin(yPosArr), std::end(yPosArr), [&](int i) { return i == yPos; }) && std::any_of(std::begin(xPosArr), std::end(xPosArr), [&](int j) {return j == xPos; })) {
-    // load IR, stereo, trimmed, normalized, size 0 = original IR size
-        irLoader.loadImpulseResponse(impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPos/20)][xPos], juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
-        // TODO: file -> audiobuffer, get samplerate from file
-        std::unique_ptr<juce::AudioFormatReader> reader;
-        reader.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPos / 20)][xPos]));
-        bufferInterp.setSize(reader->numChannels, reader->lengthInSamples);
-        if (!reader->read(&bufferInterp, 0, reader->lengthInSamples, 0, true, true)) { DBG("Reader for non-interpolated file failed to write to buffer"); }
-        
-        sampleRate = reader->sampleRate;
-        
-        suspendProcessing(false);
-        return;
-    }
-
-    // otherwise interpolate first on X axis for both Y values, then on Y axis from interpolated points on X axis, Y has to be rounded to 0 10 or 40 (recorded distances) and X to even values
-    // 1. round Y to set values
-    if (0 < yPos && yPos < 10) { yPosRoundDown = 0; yPosRoundUp = 10; }
-    else if (10 < yPos && yPos < 40) { yPosRoundDown = 10; yPosRoundUp = 40; }
-    else if (std::trunc(yPos) == yPos) { yPosRoundDown = yPos; yPosRoundUp = yPos; }
-    // round X to even values
-    xPosRoundUp = std::ceil(xPos);
-    xPosRoundDown = std::floor(xPos);
-    if (xPosRoundUp % 2 == 0 && xPosRoundDown != xPosRoundUp) { xPosRoundDown -= 1; } // when x = (1,2), (3,4), ...
-    else if (xPosRoundUp % 2 != 0 && xPosRoundUp == xPosRoundDown) { xPosRoundDown -= 1; xPosRoundUp += 1; } // when x = 1, 3, 5...
-    else if (xPosRoundDown != xPosRoundUp) { xPosRoundUp += 1; } // when x = (0,1), (2,3), ...
-
-    // 2. find maximum distance: on X axis always 2, on Y axis 10 or 30
-    XmaxDistance = 2;
-    YmaxDistance = yPosRoundUp - yPosRoundDown;
-    // 3. find the distance between X rounded down and current X, same for Y
-    Xdistance = xPos - xPosRoundDown;
-    Ydistance = yPos - yPosRoundDown;
-    // 4. map said distance to <0,1> where 0 is xPosRoundDown and 1 is maxDistance
-    XtransposedDistance = Xdistance / XmaxDistance;
-    Ydistance == 0 ? YtransposedDistance = 0 : YtransposedDistance = Ydistance / YmaxDistance;
-
-    // 5. interpolate X axis for both Y values (RoundUp & RoundDown)
-    // (a * (1.0 - f)) + (b * f) where f = transposedDistance
-    
-    
-    // impulseResponseArray[typ komba][typ mikrofonu][pozice Y - 0=0, 1=10, 2=40]  [pozice X] 
-    std::unique_ptr<juce::AudioFormatReader> readerBL, readerBR, readerTL, readerTR; // bottom-left, bottom-right etc
-
-    readerBL.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPosRoundDown / 20)][xPosRoundDown]));
-    readerBR.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPosRoundDown / 20)][xPosRoundUp]));
-    readerTL.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPosRoundUp / 20)][xPosRoundDown]));
-    readerTR.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPosRoundUp / 20)][xPosRoundUp]));
-
-    /*juce::AudioBuffer<float> audioBufferBL, audioBufferBR, audioBufferTL, audioBufferTR, audioBufferInterpBottom, audioBufferInterpTop, audioBufferInterp;
-
-    audioBufferBL.setSize(readerBL->numChannels, readerBL->lengthInSamples);
-    audioBufferBR.setSize(readerBR->numChannels, readerBR->lengthInSamples);
-    audioBufferTL.setSize(readerTL->numChannels, readerTL->lengthInSamples);
-    audioBufferTR.setSize(readerTR->numChannels, readerTR->lengthInSamples);*/
-    
-    sampleRate = readerBL->sampleRate;
-    
-    readerBL->read(&audioBufferInterpBL, 0, readerBL->lengthInSamples, 0, true, true);
-    readerBR->read(&audioBufferInterpBR, 0, readerBR->lengthInSamples, 0, true, true);
-    readerTL->read(&audioBufferInterpTL, 0, readerTL->lengthInSamples, 0, true, true);
-    readerTR->read(&audioBufferInterpTR, 0, readerTR->lengthInSamples, 0, true, true);
-    
-    // check if both audioBuffers are equal length
-    if (audioBufferInterpBL.getNumChannels() != audioBufferInterpBR.getNumChannels() || audioBufferInterpBL.getNumSamples() != audioBufferInterpBR.getNumSamples()) { DBG("Not the same no of channels or samples"); }
-    
-    /*audioBufferInterpBottom.setSize(audioBufferBL.getNumChannels(), audioBufferBL.getNumSamples());
-    audioBufferInterpTop.setSize(audioBufferBL.getNumChannels(), audioBufferBL.getNumSamples());
-    audioBufferInterp.setSize(audioBufferBL.getNumChannels(), audioBufferBL.getNumSamples());*/
-    bufferInterp.setSize(audioBufferInterpBL.getNumChannels(), audioBufferInterpBL.getNumSamples());
-    
-    float interpBottom = 0, interpTop = 0, interpValue = 0;
-    
-    for (int ch = 0; ch < audioBufferInterpBL.getNumChannels(); ++ch) {
-        for (int s = 0; s < audioBufferInterpBL.getNumSamples(); ++s) {
-            interpBottom = audioBufferInterpBL.getSample(ch, s) * (1.0 - XtransposedDistance) + (audioBufferInterpBR.getSample(ch, s) * XtransposedDistance);
-            interpTop = audioBufferInterpTL.getSample(ch, s) * (1.0 - XtransposedDistance) + (audioBufferInterpTR.getSample(ch, s) * XtransposedDistance);
-            interpValue = (interpBottom * (1.0 - YtransposedDistance)) + (interpTop * YtransposedDistance);
-            audioBufferInterpFin.setSample(ch, s, interpValue);
-        }
-    }
-    bufferInterp = audioBufferInterpFin;
-    // load IR, stereo, trimmed, normalized, size 0 = original IR size
-    irLoader.loadImpulseResponse((juce::AudioBuffer <float>)audioBufferInterpFin, (double)sampleRate, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, juce::dsp::Convolution::Normalise::yes);
-    //// write audiobuffer into wave file for further fft analysis in plugineditor
-    //juce::WavAudioFormat format;
-    //std::unique_ptr<juce::AudioFormatWriter> writer;
-    ///*juce::File file;
-    //juce::TemporaryFile tempFile;*/
-    //{
-    //    if (auto outStream = std::unique_ptr<juce::FileOutputStream> (tempFile.getFile().createOutputStream())) {
-    //        writer.reset(format.createWriterFor(outStream.get(), sampleRate, audioBufferInterp.getNumChannels(), 24, {}, 0));
-    //        if (writer != nullptr) {
-    //            outStream.release();
-    //            writer->writeFromAudioSampleBuffer(audioBufferInterp, 0, audioBufferInterp.getNumSamples());
-    //        }
-    //        writer = nullptr;
-    //    }
-    //}
-    suspendProcessing(false);
-    //return file;
-    /*DBG("Loaded IR from array " << comboTypeID << " " << mikTypeID << " " << yPos << " " << xPos);
-    DBG("File name is " << impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos].getFileName());
-    DBG("IR Size is " << irLoader.getCurrentIRSize());*/
-    //return impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos];
-}
+//void BasicEQAudioProcessor::updateLoadedIR(juce::AudioBuffer<float>& bufferInterp, int& sampleRate, int comboTypeID, int mikTypeID, float yPos, float xPos)
+//{
+//    // this might take a while, need to turn off processing
+//    suspendProcessing(true);
+//    irLoader.reset();
+//    // interpolate here instead of in PluginEditor
+//    int yPosRoundDown = 0, yPosRoundUp = 0, xPosRoundDown = 0, xPosRoundUp = 0;
+//    float XmaxDistance = 0, Xdistance = 0, XtransposedDistance = 0, YmaxDistance = 0, Ydistance = 0, YtransposedDistance = 0;
+//    int yPosArr[3] = { 0, 10, 40 };
+//    int xPosArr[6] = { 0, 2, 4, 6, 8, 10 };
+//    // formatManager takes a file (wav in our case), returns AudioBuffer (could return float array tho)
+//    
+//    
+//    // if Y = {0,10,40} and X = {0,2,4,..,10}, no need to interpolate
+//    if (std::any_of(std::begin(yPosArr), std::end(yPosArr), [&](int i) { return i == yPos; }) && std::any_of(std::begin(xPosArr), std::end(xPosArr), [&](int j) {return j == xPos; })) {
+//    // load IR, stereo, trimmed, normalized, size 0 = original IR size
+//        irLoader.loadImpulseResponse(impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPos/20)][xPos], juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
+//        // TODO: file -> audiobuffer, get samplerate from file
+//        std::unique_ptr<juce::AudioFormatReader> reader;
+//        reader.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPos / 20)][xPos]));
+//        bufferInterp.setSize(reader->numChannels, reader->lengthInSamples);
+//        if (!reader->read(&bufferInterp, 0, reader->lengthInSamples, 0, true, true)) { DBG("Reader for non-interpolated file failed to write to buffer"); }
+//        
+//        sampleRate = reader->sampleRate;
+//        
+//        suspendProcessing(false);
+//        return;
+//    }
+//
+//    // otherwise interpolate first on X axis for both Y values, then on Y axis from interpolated points on X axis, Y has to be rounded to 0 10 or 40 (recorded distances) and X to even values
+//    // 1. round Y to set values
+//    if (0 < yPos && yPos < 10) { yPosRoundDown = 0; yPosRoundUp = 10; }
+//    else if (10 < yPos && yPos < 40) { yPosRoundDown = 10; yPosRoundUp = 40; }
+//    else if (std::trunc(yPos) == yPos) { yPosRoundDown = yPos; yPosRoundUp = yPos; }
+//    // round X to even values
+//    xPosRoundUp = std::ceil(xPos);
+//    xPosRoundDown = std::floor(xPos);
+//    if (xPosRoundUp % 2 == 0 && xPosRoundDown != xPosRoundUp) { xPosRoundDown -= 1; } // when x = (1,2), (3,4), ...
+//    else if (xPosRoundUp % 2 != 0 && xPosRoundUp == xPosRoundDown) { xPosRoundDown -= 1; xPosRoundUp += 1; } // when x = 1, 3, 5...
+//    else if (xPosRoundDown != xPosRoundUp) { xPosRoundUp += 1; } // when x = (0,1), (2,3), ...
+//
+//    // 2. find maximum distance: on X axis always 2, on Y axis 10 or 30
+//    XmaxDistance = 2;
+//    YmaxDistance = yPosRoundUp - yPosRoundDown;
+//    // 3. find the distance between X rounded down and current X, same for Y
+//    Xdistance = xPos - xPosRoundDown;
+//    Ydistance = yPos - yPosRoundDown;
+//    // 4. map said distance to <0,1> where 0 is xPosRoundDown and 1 is maxDistance
+//    XtransposedDistance = Xdistance / XmaxDistance;
+//    Ydistance == 0 ? YtransposedDistance = 0 : YtransposedDistance = Ydistance / YmaxDistance;
+//
+//    // 5. interpolate X axis for both Y values (RoundUp & RoundDown)
+//    // (a * (1.0 - f)) + (b * f) where f = transposedDistance
+//    
+//    
+//    // impulseResponseArray[typ komba][typ mikrofonu][pozice Y - 0=0, 1=10, 2=40]  [pozice X] 
+//    std::unique_ptr<juce::AudioFormatReader> readerBL, readerBR, readerTL, readerTR; // bottom-left, bottom-right etc
+//
+//    readerBL.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPosRoundDown / 20)][xPosRoundDown]));
+//    readerBR.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPosRoundDown / 20)][xPosRoundUp]));
+//    readerTL.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPosRoundUp / 20)][xPosRoundDown]));
+//    readerTR.reset(formatManager.createReaderFor(impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPosRoundUp / 20)][xPosRoundUp]));
+//
+//    /*juce::AudioBuffer<float> audioBufferBL, audioBufferBR, audioBufferTL, audioBufferTR, audioBufferInterpBottom, audioBufferInterpTop, audioBufferInterp;
+//
+//    audioBufferBL.setSize(readerBL->numChannels, readerBL->lengthInSamples);
+//    audioBufferBR.setSize(readerBR->numChannels, readerBR->lengthInSamples);
+//    audioBufferTL.setSize(readerTL->numChannels, readerTL->lengthInSamples);
+//    audioBufferTR.setSize(readerTR->numChannels, readerTR->lengthInSamples);*/
+//    
+//    sampleRate = readerBL->sampleRate;
+//    
+//    readerBL->read(&audioBufferInterpBL, 0, readerBL->lengthInSamples, 0, true, true);
+//    readerBR->read(&audioBufferInterpBR, 0, readerBR->lengthInSamples, 0, true, true);
+//    readerTL->read(&audioBufferInterpTL, 0, readerTL->lengthInSamples, 0, true, true);
+//    readerTR->read(&audioBufferInterpTR, 0, readerTR->lengthInSamples, 0, true, true);
+//    
+//    // check if both audioBuffers are equal length
+//    if (audioBufferInterpBL.getNumChannels() != audioBufferInterpBR.getNumChannels() || audioBufferInterpBL.getNumSamples() != audioBufferInterpBR.getNumSamples()) { DBG("Not the same no of channels or samples"); }
+//    
+//    /*audioBufferInterpBottom.setSize(audioBufferBL.getNumChannels(), audioBufferBL.getNumSamples());
+//    audioBufferInterpTop.setSize(audioBufferBL.getNumChannels(), audioBufferBL.getNumSamples());
+//    audioBufferInterp.setSize(audioBufferBL.getNumChannels(), audioBufferBL.getNumSamples());*/
+//    bufferInterp.setSize(audioBufferInterpBL.getNumChannels(), audioBufferInterpBL.getNumSamples());
+//    
+//    float interpBottom = 0, interpTop = 0, interpValue = 0;
+//    
+//    for (int ch = 0; ch < audioBufferInterpBL.getNumChannels(); ++ch) {
+//        for (int s = 0; s < audioBufferInterpBL.getNumSamples(); ++s) {
+//            interpBottom = audioBufferInterpBL.getSample(ch, s) * (1.0 - XtransposedDistance) + (audioBufferInterpBR.getSample(ch, s) * XtransposedDistance);
+//            interpTop = audioBufferInterpTL.getSample(ch, s) * (1.0 - XtransposedDistance) + (audioBufferInterpTR.getSample(ch, s) * XtransposedDistance);
+//            interpValue = (interpBottom * (1.0 - YtransposedDistance)) + (interpTop * YtransposedDistance);
+//            audioBufferInterpFin.setSample(ch, s, interpValue);
+//        }
+//    }
+//    bufferInterp = audioBufferInterpFin;
+//    // load IR, stereo, trimmed, normalized, size 0 = original IR size
+//    irLoader.loadImpulseResponse((juce::AudioBuffer <float>)audioBufferInterpFin, (double)sampleRate, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, juce::dsp::Convolution::Normalise::yes);
+//    //// write audiobuffer into wave file for further fft analysis in plugineditor
+//    //juce::WavAudioFormat format;
+//    //std::unique_ptr<juce::AudioFormatWriter> writer;
+//    ///*juce::File file;
+//    //juce::TemporaryFile tempFile;*/
+//    //{
+//    //    if (auto outStream = std::unique_ptr<juce::FileOutputStream> (tempFile.getFile().createOutputStream())) {
+//    //        writer.reset(format.createWriterFor(outStream.get(), sampleRate, audioBufferInterp.getNumChannels(), 24, {}, 0));
+//    //        if (writer != nullptr) {
+//    //            outStream.release();
+//    //            writer->writeFromAudioSampleBuffer(audioBufferInterp, 0, audioBufferInterp.getNumSamples());
+//    //        }
+//    //        writer = nullptr;
+//    //    }
+//    //}
+//    suspendProcessing(false);
+//    //return file;
+//    /*DBG("Loaded IR from array " << comboTypeID << " " << mikTypeID << " " << yPos << " " << xPos);
+//    DBG("File name is " << impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos].getFileName());
+//    DBG("IR Size is " << irLoader.getCurrentIRSize());*/
+//    //return impulseResponseArray[comboTypeID][mikTypeID][yPos][xPos];
+//}
 
 void BasicEQAudioProcessor::updatePeakFilter(const ChainSettings& chainSettings)
 {
