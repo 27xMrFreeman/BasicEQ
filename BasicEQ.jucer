@@ -14,6 +14,22 @@
     </GROUP>
     <GROUP id="{738C76C2-F9DF-054B-1271-C9222DBDB02E}" name="Source">
       <GROUP id="{7736E6C6-E69B-2196-95B8-E06560E35405}" name="Components">
+        <FILE id="It8cnw" name="CustomYamahaClassB.cpp" compile="1" resource="0"
+              file="Source/Components/CustomYamahaClassB.cpp"/>
+        <FILE id="T4wp1v" name="CustomYamahaClassB.h" compile="0" resource="0"
+              file="Source/Components/CustomYamahaClassB.h"/>
+        <FILE id="lSsNjU" name="Distortion.cpp" compile="1" resource="0" file="Source/Components/Distortion.cpp"/>
+        <FILE id="sJiXvK" name="Distortion.h" compile="0" resource="0" file="Source/Components/Distortion.h"/>
+        <FILE id="NgoYch" name="PolettiDistortion.cpp" compile="1" resource="0"
+              file="Source/Components/PolettiDistortion.cpp"/>
+        <FILE id="W5aWYe" name="PolettiDistortion.h" compile="0" resource="0"
+              file="Source/Components/PolettiDistortion.h"/>
+        <FILE id="RP4eaN" name="ToneStack.cpp" compile="1" resource="0" file="Source/Components/ToneStack.cpp"/>
+        <FILE id="YCcwHg" name="ToneStack.h" compile="0" resource="0" file="Source/Components/ToneStack.h"/>
+        <FILE id="f6TXQO" name="WaveFolderDistortion.cpp" compile="1" resource="0"
+              file="Source/Components/WaveFolderDistortion.cpp"/>
+        <FILE id="vEM3dL" name="WaveFolderDistortion.h" compile="0" resource="0"
+              file="Source/Components/WaveFolderDistortion.h"/>
         <FILE id="i6iSjz" name="AmpDrive.cpp" compile="1" resource="0" file="Source/Components/AmpDrive.cpp"/>
         <FILE id="SElEhZ" name="AmpDrive.h" compile="0" resource="0" file="Source/Components/AmpDrive.h"/>
         <FILE id="s469Fp" name="AnalyzerPathGenerator.h" compile="0" resource="0"
@@ -59,22 +75,6 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="PoE6sJ" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
-    <FILE id="It8cnw" name="CustomYamahaClassB.cpp" compile="1" resource="0"
-          file="Source/Components/CustomYamahaClassB.cpp"/>
-    <FILE id="T4wp1v" name="CustomYamahaClassB.h" compile="0" resource="0"
-          file="Source/Components/CustomYamahaClassB.h"/>
-    <FILE id="lSsNjU" name="Distortion.cpp" compile="1" resource="0" file="Source/Components/Distortion.cpp"/>
-    <FILE id="sJiXvK" name="Distortion.h" compile="0" resource="0" file="Source/Components/Distortion.h"/>
-    <FILE id="NgoYch" name="PolettiDistortion.cpp" compile="1" resource="0"
-          file="Source/Components/PolettiDistortion.cpp"/>
-    <FILE id="W5aWYe" name="PolettiDistortion.h" compile="0" resource="0"
-          file="Source/Components/PolettiDistortion.h"/>
-    <FILE id="RP4eaN" name="ToneStack.cpp" compile="1" resource="0" file="Source/Components/ToneStack.cpp"/>
-    <FILE id="YCcwHg" name="ToneStack.h" compile="0" resource="0" file="Source/Components/ToneStack.h"/>
-    <FILE id="f6TXQO" name="WaveFolderDistortion.cpp" compile="1" resource="0"
-          file="Source/Components/WaveFolderDistortion.cpp"/>
-    <FILE id="vEM3dL" name="WaveFolderDistortion.h" compile="0" resource="0"
-          file="Source/Components/WaveFolderDistortion.h"/>
   </MAINGROUP>
   <MODULES>
     <MODULE id="foleys_gui_magic" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>

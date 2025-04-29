@@ -13,7 +13,9 @@
 #include <cmath>
 #include "Components/FFTDataGenerator.h"
 #include "Components/SingleChannelSampleFifo.h"
-#include "Components/AmpDrive.h"
+//#include "Components/AmpDrive.h"
+#include "Components/Distortion.h"
+#include "Components/ToneStack.h"
 
 enum Slope
 {
@@ -54,9 +56,10 @@ struct ChainSettings
     bool irBypassed{ false };
     //============================================================================================================================================
     //AMP
-    AmpTypeEnum ampType{ AmpTypeEnum::poletti };
-    float asymPosGain, asymNegGain, symGain, asymPosLP, asymPosLN, asymNegLP, asymNegLN, symLPLN;
-    bool ampBypassed{ false };
+    AmpTypeEnum ampType{ AmpTypeEnum::Poletti };
+    float asymPosGain, asymNegGain, symGain, asymPosLP, asymPosLN, asymNegLP, asymNegLN, symLPLN; // dont need anymore
+    float drive{ 0 };
+    bool ampBypassed{ false }, osBypassed{ false };
     //============================================================================================================================================
     //Gain
     float inputGainInDecibels{0}, outputGainInDecibels{0};
@@ -187,8 +190,12 @@ public:
     SingleChannelSampleFifo<BlockType> leftChannelFifo{ Channel::Left };
     SingleChannelSampleFifo<BlockType> rightChannelFifo{ Channel::Right };
 
-    juce::dsp::Gain<float> inputGain, outputGain;
-    AmpDrive ampDrive;
+    juce::dsp::Gain<float> inputGain, outputGain, preampGain, postampGain;
+    // dont need this anymore
+    //AmpDrive ampDrive;
+    // dont need this anymore
+    Distortion<float> ampSim;
+    ToneStack toneStack;
 
     juce::Atomic<bool> newIRReady{ false };
 

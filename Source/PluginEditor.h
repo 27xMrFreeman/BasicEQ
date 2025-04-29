@@ -38,30 +38,42 @@ public:
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
+    using APVTS = juce::AudioProcessorValueTreeState;
+    using Attachment = APVTS::SliderAttachment;
+    using ButtonAttachment = APVTS::ButtonAttachment;
+    
     BasicEQAudioProcessor& audioProcessor;
 
     // background image
     juce::Image backgroundImage;
 
+    //===============================================================================================================================
     // meters
+    
     HorizontalMeterLeft meterInLeft;
     HorizontalMeterLeft meterOutLeft;
     HorizontalMeterRight meterInRight;
     HorizontalMeterRight meterOutRight;
-
+    
+    //===============================================================================================================================
     // Amp GUI
-    RotarySliderWithLabels asymPosGainSlider,
-        asymNegGainSlider,
-        symGainSlider,
-        symLPLNSlider,
-        asymPosLPSlider,
-        asymPosLNSlider,
-        asymNegLPSlider,
-        asymNegLNSlider;
+    
+    RotarySliderWithLabels driveSlider;
+    Attachment driveSliderAttachment;
     juce::ComboBox ampTypeBox;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> ampTypeBoxAttachment;
-    juce::ToggleButton ampBypassButton;
+    juce::ToggleButton ampBypassButton, osBypassButton;
+    ButtonAttachment ampBypassButtonAttachment, osBypassButtonAttachment;
+    
+    //===============================================================================================================================
+    // Tone Stack GUI
+
+    RotarySliderWithLabels lowShelfSlider, midPeakSlider, highShelfSlider;
+    Attachment lowShelfSliderAttachment, midPeakSliderAttachment, highShelfSliderAttachment;
+    
+    //===============================================================================================================================
     // IR loader GUI:
+    
     juce::TextButton loadBtn;
     std::unique_ptr<juce::FileChooser> fileChooser;
     juce::Label irNameLabel;
@@ -69,9 +81,11 @@ private:
     juce::ComboBox comboTypeBox, mikTypeBox;
     std::unique_ptr< juce::AudioProcessorValueTreeState::ComboBoxAttachment > comboTypeBoxAttachment, mikTypeBoxAttachment;
     juce::Atomic<bool> userIRLoaded{ false }, needIRUpdate{ false };
-    
+    juce::ToggleButton irBypassButton;
+    ButtonAttachment irBypassButtonAttachment;
     IrFFTComponent irfftComponent;
-
+    
+    //===============================================================================================================================
     // EQ GUI:
         // knobs
     RotarySliderWithLabels peakFreqSlider,
@@ -86,13 +100,12 @@ private:
         toneStackLowSlider,
         toneStackMidSlider,
         toneStackHighSlider;
-    juce::ToggleButton lowCutBypassButton, peakBypassButton, highCutBypassButton, irBypassButton;
+    juce::ToggleButton lowCutBypassButton, peakBypassButton, highCutBypassButton;
         // rendered response curve of EQ filters line
     ResponseCurveComponent responseCurveComponent;
 
         // attaching knobs to values
-    using APVTS = juce::AudioProcessorValueTreeState;
-    using Attachment = APVTS::SliderAttachment;
+    
 
     Attachment
         peakFreqSliderAttachment,
@@ -106,20 +119,12 @@ private:
         yPosSliderAttachment,
         inputGainSliderAttachment,
         outputGainSliderAttachment,
-        asymPosGainSliderAttachment,
-        asymNegGainSliderAttachment,
-        symGainSliderAttachment,
-        symLPLNSliderAttachment,
-        asymPosLPSliderAttachment,
-        asymPosLNSliderAttachment,
-        asymNegLPSliderAttachment,
-        asymNegLNSliderAttachment,
         toneStackLowSliderAttachment,
         toneStackMidSliderAttachment,
         toneStackHighSliderAttachment;
 
-    using ButtonAttachment = APVTS::ButtonAttachment;
-    ButtonAttachment lowCutBypassButtonAttachment, peakBypassButtonAttachment, highCutBypassButtonAttachment, irBypassButtonAttachment, ampBypassButtonAttachment;
+    
+    ButtonAttachment lowCutBypassButtonAttachment, peakBypassButtonAttachment, highCutBypassButtonAttachment;
 
     std::vector<juce::Component*> getComps();
 

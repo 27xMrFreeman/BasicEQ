@@ -139,41 +139,60 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
 
     //==============================================================================================================================================
     // contour filters before tone stack
-    TPTcontourBP.reset();
-    TPTcontourBP.prepare(spec);
-    TPTcontourBP.setType(juce::dsp::StateVariableTPTFilterType::bandpass);
-    TPTcontourBP.setCutoffFrequency(50);
-    TPTcontourBP.setResonance(0.222);
+    //TPTcontourBP.reset();
+    //TPTcontourBP.prepare(spec);
+    //TPTcontourBP.setType(juce::dsp::StateVariableTPTFilterType::bandpass);
+    //TPTcontourBP.setCutoffFrequency(50);
+    //TPTcontourBP.setResonance(0.222);
 
 
-    TPTcontourHP.reset();
-    TPTcontourHP.prepare(spec);
-    TPTcontourHP.setType(juce::dsp::FirstOrderTPTFilterType::highpass);
-    TPTcontourHP.setCutoffFrequency(750);
+    //TPTcontourHP.reset();
+    //TPTcontourHP.prepare(spec);
+    //TPTcontourHP.setType(juce::dsp::FirstOrderTPTFilterType::highpass);
+    //TPTcontourHP.setCutoffFrequency(750);
 
-    contourBPGain.reset();
-    contourBPGain.prepare(spec);
-    contourBPGain.setGainDecibels(3.5);
-    contourHPGain.reset();
-    contourHPGain.prepare(spec);
-    contourHPGain.setGainDecibels(2);
+    //contourBPGain.reset();
+    //contourBPGain.prepare(spec);
+    //contourBPGain.setGainDecibels(3.5);
+    //contourHPGain.reset();
+    //contourHPGain.prepare(spec);
+    //contourHPGain.setGainDecibels(2);
 
     //==============================================================================================================================================
     // tone stack filters 
-    toneStackFilters.reset();
-    toneStackFilters.prepare(spec);
-    toneStackFilters.get<0>().state = IIRFilterCoeff::makeLowShelf(getSampleRate(), 62, 1/(std::sqrt(2)), juce::Decibels::decibelsToGain(0));
-    toneStackFilters.get<1>().state = IIRFilterCoeff::makePeakFilter(getSampleRate(), 700, 1 / (std::sqrt(2)), juce::Decibels::decibelsToGain(0));
-    toneStackFilters.get<2>().state = IIRFilterCoeff::makeHighShelf(getSampleRate(), 1400, 1 / (std::sqrt(2)), juce::Decibels::decibelsToGain(0));
+    //toneStackFilters.reset();
+    //toneStackFilters.prepare(spec);
+    //toneStackFilters.get<0>().state = IIRFilterCoeff::makeLowShelf(getSampleRate(), 62, 1/(std::sqrt(2)), juce::Decibels::decibelsToGain(0));
+    //toneStackFilters.get<1>().state = IIRFilterCoeff::makePeakFilter(getSampleRate(), 700, 1 / (std::sqrt(2)), juce::Decibels::decibelsToGain(0));
+    //toneStackFilters.get<2>().state = IIRFilterCoeff::makeHighShelf(getSampleRate(), 1400, 1 / (std::sqrt(2)), juce::Decibels::decibelsToGain(0));
 
     //==============================================================================================================================================
+    // AMP + GAIN STAGING
+    preampGain.reset();
+    preampGain.prepare(spec);
+    preampGain.setGainDecibels(0);
+    ampSim.polettiDistortion.posProcessorChain.get<posAsymWaveShaper>().asymPosLP = 23.6f;
+    ampSim.polettiDistortion.posProcessorChain.get<posAsymWaveShaper>().asymPosLN = 0.5f;
+    ampSim.polettiDistortion.negProcessorChain.get<posAsymWaveShaper>().asymNegLP = 0.5f;
+    ampSim.polettiDistortion.negProcessorChain.get<posAsymWaveShaper>().asymNegLN = 23.6f;
+    ampSim.polettiDistortion.posProcessorChain.get<posSymWaveShaper>().symLPLN = 1.1f;
+    ampSim.polettiDistortion.negProcessorChain.get<posSymWaveShaper>().symLPLN = 1.1f;
+    ampSim.prepare(spec);
+    postampGain.reset();
+    postampGain.prepare(spec);
+    postampGain.setGainDecibels(0);
+    //==============================================================================================================================================
+    // TONE STACK
+    toneStack.prepare(spec);
+    //==============================================================================================================================================
+    // INPUT OUTPUT GAIN
     inputGain.reset();
     inputGain.prepare(spec);
     inputGain.setGainDecibels(0);
     outputGain.reset();
     outputGain.prepare(spec);
     outputGain.setGainDecibels(0);
-
+    //==============================================================================================================================================
     spec.numChannels = 1;
 
     rmsLevelInputLeft.reset(sampleRate, 0.2);
@@ -273,9 +292,10 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
    /* for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());*/
 
-    // DONE: Input gain with visualisation
+    //==============================================================================================================================================
     // APPLY GAIN KNOB
     inputGain.process(juce::dsp::ProcessContextReplacing<float>(block));
+    //==============================================================================================================================================
     // CALC and SET RMS LEVEL OF L&R CHANNELS
     rmsLevelInputLeft.skip(buffer.getNumSamples());
     rmsLevelInputRight.skip(buffer.getNumSamples());
@@ -286,9 +306,9 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     const auto valueInRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
     if (valueInRight < rmsLevelInputRight.getCurrentValue()) { rmsLevelInputRight.setTargetValue(valueInRight); } // if the new value is lower than the current one, apply smoothing
     else { rmsLevelInputRight.setCurrentAndTargetValue(valueInRight); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
-    // DONE: make meters vertical instead of horizontal
+    //==============================================================================================================================================
 
-    updateFilters();
+    //updateFilters();
 
     //buffer.clear(); // for testing FFT with oscillator
     
@@ -334,17 +354,34 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     //toneStackFilters.process(juce::dsp::ProcessContextReplacing<float>(block));
 
     // input block divided to mono L/R for EQ processing
-    auto leftBlock = block.getSingleChannelBlock(0);
-    auto rightBlock = block.getSingleChannelBlock(1);
+    //auto leftBlock = block.getSingleChannelBlock(0);
+    //auto rightBlock = block.getSingleChannelBlock(1);
     
-    juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
-    juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
+    //juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
+    //juce::dsp::ProcessContextReplacing<float> rightContext(rightBlock);
 
-    leftChain.process(leftContext);
-    rightChain.process(rightContext);
+    //leftChain.process(leftContext);
+    //rightChain.process(rightContext);
     
     //input stereo block sent to irLoader
     //DBG((int)!settings.irBypassed);
+
+    //==============================================================================================================================================
+    // AMP PROCESS
+    ampSim.drive = settings.drive;
+    ampSim.osBypassed = settings.osBypassed;
+    ampSim.ampType = settings.ampType;
+
+    ampSim.process(block);
+    //==============================================================================================================================================
+    // TONESTACK PROCESS
+    toneStack.setLowGain(settings.stackLowGain);
+    toneStack.setMidGain(settings.stackMidGain);
+    toneStack.setHighGain(settings.stackHighGain);
+
+    toneStack.process(block);
+    //==============================================================================================================================================
+    // IR PROCESS
     if (!settings.irBypassed)
     {
         if (irLoader.getCurrentIRSize() > 0)
@@ -358,10 +395,10 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
             irLoader.process(juce::dsp::ProcessContextReplacing<float>(block));
         }
     }
-
-    // APPLY GAIN KNOB
+    //==============================================================================================================================================
+    // APPLY OUTPUT GAIN KNOB
     outputGain.process(juce::dsp::ProcessContextReplacing<float>(block));
-
+    //==============================================================================================================================================
     // CALC and SET RMS LEVEL OF L&R CHANNELS
     rmsLevelOutputLeft.skip(buffer.getNumSamples());
     rmsLevelOutputRight.skip(buffer.getNumSamples());
@@ -372,25 +409,11 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     const auto valueOutRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
     if (valueOutRight < rmsLevelOutputRight.getCurrentValue()) { rmsLevelOutputRight.setTargetValue(valueOutRight); } // if the new value is lower than the current one, apply smoothing
     else { rmsLevelOutputRight.setCurrentAndTargetValue(valueOutRight); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
-    
+    //==============================================================================================================================================
+    // UPDATE FIFO FOR FFT VISUAL
     leftChannelFifo.update(buffer);
     rightChannelFifo.update(buffer);
-
-    //TODO: Undersampling
-
-    //DBG("IR size is " << irLoader.getCurrentIRSize());
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    //for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    //{
-    //    auto* channelData = buffer.getWritePointer (channel);
-
-    //    // ..do something to the data...
-    //}
+    //==============================================================================================================================================
 }
 
 //==============================================================================
@@ -466,9 +489,11 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     settings.symGain = apvts.getRawParameterValue("SymGain")->load();
     settings.symLPLN = apvts.getRawParameterValue("SymLPLN")->load();
     settings.ampType = static_cast<AmpTypeEnum>(apvts.getRawParameterValue("Amp Type")->load());
-    settings.stackLowGain = apvts.getRawParameterValue("StackLowGain")->load();
-    settings.stackMidGain = apvts.getRawParameterValue("StackMidGain")->load();
-    settings.stackHighGain = apvts.getRawParameterValue("StackHighGain")->load();
+    settings.drive = apvts.getRawParameterValue("Drive")->load();
+    settings.osBypassed = apvts.getRawParameterValue("Oversampling Bypassed")->load() > 0.5f;
+    settings.stackLowGain = apvts.getRawParameterValue("LowShelfGain")->load();
+    settings.stackMidGain = apvts.getRawParameterValue("MidPeakGain")->load();
+    settings.stackHighGain = apvts.getRawParameterValue("HighShelfGain")->load();
     return settings;
 }
 

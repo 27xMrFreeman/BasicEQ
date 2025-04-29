@@ -23,14 +23,10 @@ xPosSlider(*audioProcessor.apvts.getParameter("X Position"), "cm"),
 yPosSlider(*audioProcessor.apvts.getParameter("Y Position"), "cm"),
 inputGainSlider(*audioProcessor.apvts.getParameter("Input Gain"), "dB"),
 outputGainSlider(*audioProcessor.apvts.getParameter("Output Gain"), "dB"),
-asymPosGainSlider(*audioProcessor.apvts.getParameter("AsymPosGain"), ""),
-asymNegGainSlider(*audioProcessor.apvts.getParameter("AsymNegGain"), ""),
-symGainSlider(*audioProcessor.apvts.getParameter("SymGain"), ""),
-symLPLNSlider(*audioProcessor.apvts.getParameter("SymLPLN"), ""),
-asymPosLPSlider(*audioProcessor.apvts.getParameter("AsymPosLP"), ""),
-asymPosLNSlider(*audioProcessor.apvts.getParameter("AsymPosLN"), ""),
-asymNegLPSlider(*audioProcessor.apvts.getParameter("AsymNegLP"), ""),
-asymNegLNSlider(*audioProcessor.apvts.getParameter("AsymNegLN"), ""),
+driveSlider(*audioProcessor.apvts.getParameter("Drive"), "dB"),
+lowShelfSlider(*audioProcessor.apvts.getParameter("LowShelfGain"), "dB"),
+midPeakSlider(*audioProcessor.apvts.getParameter("MidPeakGain"), "dB"),
+highShelfSlider(*audioProcessor.apvts.getParameter("HighShelfGain"), "dB"),
 toneStackLowSlider(*audioProcessor.apvts.getParameter("StackLowGain"), "dB"),
 toneStackMidSlider(*audioProcessor.apvts.getParameter("StackMidGain"), "dB"),
 toneStackHighSlider(*audioProcessor.apvts.getParameter("StackHighGain"), "dB"),
@@ -47,19 +43,16 @@ xPosSliderAttachment(audioProcessor.apvts, "X Position", xPosSlider),
 yPosSliderAttachment(audioProcessor.apvts, "Y Position", yPosSlider),
 inputGainSliderAttachment(audioProcessor.apvts, "Input Gain", inputGainSlider),
 outputGainSliderAttachment(audioProcessor.apvts, "Output Gain", outputGainSlider),
+driveSliderAttachment(audioProcessor.apvts, "Drive", driveSlider),
+lowShelfSliderAttachment(audioProcessor.apvts, "LowShelfGain", lowShelfSlider),
+midPeakSliderAttachment(audioProcessor.apvts, "MidPeakGain", midPeakSlider),
+highShelfSliderAttachment(audioProcessor.apvts, "HighShelfGain", highShelfSlider),
 lowCutBypassButtonAttachment(audioProcessor.apvts, "LowCut Bypassed", lowCutBypassButton),
 highCutBypassButtonAttachment(audioProcessor.apvts, "HighCut Bypassed", highCutBypassButton),
 peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButton),
 ampBypassButtonAttachment(audioProcessor.apvts, "Amp Bypassed", ampBypassButton),
+osBypassButtonAttachment(audioProcessor.apvts, "Oversampling Bypassed", osBypassButton),
 irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton),
-asymPosGainSliderAttachment(audioProcessor.apvts, "AsymPosGain", asymPosGainSlider),
-asymNegGainSliderAttachment(audioProcessor.apvts, "AsymNegGain", asymNegGainSlider),
-symGainSliderAttachment(audioProcessor.apvts, "SymGain", symGainSlider),
-symLPLNSliderAttachment(audioProcessor.apvts, "SymLPLN", symLPLNSlider),
-asymPosLPSliderAttachment(audioProcessor.apvts, "AsymPosLP", asymPosLPSlider),
-asymPosLNSliderAttachment(audioProcessor.apvts, "AsymPosLN", asymPosLNSlider),
-asymNegLPSliderAttachment(audioProcessor.apvts, "AsymNegLP", asymNegLPSlider),
-asymNegLNSliderAttachment(audioProcessor.apvts, "AsymNegLN", asymNegLNSlider),
 toneStackLowSliderAttachment(audioProcessor.apvts, "StackLowGain", toneStackLowSlider),
 toneStackMidSliderAttachment(audioProcessor.apvts, "StackMidGain", toneStackMidSlider),
 toneStackHighSliderAttachment(audioProcessor.apvts, "StackHighGain", toneStackHighSlider)
@@ -85,14 +78,6 @@ toneStackHighSliderAttachment(audioProcessor.apvts, "StackHighGain", toneStackHi
     xPosSlider.labels.add({ 1.f, "10cm" });
     yPosSlider.labels.add({ 0.f, "0cm" });
     yPosSlider.labels.add({ 1.f, "40cm" });
-    symGainSlider.labels.add({ 0.f, "SG" });
-    asymNegGainSlider.labels.add({ 0.f, "ANG" });
-    asymPosGainSlider.labels.add({ 0.f, "APG" });
-    asymNegLNSlider.labels.add({ 0.f, "ANLN" });
-    asymNegLPSlider.labels.add({ 0.f, "ANLP" });
-    asymPosLNSlider.labels.add({ 0.f, "APLN" });
-    asymPosLPSlider.labels.add({ 0.f, "APLP" });
-    symLPLNSlider.labels.add({ 0.f, "SLPLN" });
     toneStackLowSlider.labels.add({ 0.f, "Low" });
     toneStackMidSlider.labels.add({ 0.f, "Mid" });
     toneStackHighSlider.labels.add({ 0.f, "High" });
@@ -128,10 +113,12 @@ toneStackHighSliderAttachment(audioProcessor.apvts, "StackHighGain", toneStackHi
         };
 
     ampTypeBox.addItem("Poletti", 1);
-    ampTypeBox.addItem("Placeholder", 2);
+    ampTypeBox.addItem("Yamaha", 2);
+    ampTypeBox.addItem("WaveFolder", 3);
     ampTypeBox.setSelectedId(1);
     ampTypeBox.onChange = [this]() {
-        audioProcessor.ampDrive.simTypeChanged(ampTypeBox.getSelectedId());
+        //audioProcessor.ampDrive.simTypeChanged(ampTypeBox.getSelectedId());
+        audioProcessor.ampSim.ampType = static_cast<AmpTypeEnum>(ampTypeBox.getSelectedId());
         };
 
     for (auto* comp : getComps())
@@ -232,14 +219,6 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
     irBypassButton.setLookAndFeel(nullptr);
     inputGainSlider.setLookAndFeel(nullptr);
     outputGainSlider.setLookAndFeel(nullptr);
-    asymPosGainSlider.setLookAndFeel(nullptr);
-    asymNegGainSlider.setLookAndFeel(nullptr);
-    symGainSlider.setLookAndFeel(nullptr);
-    symLPLNSlider.setLookAndFeel(nullptr);
-    asymPosLPSlider.setLookAndFeel(nullptr);
-    asymPosLNSlider.setLookAndFeel(nullptr);
-    asymNegLPSlider.setLookAndFeel(nullptr);
-    asymNegLNSlider.setLookAndFeel(nullptr);
     ampBypassButton.setLookAndFeel(nullptr);
 }
 
@@ -414,13 +393,11 @@ void BasicEQAudioProcessorEditor::resized()
     // Main knobs - gain sliders will be replaced with one, additional filters will replace the rightmost two slots
     auto mainKnobsArea = bounds.removeFromBottom(bounds.getHeight() * 0.4).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);
     auto knobWidth = mainKnobsArea.getWidth() / 7;
-    symGainSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    driveSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
     ampTypeBox.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
     toneStackLowSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
     toneStackMidSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
     toneStackHighSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
-    asymPosGainSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
-    asymNegGainSlider.setBounds(mainKnobsArea);
 
     // bounds are now only top "half"
     auto xyPadArea = bounds.removeFromLeft(bounds.getWidth() * 0.25).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);;
@@ -584,9 +561,12 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &meterInRight,
         &meterOutLeft,
         &meterOutRight,
-        &asymPosGainSlider,
-        &asymNegGainSlider,
-        &symGainSlider,
+        &driveSlider,
+        &lowShelfSlider,
+        &midPeakSlider,
+        &highShelfSlider,
+        &osBypassButton,
+        &ampBypassButton,
         //&symLPLNSlider,
         //&asymPosLPSlider,
         //&asymPosLNSlider,
