@@ -48,13 +48,16 @@ private:
     juce::Image backgroundImage;
 
     //===============================================================================================================================
-    // meters
+    // meters + gain
     
     HorizontalMeterLeft meterInLeft;
     HorizontalMeterLeft meterOutLeft;
     HorizontalMeterRight meterInRight;
     HorizontalMeterRight meterOutRight;
     
+    RotarySliderWithLabels inputGainSlider, outputGainSlider;
+    Attachment inputGainSliderAttachment, outputGainSliderAttachment;
+
     //===============================================================================================================================
     // Amp GUI
     
@@ -78,6 +81,7 @@ private:
     std::unique_ptr<juce::FileChooser> fileChooser;
     juce::Label irNameLabel;
     RotarySliderWithLabels xPosSlider, yPosSlider;
+    Attachment xPosSliderAttachment, yPosSliderAttachment;
     juce::ComboBox comboTypeBox, mikTypeBox;
     std::unique_ptr< juce::AudioProcessorValueTreeState::ComboBoxAttachment > comboTypeBoxAttachment, mikTypeBoxAttachment;
     juce::Atomic<bool> userIRLoaded{ false }, needIRUpdate{ false };
@@ -94,12 +98,7 @@ private:
         lowCutFreqSlider,
         highCutFreqSlider,
         lowCutSlopeSlider,
-        highCutSlopeSlider,
-        inputGainSlider,
-        outputGainSlider,
-        toneStackLowSlider,
-        toneStackMidSlider,
-        toneStackHighSlider;
+        highCutSlopeSlider;
     juce::ToggleButton lowCutBypassButton, peakBypassButton, highCutBypassButton;
         // rendered response curve of EQ filters line
     ResponseCurveComponent responseCurveComponent;
@@ -114,14 +113,7 @@ private:
         lowCutFreqSliderAttachment,
         highCutFreqSliderAttachment,
         lowCutSlopeSliderAttachment,
-        highCutSlopeSliderAttachment,
-        xPosSliderAttachment,
-        yPosSliderAttachment,
-        inputGainSliderAttachment,
-        outputGainSliderAttachment,
-        toneStackLowSliderAttachment,
-        toneStackMidSliderAttachment,
-        toneStackHighSliderAttachment;
+        highCutSlopeSliderAttachment;
 
     
     ButtonAttachment lowCutBypassButtonAttachment, peakBypassButtonAttachment, highCutBypassButtonAttachment;

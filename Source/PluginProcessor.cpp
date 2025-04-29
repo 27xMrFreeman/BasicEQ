@@ -470,24 +470,16 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     settings.lowCutSlope = static_cast<Slope>(apvts.getRawParameterValue("LowCut Slope")->load());
     settings.highCutSlope = static_cast<Slope>(apvts.getRawParameterValue("HighCut Slope")->load());
     settings.xPos = apvts.getRawParameterValue("X Position")->load();
-    settings.yPos = /*static_cast<Distance>*/(apvts.getRawParameterValue("Y Position")->load());
+    settings.yPos = apvts.getRawParameterValue("Y Position")->load();
     settings.lowCutBypassed = apvts.getRawParameterValue("LowCut Bypassed")->load() > 0.5f;
     settings.highCutBypassed = apvts.getRawParameterValue("HighCut Bypassed")->load() > 0.5f;
     settings.peakBypassed = apvts.getRawParameterValue("Peak Bypassed")->load() > 0.5f;
-    settings.irBypassed = /*apvts.getRawParameterValue("IR Bypassed")->load() > 0.5f*/false;
+    settings.irBypassed = apvts.getRawParameterValue("IR Bypassed")->load() > 0.5f;
     settings.inputGainInDecibels = apvts.getRawParameterValue("Input Gain")->load();
     settings.outputGainInDecibels = apvts.getRawParameterValue("Output Gain")->load();
     settings.micType = static_cast<micTypeEnum>(apvts.getRawParameterValue("Mic Type")->load());
     settings.comboType = static_cast<comboTypeEnum>(apvts.getRawParameterValue("Combo Type")->load());
     settings.ampBypassed = apvts.getRawParameterValue("Amp Bypassed")->load() > 0.5f;
-    settings.asymNegGain = apvts.getRawParameterValue("AsymNegGain")->load();
-    settings.asymNegLN = apvts.getRawParameterValue("AsymNegLN")->load();
-    settings.asymNegLP = apvts.getRawParameterValue("AsymNegLP")->load();
-    settings.asymPosGain = apvts.getRawParameterValue("AsymPosGain")->load();
-    settings.asymPosLN = apvts.getRawParameterValue("AsymPosLN")->load();
-    settings.asymPosLP = apvts.getRawParameterValue("AsymPosLP")->load();
-    settings.symGain = apvts.getRawParameterValue("SymGain")->load();
-    settings.symLPLN = apvts.getRawParameterValue("SymLPLN")->load();
     settings.ampType = static_cast<AmpTypeEnum>(apvts.getRawParameterValue("Amp Type")->load());
     settings.drive = apvts.getRawParameterValue("Drive")->load();
     settings.osBypassed = apvts.getRawParameterValue("Oversampling Bypassed")->load() > 0.5f;
@@ -736,12 +728,12 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     layout.add(std::make_unique<juce::AudioParameterChoice>("HighCut Slope", "HighCut Slope", stringArray, 0));
     //============================================================================================================================================
     // ToneStack
-    layout.add(std::make_unique<juce::AudioParameterFloat>("StackLowGain", "StackLowGain",
+    layout.add(std::make_unique<juce::AudioParameterFloat>("LowShelfGain", "Low",
         juce::NormalisableRange<float>(-10.f, 10.f, 0.1f, 1.f), 0.0f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("StackMidGain", "StackMidGain",
-        juce::NormalisableRange<float>(-10.f, 10.f, 0.1f, 1.f), 0.0f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("StackHighGain", "StackHighGain",
-        juce::NormalisableRange<float>(-10.f, 10.f, 0.1f, 1.f), 0.0f));    
+    layout.add(std::make_unique<juce::AudioParameterFloat>("MidPeakGain", "Mid",
+        juce::NormalisableRange<float>(-6.f, 6.f, 0.1f, 1.f), 0.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("HighShelfGain", "High",
+        juce::NormalisableRange<float>(-8.f, 8.f, 0.1f, 1.f), 0.0f));    
     
     //============================================================================================================================================
     // IR
@@ -763,24 +755,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout
         juce::NormalisableRange<float>(-24.f, 24.f, 0.1f, 1.f), 0.0f));
     //============================================================================================================================================
     // AMP
-    layout.add(std::make_unique<juce::AudioParameterFloat>("AsymPosGain", "AsymPosGain",
-        juce::NormalisableRange<float>(0.f, 24.f, 0.1f, 1.f), 1.7f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("AsymNegGain", "AsymNegGain",
-        juce::NormalisableRange<float>(0.f, 24.f, 0.1f, 1.f), 1.7f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("SymGain", "SymGain",
-        juce::NormalisableRange<float>(0.f, 24.f, 0.1f, 1.f), 4.f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("AsymPosLP", "AsymPosLP",
-        juce::NormalisableRange<float>(0.f, 40.f, 0.1f, 1.f), 23.6f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("AsymPosLN", "AsymPosLN",
-        juce::NormalisableRange<float>(0.f, 40.f, 0.1f, 1.f), 0.5f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("AsymNegLP", "AsymNegLP",
-        juce::NormalisableRange<float>(0.f, 40.f, 0.1f, 1.f), 0.5f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("AsymNegLN", "AsymNegLN",
-        juce::NormalisableRange<float>(0.f, 40.f, 0.1f, 1.f), 23.6f));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("SymLPLN", "SymLPLN",
-        juce::NormalisableRange<float>(0.f, 24.f, 0.1f, 1.f), 1.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Drive", "Drive",
+        juce::NormalisableRange<float>(0.1f, 10.f, 0.1f, 1.f), 5.f));
+    layout.add(std::make_unique<juce::AudioParameterBool>("Oversampling Bypassed", "Oversampling Bypassed", false));
     layout.add(std::make_unique<juce::AudioParameterBool>("Amp Bypassed", "Amp Bypassed", false));
-    juce::StringArray ampChoices("Poletti", "Placeholder");
+    juce::StringArray ampChoices("Poletti", "Yamaha", "WaveFolder");
     layout.add(std::make_unique<juce::AudioParameterChoice>("Amp Type", "Amp Type", ampChoices, 0));
     //============================================================================================================================================
     // BYPASS BUTTONS

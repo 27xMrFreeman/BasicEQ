@@ -23,13 +23,10 @@ xPosSlider(*audioProcessor.apvts.getParameter("X Position"), "cm"),
 yPosSlider(*audioProcessor.apvts.getParameter("Y Position"), "cm"),
 inputGainSlider(*audioProcessor.apvts.getParameter("Input Gain"), "dB"),
 outputGainSlider(*audioProcessor.apvts.getParameter("Output Gain"), "dB"),
-driveSlider(*audioProcessor.apvts.getParameter("Drive"), "dB"),
-lowShelfSlider(*audioProcessor.apvts.getParameter("LowShelfGain"), "dB"),
-midPeakSlider(*audioProcessor.apvts.getParameter("MidPeakGain"), "dB"),
-highShelfSlider(*audioProcessor.apvts.getParameter("HighShelfGain"), "dB"),
-toneStackLowSlider(*audioProcessor.apvts.getParameter("StackLowGain"), "dB"),
-toneStackMidSlider(*audioProcessor.apvts.getParameter("StackMidGain"), "dB"),
-toneStackHighSlider(*audioProcessor.apvts.getParameter("StackHighGain"), "dB"),
+driveSlider(*audioProcessor.apvts.getParameter("Drive"), ""),
+lowShelfSlider(*audioProcessor.apvts.getParameter("LowShelfGain"), ""),
+midPeakSlider(*audioProcessor.apvts.getParameter("MidPeakGain"), ""),
+highShelfSlider(*audioProcessor.apvts.getParameter("HighShelfGain"), ""),
 responseCurveComponent(audioProcessor),
 irfftComponent(audioProcessor),
 peakFreqSliderAttachment(audioProcessor.apvts, "Peak Freq", peakFreqSlider),
@@ -52,10 +49,7 @@ highCutBypassButtonAttachment(audioProcessor.apvts, "HighCut Bypassed", highCutB
 peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButton),
 ampBypassButtonAttachment(audioProcessor.apvts, "Amp Bypassed", ampBypassButton),
 osBypassButtonAttachment(audioProcessor.apvts, "Oversampling Bypassed", osBypassButton),
-irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton),
-toneStackLowSliderAttachment(audioProcessor.apvts, "StackLowGain", toneStackLowSlider),
-toneStackMidSliderAttachment(audioProcessor.apvts, "StackMidGain", toneStackMidSlider),
-toneStackHighSliderAttachment(audioProcessor.apvts, "StackHighGain", toneStackHighSlider)
+irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -78,9 +72,6 @@ toneStackHighSliderAttachment(audioProcessor.apvts, "StackHighGain", toneStackHi
     xPosSlider.labels.add({ 1.f, "10cm" });
     yPosSlider.labels.add({ 0.f, "0cm" });
     yPosSlider.labels.add({ 1.f, "40cm" });
-    toneStackLowSlider.labels.add({ 0.f, "Low" });
-    toneStackMidSlider.labels.add({ 0.f, "Mid" });
-    toneStackHighSlider.labels.add({ 0.f, "High" });
 
     
 
@@ -392,12 +383,12 @@ void BasicEQAudioProcessorEditor::resized()
 
     // Main knobs - gain sliders will be replaced with one, additional filters will replace the rightmost two slots
     auto mainKnobsArea = bounds.removeFromBottom(bounds.getHeight() * 0.4).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);
-    auto knobWidth = mainKnobsArea.getWidth() / 7;
+    auto knobWidth = mainKnobsArea.getWidth() / 5;
     driveSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
     ampTypeBox.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
-    toneStackLowSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
-    toneStackMidSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
-    toneStackHighSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    lowShelfSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    midPeakSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    highShelfSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
 
     // bounds are now only top "half"
     auto xyPadArea = bounds.removeFromLeft(bounds.getWidth() * 0.25).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);;
@@ -540,9 +531,6 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &highCutFreqSlider,
         &lowCutSlopeSlider,
         &highCutSlopeSlider,
-        &toneStackLowSlider,
-        &toneStackMidSlider,
-        &toneStackHighSlider,
         &responseCurveComponent,
         &irfftComponent,
         &loadBtn,

@@ -57,7 +57,6 @@ struct ChainSettings
     //============================================================================================================================================
     //AMP
     AmpTypeEnum ampType{ AmpTypeEnum::Poletti };
-    float asymPosGain, asymNegGain, symGain, asymPosLP, asymPosLN, asymNegLP, asymNegLN, symLPLN; // dont need anymore
     float drive{ 0 };
     bool ampBypassed{ false }, osBypassed{ false };
     //============================================================================================================================================
