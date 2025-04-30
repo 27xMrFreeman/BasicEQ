@@ -20,6 +20,7 @@
 #include "Components/PathProducer.h"
 #include "Components/ResponseCurveComponent.h"
 #include "Components/RotarySliderWithLabels.h"
+#include "Components/XYPad.h"
 
 //==============================================================================
 /**
@@ -82,6 +83,9 @@ private:
     juce::Label irNameLabel;
     RotarySliderWithLabels xPosSlider, yPosSlider;
     Attachment xPosSliderAttachment, yPosSliderAttachment;
+
+    XYPad xyPad;
+
     juce::ComboBox comboTypeBox, mikTypeBox;
     std::unique_ptr< juce::AudioProcessorValueTreeState::ComboBoxAttachment > comboTypeBoxAttachment, mikTypeBoxAttachment;
     juce::Atomic<bool> userIRLoaded{ false }, needIRUpdate{ false };

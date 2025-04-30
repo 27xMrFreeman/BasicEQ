@@ -143,7 +143,6 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     mikTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Mic Type", mikTypeBox);
     ampTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Amp Type", ampTypeBox);
 
-    // TODO: Interpolate loaded IR, X and Y pos now floats
     yPosSlider.onValueChange = [this]() {
         ////DBG("changed yPos to " << yPosSlider.getValue());
         //juce::AudioBuffer<float> irBuffer;
@@ -164,6 +163,9 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
         //irfftComponent.loadedIRChanged(irBuffer, sampleRate);
         needIRUpdate.set(true);
         };
+
+    xyPad.registerSlider(&xPosSlider, XYPad::Axis::X);
+    xyPad.registerSlider(&yPosSlider, XYPad::Axis::Y);
 
     loadBtn.setButtonText("Load IR");
     loadBtn.onClick = [this]()
@@ -194,6 +196,7 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     outputGainSlider.onValueChange = [this] { audioProcessor.outputGain.setGainDecibels(outputGainSlider.getValue()); /*DBG("Output gain set to " << outputGainSlider.getValue());*/ };
 
     setSize (1000, 500);
+    setResizable(true, true);
 
     startTimer(0, 33);
     startTimer(1, 50);
@@ -201,6 +204,8 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
 
 BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
 {
+    xyPad.deregisterSlider(&xPosSlider);
+    xyPad.deregisterSlider(&yPosSlider);
     lowCutBypassButton.setLookAndFeel(nullptr);
     highCutBypassButton.setLookAndFeel(nullptr);
     peakBypassButton.setLookAndFeel(nullptr);
@@ -406,8 +411,10 @@ void BasicEQAudioProcessorEditor::resized()
     auto irChoicesArea = bounds.removeFromLeft(bounds.getWidth() * 0.33).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);;
     auto responseArea = bounds.reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);;
 
-    xPosSlider.setBounds(xyPadArea.removeFromTop(xyPadArea.getHeight()*0.5).reduced(xyPadArea.getWidth()*0.05));
-    yPosSlider.setBounds(xyPadArea.reduced(xyPadArea.getWidth() * 0.05));
+    //xPosSlider.setBounds(xyPadArea.removeFromTop(xyPadArea.getHeight()*0.5).reduced(xyPadArea.getWidth()*0.05));
+    //yPosSlider.setBounds(xyPadArea.reduced(xyPadArea.getWidth() * 0.05));
+
+    xyPad.setBounds(xyPadArea);
 
     irBypassButton.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.25).reduced(irChoicesArea.getWidth() * 0.09));
     loadBtn.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.33).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
@@ -573,7 +580,8 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         //&asymNegLPSlider,
         //&asymNegLNSlider,
         //&ampBypassButton,
-        &ampTypeBox
+        &ampTypeBox,
+        &xyPad
     };
 }
 
