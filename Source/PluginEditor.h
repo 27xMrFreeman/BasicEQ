@@ -65,8 +65,8 @@ private:
     Attachment driveSliderAttachment;
     juce::ComboBox ampTypeBox;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> ampTypeBoxAttachment;
-    juce::ToggleButton ampBypassButton, osBypassButton;
-    ButtonAttachment ampBypassButtonAttachment, osBypassButtonAttachment;
+    juce::ToggleButton ampBypassButton/*, osBypassButton*/;
+    ButtonAttachment ampBypassButtonAttachment/*, osBypassButtonAttachment*/;
     
     //===============================================================================================================================
     // Tone Stack GUI

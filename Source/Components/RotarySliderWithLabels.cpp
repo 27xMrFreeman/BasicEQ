@@ -21,8 +21,14 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
 
     auto sliderBounds = getSliderBounds();
 
+    auto nameBounds = getLocalBounds();
+    nameBounds.removeFromTop(sliderBounds.getHeight()).reduce(0, nameBounds.getHeight() * 0.1);
+
+    g.setColour(Colours::white);
+    g.drawFittedText(name, nameBounds, Justification::centred, 1);
+
     /*g.setColour(Colours::red);
-    g.drawRect(getLocalBounds());
+    g.drawRect(nameBounds);
     g.setColour(Colours::azure);
     g.drawRect(sliderBounds); */        // bounding boxes of sliders for debugging purposes
 

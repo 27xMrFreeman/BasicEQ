@@ -48,13 +48,13 @@ lowCutBypassButtonAttachment(audioProcessor.apvts, "LowCut Bypassed", lowCutBypa
 highCutBypassButtonAttachment(audioProcessor.apvts, "HighCut Bypassed", highCutBypassButton),
 peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButton),
 ampBypassButtonAttachment(audioProcessor.apvts, "Amp Bypassed", ampBypassButton),
-osBypassButtonAttachment(audioProcessor.apvts, "Oversampling Bypassed", osBypassButton),
+//osBypassButtonAttachment(audioProcessor.apvts, "Oversampling Bypassed", osBypassButton),
 irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
 
-    peakFreqSlider.labels.add({ 0.f, "10Hz" });
+    /*peakFreqSlider.labels.add({ 0.f, "10Hz" });
     peakFreqSlider.labels.add({ 1.f, "20kHz" });
     peakGainSlider.labels.add({ 0.f, "-24dB" });
     peakGainSlider.labels.add({ 1.f, "24dB" });
@@ -67,13 +67,19 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     highCutFreqSlider.labels.add({ 0.f, "10Hz" });
     highCutFreqSlider.labels.add({ 1.f, "20kHz" });
     highCutSlopeSlider.labels.add({ 0.f, "12" });
-    highCutSlopeSlider.labels.add({ 1.f, "48" });
-    xPosSlider.labels.add({ 0.f, "0cm" });
-    xPosSlider.labels.add({ 1.f, "10cm" });
-    yPosSlider.labels.add({ 0.f, "0cm" });
-    yPosSlider.labels.add({ 1.f, "40cm" });
-
-    
+    highCutSlopeSlider.labels.add({ 1.f, "48" });*/
+    //xPosSlider.labels.add({ 0.f, "0cm" });
+    //xPosSlider.labels.add({ 1.f, "10cm" });
+    xPosSlider.name = "X Position";
+    //yPosSlider.labels.add({ 0.f, "0cm" });
+    //yPosSlider.labels.add({ 1.f, "40cm" });
+    yPosSlider.name = "Y Position";
+    driveSlider.name = "Drive";
+    lowShelfSlider.name = "Low";
+    midPeakSlider.name = "Mid";
+    highShelfSlider.name = "High";
+    inputGainSlider.name = "IN";
+    outputGainSlider.name = "OUT";
 
     comboTypeBox.addItem("Mar", 1);
     comboTypeBox.addItem("MM", 2);
@@ -187,10 +193,10 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     inputGainSlider.onValueChange = [this] { audioProcessor.inputGain.setGainDecibels(inputGainSlider.getValue()); };
     outputGainSlider.onValueChange = [this] { audioProcessor.outputGain.setGainDecibels(outputGainSlider.getValue()); /*DBG("Output gain set to " << outputGainSlider.getValue());*/ };
 
-    setSize (1000, 600);
+    setSize (1000, 500);
 
     startTimer(0, 33);
-    startTimer(1, 200);
+    startTimer(1, 50);
 }
 
 BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
@@ -371,18 +377,23 @@ void BasicEQAudioProcessorEditor::resized()
     auto outputMeterArea = bounds.removeFromRight(meterWidth);
     auto inputGainArea = inputMeterArea.removeFromBottom(meterHeight);
     auto outputGainArea = outputMeterArea.removeFromBottom(meterHeight);
-    inputGainSlider.setBounds(inputGainArea);
-    outputGainSlider.setBounds(outputGainArea);
+    inputGainSlider.setBounds(inputGainArea.reduced(0, inputGainArea.getHeight()*0.05));
+    outputGainSlider.setBounds(outputGainArea.reduced(0, outputGainArea.getHeight() * 0.05));
     meterInLeft.setBounds(inputMeterArea.removeFromLeft(inputMeterArea.getWidth()*0.5));
     meterInRight.setBounds(inputMeterArea);
     meterOutLeft.setBounds(outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.5));
     meterOutRight.setBounds(outputMeterArea);
 
     // Space for buffer if it will be implemented
-    auto bufferArea = bounds.removeFromBottom(bounds.getHeight() * 0.2);
+    //auto bufferArea = bounds.removeFromTop(bounds.getHeight() * 0.1);
+    //auto buttonWidth = bufferArea.getWidth() * 0.33;
+    
+    //osBypassButton.setBounds(bufferArea.removeFromLeft(buttonWidth));
+    
 
     // Main knobs - gain sliders will be replaced with one, additional filters will replace the rightmost two slots
-    auto mainKnobsArea = bounds.removeFromBottom(bounds.getHeight() * 0.4).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);
+    auto mainKnobsArea = bounds.removeFromBottom(bounds.getHeight() * 0.4).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.1);
+    ampBypassButton.setBounds(mainKnobsArea.removeFromLeft(mainKnobsArea.getWidth()/20));
     auto knobWidth = mainKnobsArea.getWidth() / 5;
     driveSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
     ampTypeBox.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
@@ -395,9 +406,10 @@ void BasicEQAudioProcessorEditor::resized()
     auto irChoicesArea = bounds.removeFromLeft(bounds.getWidth() * 0.33).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);;
     auto responseArea = bounds.reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);;
 
-    xPosSlider.setBounds(xyPadArea.removeFromLeft(xyPadArea.getWidth()*0.5));
-    yPosSlider.setBounds(xyPadArea);
+    xPosSlider.setBounds(xyPadArea.removeFromTop(xyPadArea.getHeight()*0.5).reduced(xyPadArea.getWidth()*0.05));
+    yPosSlider.setBounds(xyPadArea.reduced(xyPadArea.getWidth() * 0.05));
 
+    irBypassButton.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.25).reduced(irChoicesArea.getWidth() * 0.09));
     loadBtn.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.33).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
     mikTypeBox.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.5).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
     comboTypeBox.setBounds(irChoicesArea.reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
@@ -553,7 +565,7 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &lowShelfSlider,
         &midPeakSlider,
         &highShelfSlider,
-        &osBypassButton,
+        //&osBypassButton,
         &ampBypassButton,
         //&symLPLNSlider,
         //&asymPosLPSlider,

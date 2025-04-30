@@ -371,8 +371,9 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     ampSim.drive = settings.drive;
     ampSim.osBypassed = settings.osBypassed;
     ampSim.ampType = settings.ampType;
-
-    ampSim.process(block);
+    if (!settings.ampBypassed) {
+        ampSim.process(block);
+    }
     //==============================================================================================================================================
     // TONESTACK PROCESS
     toneStack.setLowGain(settings.stackLowGain);
@@ -482,7 +483,7 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts)
     settings.ampBypassed = apvts.getRawParameterValue("Amp Bypassed")->load() > 0.5f;
     settings.ampType = static_cast<AmpTypeEnum>(apvts.getRawParameterValue("Amp Type")->load());
     settings.drive = apvts.getRawParameterValue("Drive")->load();
-    settings.osBypassed = apvts.getRawParameterValue("Oversampling Bypassed")->load() > 0.5f;
+    //settings.osBypassed = apvts.getRawParameterValue("Oversampling Bypassed")->load() > 0.5f;
     settings.stackLowGain = apvts.getRawParameterValue("LowShelfGain")->load();
     settings.stackMidGain = apvts.getRawParameterValue("MidPeakGain")->load();
     settings.stackHighGain = apvts.getRawParameterValue("HighShelfGain")->load();
@@ -757,7 +758,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout
     // AMP
     layout.add(std::make_unique<juce::AudioParameterFloat>("Drive", "Drive",
         juce::NormalisableRange<float>(0.1f, 10.f, 0.1f, 1.f), 5.f));
-    layout.add(std::make_unique<juce::AudioParameterBool>("Oversampling Bypassed", "Oversampling Bypassed", false));
+    //layout.add(std::make_unique<juce::AudioParameterBool>("Oversampling Bypassed", "Oversampling Bypassed", false));
     layout.add(std::make_unique<juce::AudioParameterBool>("Amp Bypassed", "Amp Bypassed", false));
     juce::StringArray ampChoices("Poletti", "Yamaha", "WaveFolder");
     layout.add(std::make_unique<juce::AudioParameterChoice>("Amp Type", "Amp Type", ampChoices, 0));

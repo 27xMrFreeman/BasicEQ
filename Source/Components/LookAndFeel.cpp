@@ -17,11 +17,14 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
 
     auto bounds = Rectangle<float>(x, y, width, height);
 
-    /*g.setColour(Colour(72u, 30u, 20u));
+   /* g.setColour(Colour(Colours::red));
+    g.drawRect(bounds);*/
+
+    g.setColour(Colour(72u, 30u, 20u));
     g.fillEllipse(bounds);
 
     g.setColour(Colour(242u, 97u, 63u));
-    g.drawEllipse(bounds, 1.5);*/
+    g.drawEllipse(bounds, 1.5);
 
     if (auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider))
     {
