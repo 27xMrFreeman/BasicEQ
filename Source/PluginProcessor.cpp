@@ -370,7 +370,7 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     // AMP PROCESS
     ampSim.drive = settings.drive;
     ampSim.osBypassed = settings.osBypassed;
-    //ampSim.ampType = settings.ampType;
+    ampSim.ampType = settings.ampType;
     if (!settings.ampBypassed) {
         ampSim.process(block);
     }
