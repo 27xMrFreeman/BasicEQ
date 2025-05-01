@@ -88,7 +88,7 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     comboTypeBox.addItem("Mar", 1);
     comboTypeBox.addItem("MM", 2);
     comboTypeBox.addItem("SV", 3);
-    comboTypeBox.setSelectedItemIndex(1);
+    //comboTypeBox.setSelectedItemIndex(1);
     comboTypeBox.onChange = [this]() { 
         //DBG("changed combo");
         //juce::AudioBuffer<float> irBuffer;
@@ -99,10 +99,34 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
         needIRUpdate.set(true);
         };
 
+    aCabButton.setRadioGroupId(RadioButtonIDs::CabTypeButtons);
+    aCabButton.setClickingTogglesState(true);
+    aCabButton.onClick = [this]() { comboTypeBox.setSelectedItemIndex(0); };
+
+    bCabButton.setRadioGroupId(RadioButtonIDs::CabTypeButtons);
+    bCabButton.setClickingTogglesState(true);
+    bCabButton.onClick = [this]() { comboTypeBox.setSelectedItemIndex(1); };
+
+    cCabButton.setRadioGroupId(RadioButtonIDs::CabTypeButtons);
+    cCabButton.setClickingTogglesState(true);
+    cCabButton.onClick = [this]() { comboTypeBox.setSelectedItemIndex(2); };
+
+    switch (comboTypeBox.getSelectedItemIndex()) {
+    case 0:
+        aCabButton.triggerClick();
+        break;
+    case 1:
+        bCabButton.triggerClick();
+        break;
+    case 2:
+        cCabButton.triggerClick();
+        break;
+    }
+
     mikTypeBox.addItem("57A", 1);
     mikTypeBox.addItem("kalib", 2);
     mikTypeBox.addItem("sm57", 3);
-    mikTypeBox.setSelectedItemIndex(1);
+    //mikTypeBox.setSelectedItemIndex(1);
     mikTypeBox.onChange = [this]() {
         //DBG("changed mic");
         //juce::AudioBuffer<float> irBuffer;
@@ -112,6 +136,18 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
         //irfftComponent.loadedIRChanged(irBuffer, sampleRate);
         needIRUpdate.set(true);
         };
+
+    aMicButton.setRadioGroupId(RadioButtonIDs::MicTypeButtons);
+    aMicButton.setClickingTogglesState(true);
+    aMicButton.onClick = [this]() { mikTypeBox.setSelectedItemIndex(0); };
+
+    bMicButton.setRadioGroupId(RadioButtonIDs::MicTypeButtons);
+    bMicButton.setClickingTogglesState(true);
+    bMicButton.onClick = [this]() { mikTypeBox.setSelectedItemIndex(1); };
+
+    cMicButton.setRadioGroupId(RadioButtonIDs::MicTypeButtons);
+    cMicButton.setClickingTogglesState(true);
+    cMicButton.onClick = [this]() { mikTypeBox.setSelectedItemIndex(2); };
 
     ampTypeBox.addItem("Poletti", 1);
     ampTypeBox.addItem("Yamaha", 2);
@@ -523,8 +559,19 @@ void BasicEQAudioProcessorEditor::resized()
 
     irBypassButton.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.25).reduced(irChoicesArea.getWidth() * 0.09));
     loadBtn.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.33).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
-    mikTypeBox.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.5).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
-    comboTypeBox.setBounds(irChoicesArea.reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
+    //mikTypeBox.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.5).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
+    //comboTypeBox.setBounds(irChoicesArea.reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
+
+    auto cabBtnsArea = irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.5).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02);
+    auto cabBtnWidth = cabBtnsArea.getWidth() * 0.33;
+    aCabButton.setBounds(cabBtnsArea.removeFromLeft(cabBtnWidth));
+    bCabButton.setBounds(cabBtnsArea.removeFromLeft(cabBtnWidth));
+    cCabButton.setBounds(cabBtnsArea);
+
+    auto micBtnsArea = irChoicesArea.reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02);
+    aMicButton.setBounds(micBtnsArea.removeFromLeft(cabBtnWidth));
+    bMicButton.setBounds(micBtnsArea.removeFromLeft(cabBtnWidth));
+    cMicButton.setBounds(micBtnsArea);
 
     irfftComponent.setBounds(responseArea);
 
@@ -689,7 +736,13 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &xyPad,
         &polettiAmpTypeButton,
         &yamahaAmpTypeButton,
-        &wavefoldAmpTypeButton
+        &wavefoldAmpTypeButton,
+        &aCabButton,
+        &bCabButton,
+        &cCabButton,
+        &aMicButton,
+        &bMicButton,
+        &cMicButton
     };
 }
 

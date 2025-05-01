@@ -45,6 +45,8 @@ private:
     
     BasicEQAudioProcessor& audioProcessor;
 
+    enum RadioButtonIDs { AmpTypeButtons = 1001, MicTypeButtons = 1002, CabTypeButtons = 1003 };
+
     // background image
     juce::Image backgroundImage;
 
@@ -68,7 +70,6 @@ private:
     juce::ComboBox ampTypeBox;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> ampTypeBoxAttachment;
     
-    enum RadioButtonIDs { AmpTypeButtons = 1001 };
     juce::ToggleButton polettiAmpTypeButton, yamahaAmpTypeButton, wavefoldAmpTypeButton;
     //ButtonAttachment polettiAmpTypeButtonAttachment, yamahaAmpTypeButtonAttachment, wavefoldAmpTypeButtonAttachment;
     juce::ToggleButton ampBypassButton/*, osBypassButton*/;
@@ -93,6 +94,7 @@ private:
 
     juce::ComboBox comboTypeBox, mikTypeBox;
     std::unique_ptr< juce::AudioProcessorValueTreeState::ComboBoxAttachment > comboTypeBoxAttachment, mikTypeBoxAttachment;
+    juce::ToggleButton aMicButton, bMicButton, cMicButton, aCabButton, bCabButton, cCabButton;
     juce::Atomic<bool> userIRLoaded{ false }, needIRUpdate{ false };
     juce::ToggleButton irBypassButton;
     ButtonAttachment irBypassButtonAttachment;
