@@ -227,6 +227,8 @@ private:
     void updateToneStackMid(const ChainSettings& chainSettings);
     void updateToneStackHigh(const ChainSettings& chainSettings);
 
+    void updateLoadedIR(juce::AudioBuffer<float>& bufferInterp, int& sampleRate, int comboTypeID, int mikTypeID, float yPos, float xPos);
+
     void updateFilters();
 
     juce::dsp::Oscillator<float> osc;

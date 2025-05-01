@@ -25,4 +25,6 @@ struct LookAndFeel : juce::LookAndFeel_V4
         juce::ToggleButton& toggleButton,
         bool shouldDrawButtonAsHighlighted,
         bool shouldDrawButtonAsDown) override;
+
+    //juce::Colour sliderColour{ juce::Colours::white };
 };

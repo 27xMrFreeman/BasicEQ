@@ -16,6 +16,9 @@ public:
 
         std::function<void(juce::Point<double>)> moveCallback;
 
+        void setThumbColor(juce::Colour newColour);
+
+        juce::Colour thumbColour{ juce::Colours::white };
         juce::ComponentDragger dragger;
         juce::ComponentBoundsConstrainer constrainer;
 

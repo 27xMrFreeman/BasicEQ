@@ -7,7 +7,7 @@ XYPad::Thumb::Thumb()
 
 void XYPad::Thumb::paint(juce::Graphics& g)
 {
-	g.setColour(juce::Colours::white);
+	g.setColour(thumbColour);
 	g.drawEllipse(getLocalBounds().reduced(4).toFloat(), 4.f);
 }
 
@@ -20,6 +20,11 @@ void XYPad::Thumb::mouseDrag(const juce::MouseEvent& event)
 {
 	dragger.dragComponent(this, event, &constrainer);
 	if (moveCallback) { moveCallback(getPosition().toDouble()); }
+}
+
+void XYPad::Thumb::setThumbColor(juce::Colour newColour)
+{
+	thumbColour = newColour;
 }
 
 //=====================================================================================

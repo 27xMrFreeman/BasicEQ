@@ -49,10 +49,14 @@ highCutBypassButtonAttachment(audioProcessor.apvts, "HighCut Bypassed", highCutB
 peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButton),
 ampBypassButtonAttachment(audioProcessor.apvts, "Amp Bypassed", ampBypassButton),
 //osBypassButtonAttachment(audioProcessor.apvts, "Oversampling Bypassed", osBypassButton),
-irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
+irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)/*,
+polettiAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", polettiAmpTypeButton),
+yamahaAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", yamahaAmpTypeButton),
+wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmpTypeButton)*/
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
+
 
     /*peakFreqSlider.labels.add({ 0.f, "10Hz" });
     peakFreqSlider.labels.add({ 1.f, "20kHz" });
@@ -84,7 +88,7 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     comboTypeBox.addItem("Mar", 1);
     comboTypeBox.addItem("MM", 2);
     comboTypeBox.addItem("SV", 3);
-    comboTypeBox.setSelectedId(1);
+    comboTypeBox.setSelectedItemIndex(1);
     comboTypeBox.onChange = [this]() { 
         //DBG("changed combo");
         //juce::AudioBuffer<float> irBuffer;
@@ -98,7 +102,7 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     mikTypeBox.addItem("57A", 1);
     mikTypeBox.addItem("kalib", 2);
     mikTypeBox.addItem("sm57", 3);
-    mikTypeBox.setSelectedId(1);
+    mikTypeBox.setSelectedItemIndex(1);
     mikTypeBox.onChange = [this]() {
         //DBG("changed mic");
         //juce::AudioBuffer<float> irBuffer;
@@ -112,11 +116,100 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     ampTypeBox.addItem("Poletti", 1);
     ampTypeBox.addItem("Yamaha", 2);
     ampTypeBox.addItem("WaveFolder", 3);
-    ampTypeBox.setSelectedId(1);
+    //ampTypeBox.setSelectedItemIndex(0);
     ampTypeBox.onChange = [this]() {
         //audioProcessor.ampDrive.simTypeChanged(ampTypeBox.getSelectedId());
-        audioProcessor.ampSim.ampType = static_cast<AmpTypeEnum>(ampTypeBox.getSelectedId());
+        audioProcessor.ampSim.ampType = static_cast<AmpTypeEnum>(ampTypeBox.getSelectedId() - 1);
+        DBG("ComboBox: ");
+        DBG(audioProcessor.ampSim.ampType);
+
         };
+
+
+    polettiAmpTypeButton.setRadioGroupId(RadioButtonIDs::AmpTypeButtons);
+    polettiAmpTypeButton.setClickingTogglesState(true);
+    polettiAmpTypeButton.onClick = [this]() { /*audioProcessor.ampSim.ampType = AmpTypeEnum::Poletti;*/ 
+        if (!polettiAmpTypeButton.getToggleState()) return;
+        ampTypeBox.setSelectedItemIndex(0);
+        //getLookAndFeel().setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colours::red);
+        driveSlider.setSliderColor(juce::Colours::red);
+        driveSlider.repaint();
+        lowShelfSlider.setSliderColor(juce::Colours::red);
+        lowShelfSlider.repaint();
+        midPeakSlider.setSliderColor(juce::Colours::red);
+        midPeakSlider.repaint();
+        highShelfSlider.setSliderColor(juce::Colours::red);
+        highShelfSlider.repaint();
+        inputGainSlider.setSliderColor(juce::Colours::red);
+        inputGainSlider.repaint();
+        outputGainSlider.setSliderColor(juce::Colours::red);
+        outputGainSlider.repaint();
+        xyPad.thumb.setThumbColor(juce::Colours::red);
+        xyPad.thumb.repaint();
+        DBG("Button 1 pressed: ");
+        DBG(ampTypeBox.getSelectedId());
+        };
+
+    yamahaAmpTypeButton.setRadioGroupId(RadioButtonIDs::AmpTypeButtons);
+    yamahaAmpTypeButton.setClickingTogglesState(true);
+    yamahaAmpTypeButton.onClick = [this]() { /*audioProcessor.ampSim.ampType = AmpTypeEnum::Yamaha;*/ 
+        if (!yamahaAmpTypeButton.getToggleState()) return;
+        ampTypeBox.setSelectedItemIndex(1);
+        driveSlider.setSliderColor(juce::Colours::blue);
+        driveSlider.repaint();
+        lowShelfSlider.setSliderColor(juce::Colours::blue);
+        lowShelfSlider.repaint();
+        midPeakSlider.setSliderColor(juce::Colours::blue);
+        midPeakSlider.repaint();
+        highShelfSlider.setSliderColor(juce::Colours::blue);
+        highShelfSlider.repaint();
+        inputGainSlider.setSliderColor(juce::Colours::blue);
+        inputGainSlider.repaint();
+        outputGainSlider.setSliderColor(juce::Colours::blue);
+        outputGainSlider.repaint();
+        xyPad.thumb.setThumbColor(juce::Colours::blue);
+        xyPad.thumb.repaint();
+        //getLookAndFeel().setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colours::red);
+        DBG("Button 2 pressed: ");
+        DBG(ampTypeBox.getSelectedId());
+        };
+    
+    wavefoldAmpTypeButton.setRadioGroupId(RadioButtonIDs::AmpTypeButtons);
+    wavefoldAmpTypeButton.setClickingTogglesState(true);
+    wavefoldAmpTypeButton.onClick = [this]() { /*audioProcessor.ampSim.ampType = AmpTypeEnum::WaveFolder;*/ 
+        if (!wavefoldAmpTypeButton.getToggleState()) return;
+        ampTypeBox.setSelectedItemIndex(2);
+        driveSlider.setSliderColor(juce::Colours::green);
+        driveSlider.repaint();
+        lowShelfSlider.setSliderColor(juce::Colours::green);
+        lowShelfSlider.repaint();
+        midPeakSlider.setSliderColor(juce::Colours::green);
+        midPeakSlider.repaint();
+        highShelfSlider.setSliderColor(juce::Colours::green);
+        highShelfSlider.repaint();
+        inputGainSlider.setSliderColor(juce::Colours::green);
+        inputGainSlider.repaint();
+        outputGainSlider.setSliderColor(juce::Colours::green);
+        outputGainSlider.repaint();
+        xyPad.thumb.setThumbColor(juce::Colours::green);
+        xyPad.thumb.repaint();
+        //getLookAndFeel().setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colours::red);
+        DBG("Button 3 pressed: ");
+        DBG(ampTypeBox.getSelectedId());
+        };
+
+    switch (audioProcessor.ampSim.ampType)
+    {
+    case AmpTypeEnum::Poletti:
+        polettiAmpTypeButton.triggerClick();
+        break;
+    case AmpTypeEnum::Yamaha:
+        yamahaAmpTypeButton.triggerClick();
+        break;
+    case AmpTypeEnum::WaveFolder:
+        wavefoldAmpTypeButton.triggerClick();
+        break;
+    }
 
     for (auto* comp : getComps())
     {
@@ -138,6 +231,10 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     //xPosSlider.setLookAndFeel(&lnf);
     //yPosSlider.setLookAndFeel(&lnf);
     //outputGainSlider.setLookAndFeel(&lnf);
+    //driveSlider.setLookAndFeel(&lnf);
+    //lowShelfSlider.setLookAndFeel(&lnf);
+    //midPeakSlider.setLookAndFeel(&lnf);
+    //highShelfSlider.setLookAndFeel(&lnf);
 
     comboTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Combo Type", comboTypeBox);
     mikTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Mic Type", mikTypeBox);
@@ -222,6 +319,10 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
     inputGainSlider.setLookAndFeel(nullptr);
     outputGainSlider.setLookAndFeel(nullptr);
     ampBypassButton.setLookAndFeel(nullptr);
+    //driveSlider.setLookAndFeel(nullptr);
+    //lowShelfSlider.setLookAndFeel(nullptr);
+    //midPeakSlider.setLookAndFeel(nullptr);
+    //highShelfSlider.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -401,7 +502,11 @@ void BasicEQAudioProcessorEditor::resized()
     ampBypassButton.setBounds(mainKnobsArea.removeFromLeft(mainKnobsArea.getWidth()/20));
     auto knobWidth = mainKnobsArea.getWidth() / 5;
     driveSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
-    ampTypeBox.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    auto ampTypeArea = mainKnobsArea.removeFromLeft(knobWidth);
+    polettiAmpTypeButton.setBounds(ampTypeArea.removeFromTop(ampTypeArea.getHeight() * 0.33));
+    yamahaAmpTypeButton.setBounds(ampTypeArea.removeFromTop(ampTypeArea.getHeight() * 0.5));
+    wavefoldAmpTypeButton.setBounds(ampTypeArea);
+    //ampTypeBox.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
     lowShelfSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
     midPeakSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
     highShelfSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
@@ -581,7 +686,10 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         //&asymNegLNSlider,
         //&ampBypassButton,
         &ampTypeBox,
-        &xyPad
+        &xyPad,
+        &polettiAmpTypeButton,
+        &yamahaAmpTypeButton,
+        &wavefoldAmpTypeButton
     };
 }
 

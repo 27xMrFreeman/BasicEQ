@@ -42,12 +42,14 @@ struct RotarySliderWithLabels : juce::Slider
     juce::Rectangle<int> getSliderBounds() const;
     int getTextHeight() const { return 14; }
     juce::String getDisplayString() const;
+    void setSliderColor(juce::Colour newColor);
+
 private:
     LookAndFeel lnf;
     /*LookAndFeelBlue lnfb;
     LookAndFeelGreen lnfg;
     LookAndFeelBlack lnfk;*/
-
+    juce::Colour sliderColor{ juce::Colours::black };
     juce::RangedAudioParameter* param;
     juce::String suffix;
 };

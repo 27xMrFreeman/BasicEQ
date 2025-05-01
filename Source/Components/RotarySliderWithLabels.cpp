@@ -31,7 +31,7 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
     g.drawRect(nameBounds);
     g.setColour(Colours::azure);
     g.drawRect(sliderBounds); */        // bounding boxes of sliders for debugging purposes
-
+    g.setColour(sliderColor);
     getLookAndFeel().drawRotarySlider(g,
         sliderBounds.getX(),
         sliderBounds.getY(),
@@ -117,4 +117,9 @@ juce::String RotarySliderWithLabels::getDisplayString() const
     str << suffix;
 
     return str;
+}
+
+void RotarySliderWithLabels::setSliderColor(juce::Colour newColor)
+{
+    sliderColor = newColor;
 }

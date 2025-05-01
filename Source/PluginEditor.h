@@ -64,8 +64,13 @@ private:
     
     RotarySliderWithLabels driveSlider;
     Attachment driveSliderAttachment;
+
     juce::ComboBox ampTypeBox;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> ampTypeBoxAttachment;
+    
+    enum RadioButtonIDs { AmpTypeButtons = 1001 };
+    juce::ToggleButton polettiAmpTypeButton, yamahaAmpTypeButton, wavefoldAmpTypeButton;
+    //ButtonAttachment polettiAmpTypeButtonAttachment, yamahaAmpTypeButtonAttachment, wavefoldAmpTypeButtonAttachment;
     juce::ToggleButton ampBypassButton/*, osBypassButton*/;
     ButtonAttachment ampBypassButtonAttachment/*, osBypassButtonAttachment*/;
     
