@@ -146,9 +146,9 @@ void IrFFTComponent::loadedIRChanged(const juce::AudioBuffer<float>& newIR, cons
 void IrFFTComponent::paint(juce::Graphics& g)
 {
     using namespace juce;
-    g.fillAll(Colours::black);
+    //g.fillAll(Colours::black);
 
-    g.drawImage(background, getLocalBounds().toFloat());
+    //g.drawImage(background, getLocalBounds().toFloat());
 
     auto irArea = getLocalBounds();
 
@@ -163,8 +163,8 @@ void IrFFTComponent::paint(juce::Graphics& g)
     g.setColour(Colours::white);
     g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));
 
-    g.setColour(Colours::silver);
-    g.drawRoundedRectangle(irArea.toFloat(), 6.f, 5.f);
+    //g.setColour(Colour::fromString("FFF09500"));
+    //g.drawRoundedRectangle(irArea.toFloat(), 6.f, 5.f);
 
     //g.setColour(Colours::aqua);
     //g.strokePath(rightChannelFFTPath, PathStrokeType(1.f));

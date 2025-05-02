@@ -5,12 +5,16 @@
               pluginName="IRLoader" pluginDesc="IRLoader with 3band EQ" pluginManufacturer="Bartolom&#283;j Pech&#225;&#269;ek">
   <MAINGROUP id="mAuQQK" name="BasicEQ">
     <GROUP id="{F640BCEA-ABE8-5245-9F88-90E07B1587F1}" name="Assets">
-      <FILE id="tW9MXV" name="dark-brushed-metal-texture-steel-black-stock-photo-scratch-wallpaper.png"
-            compile="0" resource="1" file="Assets/dark-brushed-metal-texture-steel-black-stock-photo-scratch-wallpaper.png"/>
-      <FILE id="RgkpIc" name="knob_black.png" compile="0" resource="1" file="F:/VUT/bakalarka/Zdroje/knob_black.png"/>
-      <FILE id="IiJ7mN" name="knob_blue.png" compile="0" resource="1" file="F:/VUT/bakalarka/Zdroje/knob_blue.png"/>
-      <FILE id="FWR5R9" name="knob_green.png" compile="0" resource="1" file="F:/VUT/bakalarka/Zdroje/knob_green.png"/>
-      <FILE id="l5XTvz" name="knob_red.png" compile="0" resource="1" file="F:/VUT/bakalarka/Zdroje/knob_red.png"/>
+      <FILE id="XfYZJg" name="AmpTypeSwitch.png" compile="0" resource="1"
+            file="F:/VUT/bakalarka/AmpTypeSwitch.png"/>
+      <FILE id="vyniS3" name="BackgroundImage.png" compile="0" resource="1"
+            file="F:/VUT/bakalarka/BackgroundImage.png"/>
+      <FILE id="iEU0Xv" name="ChoiceOff.png" compile="0" resource="1" file="F:/VUT/bakalarka/ChoiceOff.png"/>
+      <FILE id="ELc2tl" name="ChoiceOn.png" compile="0" resource="1" file="F:/VUT/bakalarka/ChoiceOn.png"/>
+      <FILE id="i3FXD1" name="InstrumentSans-Bold.ttf" compile="0" resource="1"
+            file="F:/VUT/bakalarka/InstrumentSans-Bold.ttf"/>
+      <FILE id="bpo2Ye" name="Knob.png" compile="0" resource="1" file="F:/VUT/bakalarka/Knob.png"/>
+      <FILE id="MLePgJ" name="LoadIRBtn.png" compile="0" resource="1" file="F:/VUT/bakalarka/LoadIRBtn.png"/>
     </GROUP>
     <GROUP id="{738C76C2-F9DF-054B-1271-C9222DBDB02E}" name="Source">
       <GROUP id="{7736E6C6-E69B-2196-95B8-E06560E35405}" name="Components">

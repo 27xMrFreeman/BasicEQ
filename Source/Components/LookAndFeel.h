@@ -26,5 +26,19 @@ struct LookAndFeel : juce::LookAndFeel_V4
         bool shouldDrawButtonAsHighlighted,
         bool shouldDrawButtonAsDown) override;
 
+    juce::Typeface::Ptr getTypefaceForFont(const juce::Font& f) override
+    {
+        static juce::Typeface::Ptr myFont = juce::Typeface::createSystemTypefaceFor(BinaryData::InstrumentSansBold_ttf,
+                                                                                    BinaryData::InstrumentSansBold_ttfSize);
+        return myFont;
+    }
+
+    static const juce::Font& getCustomFont()
+    {
+        static juce::Font customFont(juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::InstrumentSansBold_ttf,
+                                                                                        BinaryData::InstrumentSansBold_ttfSize)));
+        return customFont;
+    }
+
     //juce::Colour sliderColour{ juce::Colours::white };
 };

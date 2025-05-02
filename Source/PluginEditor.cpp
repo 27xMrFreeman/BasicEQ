@@ -82,8 +82,8 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     lowShelfSlider.name = "Low";
     midPeakSlider.name = "Mid";
     highShelfSlider.name = "High";
-    inputGainSlider.name = "IN";
-    outputGainSlider.name = "OUT";
+    inputGainSlider.name = "Input";
+    outputGainSlider.name = "Output";
 
     comboTypeBox.addItem("Mar", 1);
     comboTypeBox.addItem("MM", 2);
@@ -345,8 +345,10 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     inputGainSlider.onValueChange = [this] { audioProcessor.inputGain.setGainDecibels(inputGainSlider.getValue()); };
     outputGainSlider.onValueChange = [this] { audioProcessor.outputGain.setGainDecibels(outputGainSlider.getValue()); /*DBG("Output gain set to " << outputGainSlider.getValue());*/ };
 
-    setSize (1000, 500);
+    setSize (1674, 752);
     setResizable(true, true);
+    setResizeLimits( 418.5, 188, 1674, 752);
+    getConstrainer()->setFixedAspectRatio(1674.f / 752.f);
 
     startTimer(0, 33);
     startTimer(1, 50);
@@ -518,8 +520,8 @@ void BasicEQAudioProcessorEditor::paint (juce::Graphics& g)
     using namespace juce;
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     //g.fillAll (Colours::black);
-    //backgroundImage = ImageCache::getFromMemory(BinaryData::darkbrushedmetaltexturesteelblackstockphotoscratchwallpaper_png, BinaryData::darkbrushedmetaltexturesteelblackstockphotoscratchwallpaper_pngSize);
-    //g.drawImage(backgroundImage, getLocalBounds().toFloat(), RectanglePlacement::stretchToFit);
+    backgroundImage = ImageCache::getFromMemory(BinaryData::BackgroundImage_png, BinaryData::BackgroundImage_pngSize);
+    g.drawImage(backgroundImage, getLocalBounds().toFloat(), RectanglePlacement::stretchToFit);
 }
 
 void BasicEQAudioProcessorEditor::resized()
@@ -530,18 +532,25 @@ void BasicEQAudioProcessorEditor::resized()
     auto bounds = getLocalBounds();
     bounds.reduce(bounds.getWidth() * 0.01, bounds.getHeight() * 0.01);
     // Input/Output meters and sliders
-    auto meterWidth = bounds.getWidth() * 0.1;
+    auto meterWidth = bounds.getWidth() * 0.062;
     auto meterHeight = bounds.getHeight() * 0.2;
     auto inputMeterArea = bounds.removeFromLeft(meterWidth);
+    inputMeterArea.removeFromTop(inputMeterArea.getHeight() * 0.02);
+    auto inputMeterLabelArea = inputMeterArea.removeFromBottom(inputMeterArea.getHeight() * 0.12);
     auto outputMeterArea = bounds.removeFromRight(meterWidth);
-    auto inputGainArea = inputMeterArea.removeFromBottom(meterHeight);
-    auto outputGainArea = outputMeterArea.removeFromBottom(meterHeight);
-    inputGainSlider.setBounds(inputGainArea.reduced(0, inputGainArea.getHeight()*0.05));
-    outputGainSlider.setBounds(outputGainArea.reduced(0, outputGainArea.getHeight() * 0.05));
-    meterInLeft.setBounds(inputMeterArea.removeFromLeft(inputMeterArea.getWidth()*0.5));
-    meterInRight.setBounds(inputMeterArea);
-    meterOutLeft.setBounds(outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.5));
-    meterOutRight.setBounds(outputMeterArea);
+    outputMeterArea.removeFromTop(outputMeterArea.getHeight() * 0.02);
+    auto outputMeterLabelArea = outputMeterArea.removeFromBottom(outputMeterArea.getHeight() * 0.12);
+    //auto inputGainArea = inputMeterArea.removeFromBottom(meterHeight);
+    //auto outputGainArea = outputMeterArea.removeFromBottom(meterHeight);
+    //inputGainSlider.setBounds(inputGainArea.reduced(0, inputGainArea.getHeight()*0.05));
+    //outputGainSlider.setBounds(outputGainArea.reduced(0, outputGainArea.getHeight() * 0.05));
+    meterInLeft.setBounds(inputMeterArea.removeFromLeft(inputMeterArea.getWidth()*0.38));
+    inputMeterArea.removeFromLeft(inputMeterArea.getWidth() * 0.3);
+    meterInRight.setBounds(inputMeterArea.removeFromLeft(inputMeterArea.getWidth()*0.81));
+    outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.1);
+    meterOutLeft.setBounds(outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.38));
+    outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.36);
+    meterOutRight.setBounds(outputMeterArea.removeFromLeft(outputMeterArea.getWidth()));
 
     // Space for buffer if it will be implemented
     //auto bufferArea = bounds.removeFromTop(bounds.getHeight() * 0.1);
@@ -550,36 +559,50 @@ void BasicEQAudioProcessorEditor::resized()
     //osBypassButton.setBounds(bufferArea.removeFromLeft(buttonWidth));
     
 
-    // Main knobs - gain sliders will be replaced with one, additional filters will replace the rightmost two slots
+    // Main knobs - gain sliders in with knobs, maybe smaller size
     auto mainKnobsArea = bounds.removeFromBottom(bounds.getHeight() * 0.4).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.1);
-    ampBypassButton.setBounds(mainKnobsArea.removeFromLeft(mainKnobsArea.getWidth()/20));
-    auto knobWidth = mainKnobsArea.getWidth() / 5;
-    driveSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
-    auto ampTypeArea = mainKnobsArea.removeFromLeft(knobWidth);
-    polettiAmpTypeButton.setBounds(ampTypeArea.removeFromTop(ampTypeArea.getHeight() * 0.33));
-    yamahaAmpTypeButton.setBounds(ampTypeArea.removeFromTop(ampTypeArea.getHeight() * 0.5));
-    wavefoldAmpTypeButton.setBounds(ampTypeArea);
-    //ampTypeBox.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
-    lowShelfSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
-    midPeakSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
-    highShelfSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    driveSlider.setBounds(mainKnobsArea);
+    //ampBypassButton.setBounds(mainKnobsArea.removeFromLeft(mainKnobsArea.getWidth()/20));
+    //auto knobWidth = mainKnobsArea.getWidth() / 5;
+    //driveSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    //auto ampTypeArea = mainKnobsArea.removeFromLeft(knobWidth);
+    //polettiAmpTypeButton.setBounds(ampTypeArea.removeFromTop(ampTypeArea.getHeight() * 0.33));
+    //yamahaAmpTypeButton.setBounds(ampTypeArea.removeFromTop(ampTypeArea.getHeight() * 0.5));
+    //wavefoldAmpTypeButton.setBounds(ampTypeArea);
+    ////ampTypeBox.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    //lowShelfSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    //midPeakSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
+    //highShelfSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
 
     // bounds are now only top "half"
-    auto xyPadArea = bounds.removeFromLeft(bounds.getWidth() * 0.25).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);;
-    auto irChoicesArea = bounds.removeFromLeft(bounds.getWidth() * 0.33).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);;
-    auto responseArea = bounds.reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);;
+    //auto xyPadArea = bounds.removeFromLeft(bounds.getWidth() * 0.25).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);
+    //auto irChoicesArea = bounds.removeFromLeft(bounds.getWidth() * 0.33).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);
+    //auto responseArea = bounds.reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);
 
     //xPosSlider.setBounds(xyPadArea.removeFromTop(xyPadArea.getHeight()*0.5).reduced(xyPadArea.getWidth()*0.05));
     //yPosSlider.setBounds(xyPadArea.reduced(xyPadArea.getWidth() * 0.05));
-
+    auto xyPadArea = bounds.removeFromLeft(bounds.getWidth() * 0.299);
+    xyPadArea.removeFromTop(xyPadArea.getHeight() * 0.21);
+    xyPadArea.removeFromBottom(xyPadArea.getHeight() * 0.138);
+    xyPadArea.removeFromLeft(xyPadArea.getWidth() * 0.295);
     xyPad.setBounds(xyPadArea);
 
-    irBypassButton.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.25).reduced(irChoicesArea.getWidth() * 0.09));
-    loadBtn.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.33).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
+    auto responseArea = bounds.removeFromRight(bounds.getWidth() * 0.628);
+    responseArea.removeFromTop(bounds.getHeight() * 0.195);
+    responseArea.removeFromBottom(bounds.getHeight() * 0.095);
+    responseArea.removeFromRight(responseArea.getWidth() * 0.195);
+    irfftComponent.setBounds(responseArea);
+
+
+
+
+
+    //irBypassButton.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.25).reduced(irChoicesArea.getWidth() * 0.09));
+    //loadBtn.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.33).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
     //mikTypeBox.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.5).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
     //comboTypeBox.setBounds(irChoicesArea.reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
 
-    auto cabBtnsArea = irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.5).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02);
+    /*auto cabBtnsArea = irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.5).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02);
     auto cabBtnWidth = cabBtnsArea.getWidth() * 0.33;
     aCabButton.setBounds(cabBtnsArea.removeFromLeft(cabBtnWidth));
     bCabButton.setBounds(cabBtnsArea.removeFromLeft(cabBtnWidth));
@@ -588,9 +611,9 @@ void BasicEQAudioProcessorEditor::resized()
     auto micBtnsArea = irChoicesArea.reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02);
     aMicButton.setBounds(micBtnsArea.removeFromLeft(cabBtnWidth));
     bMicButton.setBounds(micBtnsArea.removeFromLeft(cabBtnWidth));
-    cMicButton.setBounds(micBtnsArea);
+    cMicButton.setBounds(micBtnsArea);*/
 
-    irfftComponent.setBounds(responseArea);
+    //irfftComponent.setBounds(responseArea);
 
     //auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.4);
 

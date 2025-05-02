@@ -24,7 +24,7 @@ void HorizontalMeterLeft::paint(juce::Graphics& g)
     g.fillRoundedRectangle(bounds.removeFromBottom(scaledX), 5.f);
 
     g.setColour(Colours::silver);
-    g.drawRoundedRectangle(r, 5.f, 5.f);
+    g.drawRoundedRectangle(r, 10.f, 5.f);
 
 }
 

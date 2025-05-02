@@ -22,9 +22,15 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
     auto sliderBounds = getSliderBounds();
 
     auto nameBounds = getLocalBounds();
+
+    //debug
+    g.setColour(juce::Colours::aquamarine);
+    g.drawRect(nameBounds);
+
     nameBounds.removeFromTop(sliderBounds.getHeight()).reduce(0, nameBounds.getHeight() * 0.1);
 
     g.setColour(Colours::white);
+    g.setFont(lnf.getCustomFont().withHeight(nameBounds.getHeight()));
     g.drawFittedText(name, nameBounds, Justification::centred, 1);
 
     /*g.setColour(Colours::red);
