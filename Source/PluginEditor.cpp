@@ -111,7 +111,10 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     cCabButton.setClickingTogglesState(true);
     cCabButton.onClick = [this]() { comboTypeBox.setSelectedItemIndex(2); };
 
-    switch (comboTypeBox.getSelectedItemIndex()) {
+    //auto x = comboTypeBox.getSelectedId();
+    int cabTypeSelected = audioProcessor.apvts.getRawParameterValue("Combo Type")->load();
+
+    switch (cabTypeSelected) {
     case 0:
         aCabButton.triggerClick();
         break;
@@ -148,6 +151,20 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     cMicButton.setRadioGroupId(RadioButtonIDs::MicTypeButtons);
     cMicButton.setClickingTogglesState(true);
     cMicButton.onClick = [this]() { mikTypeBox.setSelectedItemIndex(2); };
+
+    int micTypeSelected = audioProcessor.apvts.getRawParameterValue("Mic Type")->load();
+
+    switch (micTypeSelected) {
+    case 0:
+        aMicButton.triggerClick();
+        break;
+    case 1:
+        bMicButton.triggerClick();
+        break;
+    case 2:
+        cMicButton.triggerClick();
+        break;
+    }
 
     ampTypeBox.addItem("Poletti", 1);
     ampTypeBox.addItem("Yamaha", 2);
