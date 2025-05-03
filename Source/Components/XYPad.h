@@ -22,6 +22,7 @@ public:
         juce::ComponentDragger dragger;
         juce::ComponentBoundsConstrainer constrainer;
 
+        double thumbSize{ 35 };
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Thumb)
     };
@@ -35,8 +36,9 @@ public:
 
     std::vector<juce::Slider*> xSliders, ySliders;
     Thumb thumb;
-    double thumbSize{ 28 };
+    double thumbSize{ 35 };
     std::mutex vectorMutex;
+    juce::Image background;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (XYPad)
 };

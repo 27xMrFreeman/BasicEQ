@@ -2,13 +2,13 @@
 
 XYPad::Thumb::Thumb()
 {
-	constrainer.setMinimumOnscreenAmounts(28,28,28,28);
+	constrainer.setMinimumOnscreenAmounts(thumbSize, thumbSize, thumbSize, thumbSize);
 }
 
 void XYPad::Thumb::paint(juce::Graphics& g)
 {
 	g.setColour(thumbColour);
-	g.drawEllipse(getLocalBounds().reduced(4).toFloat(), 4.f);
+	g.drawEllipse(getLocalBounds().reduced(6).toFloat(), 6.f);
 }
 
 void XYPad::Thumb::mouseDown(const juce::MouseEvent& event)
@@ -46,13 +46,16 @@ XYPad::XYPad()
 
 void XYPad::paint(juce::Graphics& g)
 {
-	g.setColour(juce::Colours::black);
-	g.fillRoundedRectangle(getLocalBounds().toFloat(), 10.f);
+	/*g.setColour(juce::Colours::black);
+	g.fillRoundedRectangle(getLocalBounds().toFloat(), 10.f);*/
+	g.drawImage(background, getLocalBounds().reduced(thumbSize/2).toFloat());
 }
 
 void XYPad::resized()
 {
 	auto bounds = getLocalBounds();
+	thumbSize = bounds.getWidth() * 0.12;
+	thumb.thumbSize = thumbSize;
 	auto thumbBounds = bounds.withSizeKeepingCentre(thumbSize, thumbSize);
 	thumb.setBounds(thumbBounds);
 	if (!xSliders.empty()) {
@@ -63,6 +66,46 @@ void XYPad::resized()
 		thumb.setTopLeftPosition(	thumb.getX(),
 									juce::jmap(ySliders[0]->getValue(), ySliders[0]->getMinimum(), ySliders[0]->getMaximum(), bounds.getHeight()-thumbSize, 0.0));
 	}
+
+	auto backgroundBounds = bounds.reduced(thumbSize);
+
+	background = juce::Image(juce::Image::PixelFormat::ARGB, backgroundBounds.getWidth(), backgroundBounds.getHeight(), true);
+
+	juce::Graphics g(background);
+
+	g.setColour(juce::Colours::transparentWhite);
+	g.setOpacity(0.0);
+	g.fillAll();
+
+	juce::Array<float> verticalLines
+	{
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+	};
+	juce::Array<float> horizontalLines
+	{
+		10, 40
+	};
+
+	g.setColour(juce::Colour::fromString("FF3860B5"));
+	
+	for (auto l : verticalLines)
+	{
+		auto normX = juce::jmap(l, 0.f, 10.f, 0.f, (float)backgroundBounds.getWidth());
+		//g.drawVerticalLine(normX, 0.f, backgroundBounds.getHeight());
+		g.fillRect(normX, 0.f, 2.f, (float)backgroundBounds.getHeight());
+	}
+	g.fillRect(backgroundBounds.getWidth() - 2.f, 0.f, 2.f, (float)backgroundBounds.getHeight());
+	//g.drawVerticalLine(backgroundBounds.getWidth()-1, 0.f, backgroundBounds.getHeight());
+
+	//g.setColour(juce::Colour::fromRGB(120, 120, 120));
+	for (auto l : horizontalLines)
+	{
+		auto normY = juce::jmap(l, 40.f, 0.f, 0.f, (float)backgroundBounds.getHeight());
+		g.fillRect(0.f, normY, (float)backgroundBounds.getWidth(), 2.f);
+		//auto normX = juce::mapFromLog10(f, 20.f, 20000.f);
+		//g.drawVerticalLine(getWidth() * normX, 0.f, getHeight());
+	}
+	g.fillRect(0.f, (float)backgroundBounds.getHeight()-2, (float)backgroundBounds.getWidth(), 2.f);
 }
 
 void XYPad::registerSlider(juce::Slider* slider, Axis axis)

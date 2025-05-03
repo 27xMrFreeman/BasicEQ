@@ -536,21 +536,23 @@ void BasicEQAudioProcessorEditor::resized()
     auto meterHeight = bounds.getHeight() * 0.2;
     auto inputMeterArea = bounds.removeFromLeft(meterWidth);
     inputMeterArea.removeFromTop(inputMeterArea.getHeight() * 0.02);
-    auto inputMeterLabelArea = inputMeterArea.removeFromBottom(inputMeterArea.getHeight() * 0.12);
+    auto inputMeterLabelArea = inputMeterArea.removeFromBottom(inputMeterArea.getHeight() * 0.122);
     auto outputMeterArea = bounds.removeFromRight(meterWidth);
     outputMeterArea.removeFromTop(outputMeterArea.getHeight() * 0.02);
-    auto outputMeterLabelArea = outputMeterArea.removeFromBottom(outputMeterArea.getHeight() * 0.12);
+    auto outputMeterLabelArea = outputMeterArea.removeFromBottom(outputMeterArea.getHeight() * 0.122);
     //auto inputGainArea = inputMeterArea.removeFromBottom(meterHeight);
     //auto outputGainArea = outputMeterArea.removeFromBottom(meterHeight);
     //inputGainSlider.setBounds(inputGainArea.reduced(0, inputGainArea.getHeight()*0.05));
     //outputGainSlider.setBounds(outputGainArea.reduced(0, outputGainArea.getHeight() * 0.05));
-    meterInLeft.setBounds(inputMeterArea.removeFromLeft(inputMeterArea.getWidth()*0.38));
-    inputMeterArea.removeFromLeft(inputMeterArea.getWidth() * 0.3);
-    meterInRight.setBounds(inputMeterArea.removeFromLeft(inputMeterArea.getWidth()*0.81));
-    outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.1);
-    meterOutLeft.setBounds(outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.38));
-    outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.36);
-    meterOutRight.setBounds(outputMeterArea.removeFromLeft(outputMeterArea.getWidth()));
+    inputMeterArea.removeFromLeft(inputMeterArea.getWidth() * 0.03);
+    meterInLeft.setBounds(inputMeterArea.removeFromLeft(inputMeterArea.getWidth()*0.33));
+    inputMeterArea.removeFromLeft(inputMeterArea.getWidth() * 0.36);
+    meterInRight.setBounds(inputMeterArea.removeFromLeft(inputMeterArea.getWidth()*0.75));
+
+    outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.11);
+    meterOutLeft.setBounds(outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.36));
+    outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.41);
+    meterOutRight.setBounds(outputMeterArea.removeFromLeft(outputMeterArea.getWidth()*0.92));
 
     // Space for buffer if it will be implemented
     //auto bufferArea = bounds.removeFromTop(bounds.getHeight() * 0.1);
