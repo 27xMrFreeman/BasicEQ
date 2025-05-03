@@ -587,10 +587,10 @@ void BasicEQAudioProcessorEditor::resized()
     xyPadArea.removeFromLeft(xyPadArea.getWidth() * 0.295);
     xyPad.setBounds(xyPadArea);
 
-    auto responseArea = bounds.removeFromRight(bounds.getWidth() * 0.628);
-    responseArea.removeFromTop(bounds.getHeight() * 0.195);
-    responseArea.removeFromBottom(bounds.getHeight() * 0.095);
-    responseArea.removeFromRight(responseArea.getWidth() * 0.195);
+    auto responseArea = bounds.removeFromRight(bounds.getWidth() * 0.635);
+    responseArea.removeFromTop(bounds.getHeight() * 0.182);
+    responseArea.removeFromBottom(bounds.getHeight() * 0.08);
+    responseArea.removeFromRight(responseArea.getWidth() * 0.184);
     irfftComponent.setBounds(responseArea);
 
 

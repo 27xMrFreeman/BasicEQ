@@ -148,10 +148,11 @@ void IrFFTComponent::paint(juce::Graphics& g)
     using namespace juce;
     //g.fillAll(Colours::black);
 
-    //g.drawImage(background, getLocalBounds().toFloat());
 
     auto irArea = getLocalBounds();
+    auto irAreaWidth = irArea.getWidth();
 
+    g.drawImage(background, irArea.reduced(0,irAreaWidth*0.02).toFloat());
 
 
     // here we need to paint the path from FFT values
@@ -163,8 +164,15 @@ void IrFFTComponent::paint(juce::Graphics& g)
     g.setColour(Colours::white);
     g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));
 
-    //g.setColour(Colour::fromString("FFF09500"));
-    //g.drawRoundedRectangle(irArea.toFloat(), 6.f, 5.f);
+    g.setColour(Colour::fromString("FFF09500"));
+    //g.setColour(Colours::green);
+    g.drawRoundedRectangle(irArea.reduced(irAreaWidth*0.005).toFloat(), irAreaWidth * 0.061, irAreaWidth * 0.015); // 32 cornersize, 8 linethickness when max size
+
+    g.setColour(Colours::red);
+    //g.drawRect(irArea);
+
+    g.setColour(Colours::blue);
+    //g.drawRect(getAnalysisArea());
 
     //g.setColour(Colours::aqua);
     //g.strokePath(rightChannelFFTPath, PathStrokeType(1.f));
@@ -174,13 +182,17 @@ void IrFFTComponent::resized()
 {
     // drawing frequency grid behind IR graph
     using namespace juce;
-    background = Image(Image::PixelFormat::RGB, getWidth(), getHeight(), true);
+    background = Image(Image::PixelFormat::ARGB, getWidth(), getHeight(), true);
 
     Graphics g(background);
 
+    g.setColour(Colours::transparentWhite);
+    g.setOpacity(0.0);
+    g.fillAll();
+
     Array<float> freqsDim
     {
-        20, 30, 40, 50, 60, 70, 80, 90,
+        30, 40, 50, 60, 70, 80, 90,
         200, 300, 400, 500, 600, 700, 800, 900,
         2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000,
         20000
@@ -200,6 +212,12 @@ void IrFFTComponent::resized()
         auto normX = mapFromLog10(f, 20.f, 20000.f);
         g.drawVerticalLine(getWidth() * normX, 0.f, getHeight());
     }
+
+    //repaint();
+    /*auto leftChannelFFTPath = leftPathProducer.getPath();
+    leftChannelFFTPath.applyTransform(AffineTransform().translation(getLocalBounds().getX(), getLocalBounds().getY() - 80));
+    g.setColour(Colours::white);
+    g.strokePath(leftChannelFFTPath, PathStrokeType(1.f));*/
 }
 
 juce::Rectangle<int> IrFFTComponent::getRenderArea()
@@ -207,7 +225,7 @@ juce::Rectangle<int> IrFFTComponent::getRenderArea()
     auto bounds = getLocalBounds();
 
     bounds.removeFromTop(0);
-    bounds.removeFromBottom(0);
+    bounds.removeFromBottom(bounds.getHeight()*0.1);
     bounds.removeFromLeft(0);
     bounds.removeFromRight(0);
 
@@ -220,5 +238,7 @@ juce::Rectangle<int> IrFFTComponent::getAnalysisArea()
     auto bounds = getRenderArea();
     bounds.removeFromTop(4);
     bounds.removeFromBottom(4);
+   /* bounds.removeFromBottom(bounds.getHeight()*0.1);
+    bounds.removeFromRight(bounds.getWidth() * 0.0187);*/
     return bounds;
 }
