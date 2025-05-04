@@ -117,30 +117,81 @@ void LookAndFeel::drawToggleButton(juce::Graphics& g,
 {
     using namespace juce;
 
-    Path powerButton;
+    //Path powerButton;
 
     auto bounds = toggleButton.getLocalBounds();
     auto size = jmin(bounds.getWidth(), bounds.getHeight()) - 5;
     auto r = bounds.withSizeKeepingCentre(size, size).toFloat();
 
-    float ang = 30.f;
+    g.setColour(Colours::red);
+    g.drawRect(bounds);
 
-    size -= 6;
+    //g.setColour(bypassButtonEdgeColor);
+    //g.drawEllipse(bounds.toFloat(),bounds.getWidth()*0.05);
 
-    powerButton.addCentredArc(r.getCentreX(), r.getCentreY(), size * 0.5, size * 0.5, 0.f, degreesToRadians(ang), degreesToRadians(360.f - ang), true);
+    if (toggleButton.getToggleState())    g.setColour(bypassButtonFillColor); //ON
+    else g.setColour(Colours::black);                                         //OFF
 
-    powerButton.startNewSubPath(r.getCentreX(), r.getY() + 3);
-    powerButton.lineTo(r.getCentre());
+    g.fillEllipse(bounds.reduced(bounds.getWidth() * 0.1).toFloat());
+    //auto name = toggleButton.getName();
 
-    PathStrokeType pst(2.f, PathStrokeType::JointStyle::curved);
+    //float ang = 30.f;
 
-    auto color = toggleButton.getToggleState() ? Colours::dimgrey : Colours::lightgreen;
+    //size -= 6;
 
-    g.setColour(color);
-    g.strokePath(powerButton, pst);
-    size = jmin(bounds.getWidth(), bounds.getHeight()) - 3;
-    r = bounds.withSizeKeepingCentre(size, size).toFloat();
-    g.setColour(Colours::silver);
-    g.drawEllipse(r, 2);
+    //powerButton.addCentredArc(r.getCentreX(), r.getCentreY(), size * 0.5, size * 0.5, 0.f, degreesToRadians(ang), degreesToRadians(360.f - ang), true);
+
+    //powerButton.startNewSubPath(r.getCentreX(), r.getY() + 3);
+    //powerButton.lineTo(r.getCentre());
+
+    //PathStrokeType pst(2.f, PathStrokeType::JointStyle::curved);
+
+    //auto color = toggleButton.getToggleState() ? Colours::dimgrey : Colours::lightgreen;
+
+    //g.setColour(color);
+    ////g.strokePath(powerButton, pst);
+    //size = jmin(bounds.getWidth(), bounds.getHeight()) - 3;
+    //r = bounds.withSizeKeepingCentre(size, size).toFloat();
+    //g.setColour(Colours::silver);
+    ////g.drawEllipse(r, 2);
+
+}
+
+void LookAndFeelIRBypass::drawToggleButton(juce::Graphics& g, juce::ToggleButton& toggleButton, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
+{
+    using namespace juce;
+
+    auto bounds = toggleButton.getLocalBounds();
+
+    g.setColour(Colours::red);
+    g.drawRect(bounds);
+    
+    g.setColour(Colour::fromString("FF4F83F3"));
+    g.drawEllipse(bounds.reduced(bounds.getWidth() * 0.06).toFloat(), bounds.getWidth() * 0.1);
+
+    if (toggleButton.getToggleState())    g.setColour(Colour::fromString("FF4F83F3")); //ON
+    else g.setColour(Colour::fromString("FF14213D"));                                  //OFF
+
+    g.fillEllipse(bounds.reduced(bounds.getWidth() * 0.1).toFloat());
+}
+
+void LookAndFeelChoiceButtons::drawToggleButton(juce::Graphics& g, juce::ToggleButton& toggleButton, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
+{
+    using namespace juce;
+
+    auto bounds = toggleButton.getLocalBounds();
+
+    g.setColour(Colours::red);
+    g.drawRect(bounds);
+
+    auto onBtnImage = ImageCache::getFromMemory(BinaryData::ChoiceOn_png, BinaryData::ChoiceOn_pngSize);
+    auto offBtnImage = ImageCache::getFromMemory(BinaryData::ChoiceOff_png, BinaryData::ChoiceOff_pngSize);
+
+    if (toggleButton.getToggleState()) {
+        g.drawImage(onBtnImage, bounds.toFloat(), RectanglePlacement::stretchToFit, false);
+    }
+    else {
+        g.drawImage(offBtnImage, bounds.toFloat(), RectanglePlacement::stretchToFit, false);
+    }
 
 }

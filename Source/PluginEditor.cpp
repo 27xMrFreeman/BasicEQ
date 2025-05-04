@@ -173,8 +173,8 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     ampTypeBox.onChange = [this]() {
         //audioProcessor.ampDrive.simTypeChanged(ampTypeBox.getSelectedId());
         audioProcessor.ampSim.ampType = static_cast<AmpTypeEnum>(ampTypeBox.getSelectedId() - 1);
-        DBG("ComboBox: ");
-        DBG(audioProcessor.ampSim.ampType);
+        //DBG("ComboBox: ");
+        //DBG(audioProcessor.ampSim.ampType);
 
         };
 
@@ -199,8 +199,10 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
         outputGainSlider.repaint();
         xyPad.thumb.setThumbColor(juce::Colours::red);
         xyPad.thumb.repaint();
-        DBG("Button 1 pressed: ");
-        DBG(ampTypeBox.getSelectedId());
+        this->lnf.bypassButtonFillColor = juce::Colours::red;
+        ampBypassButton.repaint();
+        //DBG("Button 1 pressed: ");
+        //DBG(ampTypeBox.getSelectedId());
         };
 
     yamahaAmpTypeButton.setRadioGroupId(RadioButtonIDs::AmpTypeButtons);
@@ -222,9 +224,11 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
         outputGainSlider.repaint();
         xyPad.thumb.setThumbColor(juce::Colours::blue);
         xyPad.thumb.repaint();
+        this->lnf.bypassButtonFillColor = juce::Colours::blue;
+        ampBypassButton.repaint();
         //getLookAndFeel().setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colours::red);
-        DBG("Button 2 pressed: ");
-        DBG(ampTypeBox.getSelectedId());
+        //DBG("Button 2 pressed: ");
+        //DBG(ampTypeBox.getSelectedId());
         };
     
     wavefoldAmpTypeButton.setRadioGroupId(RadioButtonIDs::AmpTypeButtons);
@@ -246,9 +250,11 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
         outputGainSlider.repaint();
         xyPad.thumb.setThumbColor(juce::Colours::green);
         xyPad.thumb.repaint();
+        this->lnf.bypassButtonFillColor = juce::Colours::green;
+        ampBypassButton.repaint();
         //getLookAndFeel().setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colours::red);
-        DBG("Button 3 pressed: ");
-        DBG(ampTypeBox.getSelectedId());
+        //DBG("Button 3 pressed: ");
+        //DBG(ampTypeBox.getSelectedId());
         };
 
     switch (audioProcessor.ampSim.ampType)
@@ -272,8 +278,14 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     lowCutBypassButton.setLookAndFeel(&lnf);
     highCutBypassButton.setLookAndFeel(&lnf);
     peakBypassButton.setLookAndFeel(&lnf);
-    irBypassButton.setLookAndFeel(&lnf);
+    irBypassButton.setLookAndFeel(&lnfIRBypass);
     ampBypassButton.setLookAndFeel(&lnf);
+    polettiAmpTypeButton.setLookAndFeel(&lnfChoices);
+    yamahaAmpTypeButton.setLookAndFeel(&lnfChoices);
+    wavefoldAmpTypeButton.setLookAndFeel(&lnfChoices);
+    aMicButton.setLookAndFeel(&lnfChoices);
+    bMicButton.setLookAndFeel(&lnfChoices);
+    cMicButton.setLookAndFeel(&lnfChoices);
     //lowCutFreqSlider.setLookAndFeel(&lnf);
     //lowCutSlopeSlider.setLookAndFeel(&lnf);
     //highCutFreqSlider.setLookAndFeel(&lnf);
@@ -374,6 +386,12 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
     inputGainSlider.setLookAndFeel(nullptr);
     outputGainSlider.setLookAndFeel(nullptr);
     ampBypassButton.setLookAndFeel(nullptr);
+    polettiAmpTypeButton.setLookAndFeel(nullptr);
+    yamahaAmpTypeButton.setLookAndFeel(nullptr);
+    wavefoldAmpTypeButton.setLookAndFeel(nullptr);
+    aMicButton.setLookAndFeel(nullptr);
+    bMicButton.setLookAndFeel(nullptr);
+    cMicButton.setLookAndFeel(nullptr);
     //driveSlider.setLookAndFeel(nullptr);
     //lowShelfSlider.setLookAndFeel(nullptr);
     //midPeakSlider.setLookAndFeel(nullptr);
@@ -522,6 +540,7 @@ void BasicEQAudioProcessorEditor::paint (juce::Graphics& g)
     //g.fillAll (Colours::black);
     backgroundImage = ImageCache::getFromMemory(BinaryData::BackgroundImage_png, BinaryData::BackgroundImage_pngSize);
     g.drawImage(backgroundImage, getLocalBounds().toFloat(), RectanglePlacement::stretchToFit);
+    //lnf.sliderColour = Colours::black;
 }
 
 void BasicEQAudioProcessorEditor::resized()
@@ -562,9 +581,13 @@ void BasicEQAudioProcessorEditor::resized()
     
 
     // Main knobs - gain sliders in with knobs, maybe smaller size
-    auto mainKnobsArea = bounds.removeFromBottom(bounds.getHeight() * 0.4).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.1);
-    driveSlider.setBounds(mainKnobsArea);
-    //ampBypassButton.setBounds(mainKnobsArea.removeFromLeft(mainKnobsArea.getWidth()/20));
+    auto oldHeight = bounds.getHeight();
+    auto mainKnobsArea = bounds.removeFromBottom(oldHeight * 0.36).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.0);
+    auto knobLabelArea = mainKnobsArea.removeFromBottom(mainKnobsArea.getHeight() * 0.28);
+    //driveSlider.setBounds(mainKnobsArea);
+    mainKnobsArea.removeFromLeft(mainKnobsArea.getWidth() * 0.05);
+    mainKnobsArea.removeFromTop(mainKnobsArea.getHeight() * 0.07);
+    ampBypassButton.setBounds(mainKnobsArea.removeFromLeft(mainKnobsArea.getWidth()*0.04).reduced(0,mainKnobsArea.getHeight()*0.355));
     //auto knobWidth = mainKnobsArea.getWidth() / 5;
     //driveSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
     //auto ampTypeArea = mainKnobsArea.removeFromLeft(knobWidth);
@@ -583,6 +606,7 @@ void BasicEQAudioProcessorEditor::resized()
 
     //xPosSlider.setBounds(xyPadArea.removeFromTop(xyPadArea.getHeight()*0.5).reduced(xyPadArea.getWidth()*0.05));
     //yPosSlider.setBounds(xyPadArea.reduced(xyPadArea.getWidth() * 0.05));
+    bounds.removeFromBottom(oldHeight * 0.04);
     auto xyPadArea = bounds.removeFromLeft(bounds.getWidth() * 0.299);
     xyPadArea.removeFromTop(xyPadArea.getHeight() * 0.21);
     xyPadArea.removeFromBottom(xyPadArea.getHeight() * 0.138);

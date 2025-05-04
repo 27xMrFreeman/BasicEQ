@@ -40,5 +40,21 @@ struct LookAndFeel : juce::LookAndFeel_V4
         return customFont;
     }
 
-    //juce::Colour sliderColour{ juce::Colours::white };
+    juce::Colour bypassButtonEdgeColor{ juce::Colours::white }, bypassButtonFillColor{ juce::Colours::white };
+};
+
+struct LookAndFeelIRBypass : juce::LookAndFeel_V4
+{
+    void drawToggleButton(juce::Graphics& g,
+        juce::ToggleButton& toggleButton,
+        bool shouldDrawButtonAsHighlighted,
+        bool shouldDrawButtonAsDown) override;
+};
+
+struct LookAndFeelChoiceButtons : juce::LookAndFeel_V4
+{
+    void drawToggleButton(juce::Graphics& g,
+        juce::ToggleButton& toggleButton,
+        bool shouldDrawButtonAsHighlighted,
+        bool shouldDrawButtonAsDown) override;
 };

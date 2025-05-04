@@ -132,6 +132,8 @@ private:
     std::vector<juce::Component*> getComps();
 
     LookAndFeel lnf;
+    LookAndFeelIRBypass lnfIRBypass;
+    LookAndFeelChoiceButtons lnfChoices;
     /*LookAndFeelBlue lnfb;
     LookAndFeelGreen lnfg;
     LookAndFeelBlack lnfk;*/
