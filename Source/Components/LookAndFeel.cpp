@@ -15,10 +15,14 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
 {
     using namespace juce;
 
-    auto bounds = Rectangle<float>(x, y, width, height);
+    auto imageBounds = Rectangle<float>(x, y, width, height);
+    auto sliderBounds = imageBounds.reduced(width * 0.1);
+    juce::Image sliderImage = juce::ImageCache::getFromMemory(BinaryData::Knob_png, BinaryData::Knob_pngSize);
+
     // for debugging
-    g.setColour(Colour(Colours::red));
-    g.drawRect(bounds);
+    /*g.setColour(Colour(Colours::red));
+    g.drawRect(imageBounds);
+    g.drawRect(sliderBounds);*/
 
     //g.setColour(Colour(72u, 30u, 20u));
     //g.setColour(findColour(juce::Slider::rotarySliderFillColourId));
@@ -27,16 +31,20 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
     //====================================================================================
     // slider should be rectangle with height proportional to slider value
 
-    auto sliderFilledArea = bounds;
-    auto sliderValMappedToHeight = jmap(slider.getValue(), slider.getMinimum(), slider.getMaximum(), (double)height, 0.0);
-    sliderFilledArea.removeFromTop(sliderValMappedToHeight);
-    g.setColour(Colours::blueviolet);
+    g.fillEllipse(sliderBounds);
+
+    auto sliderFilledArea = sliderBounds;
+    auto sliderValMappedToHeight = jmap(slider.getValue(), slider.getMinimum(), slider.getMaximum(), 0.0, (double)sliderBounds.getHeight());
+    sliderFilledArea.removeFromBottom(sliderValMappedToHeight);
+    g.setColour(Colour::fromString("FFFCA311"));
     
     g.fillRect(sliderFilledArea);
 
+    g.drawImage(sliderImage, imageBounds.toFloat(), RectanglePlacement::stretchToFit, false);
+
     if (auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider))
     {
-        if (slider.isMouseOverOrDragging())
+        //if (slider.isMouseOverOrDragging())
         {
             g.setFont(rswl->getTextHeight());                           // sets basic font with set height
             auto text = rswl->getDisplayString();                       // gets text to put in
@@ -44,10 +52,10 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
 
             Rectangle<float> r;
             r.setSize(strWidth + 4, rswl->getTextHeight() + 2);         // rectangle r is little bigger than the text
-            r.setCentre(bounds.getCentre());                            // set centre of the rectangle to centre of bounds (slider)
+            r.setCentre(sliderBounds.getCentre());                            // set centre of the rectangle to centre of bounds (slider)
 
-            g.setColour(Colours::black);
-            g.fillRect(r);
+            /*g.setColour(Colours::black);
+            g.fillRect(r);*/
 
             g.setColour(Colours::white);
             g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
@@ -123,8 +131,8 @@ void LookAndFeel::drawToggleButton(juce::Graphics& g,
     auto size = jmin(bounds.getWidth(), bounds.getHeight()) - 5;
     auto r = bounds.withSizeKeepingCentre(size, size).toFloat();
 
-    g.setColour(Colours::red);
-    g.drawRect(bounds);
+    /*g.setColour(Colours::red);
+    g.drawRect(bounds);*/
 
     //g.setColour(bypassButtonEdgeColor);
     //g.drawEllipse(bounds.toFloat(),bounds.getWidth()*0.05);
@@ -132,7 +140,7 @@ void LookAndFeel::drawToggleButton(juce::Graphics& g,
     if (toggleButton.getToggleState())    g.setColour(bypassButtonFillColor); //ON
     else g.setColour(Colours::black);                                         //OFF
 
-    g.fillEllipse(bounds.reduced(bounds.getWidth() * 0.1).toFloat());
+    g.fillEllipse(bounds.reduced(bounds.getWidth() * 0.2).toFloat());
     //auto name = toggleButton.getName();
 
     //float ang = 30.f;

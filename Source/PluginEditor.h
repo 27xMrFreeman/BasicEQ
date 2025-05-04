@@ -50,6 +50,8 @@ private:
     // background image
     juce::Image backgroundImage;
 
+    float fontSize{ 0 };
+
     //===============================================================================================================================
     // meters + gain
     
@@ -60,6 +62,8 @@ private:
     
     RotarySliderWithLabels inputGainSlider, outputGainSlider;
     Attachment inputGainSliderAttachment, outputGainSliderAttachment;
+
+    juce::Label inputGainLabel{ {}, "In" }, outputGainLabel{ {}, "Out" };
 
     //===============================================================================================================================
     // Amp GUI
@@ -74,12 +78,16 @@ private:
     //ButtonAttachment polettiAmpTypeButtonAttachment, yamahaAmpTypeButtonAttachment, wavefoldAmpTypeButtonAttachment;
     juce::ToggleButton ampBypassButton/*, osBypassButton*/;
     ButtonAttachment ampBypassButtonAttachment/*, osBypassButtonAttachment*/;
+
+    juce::Label driveLabel{ {}, "Drive" }, ampTypeLabel{ {}, "Type" }, ampBypassLabel{ {}, "Bypass" };
     
     //===============================================================================================================================
     // Tone Stack GUI
 
     RotarySliderWithLabels lowShelfSlider, midPeakSlider, highShelfSlider;
     Attachment lowShelfSliderAttachment, midPeakSliderAttachment, highShelfSliderAttachment;
+
+    juce::Label lowLabel{ {}, "Low" }, midLabel{ {}, "Mid" }, highLabel{ {}, "High" };
     
     //===============================================================================================================================
     // IR loader GUI:
@@ -130,6 +138,7 @@ private:
     ButtonAttachment lowCutBypassButtonAttachment, peakBypassButtonAttachment, highCutBypassButtonAttachment;
 
     std::vector<juce::Component*> getComps();
+    std::vector<juce::Label*> getLabels();
 
     LookAndFeel lnf;
     LookAndFeelIRBypass lnfIRBypass;

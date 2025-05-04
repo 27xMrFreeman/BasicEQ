@@ -40,7 +40,7 @@ struct RotarySliderWithLabels : juce::Slider
 
     void paint(juce::Graphics& g) override;
     juce::Rectangle<int> getSliderBounds() const;
-    int getTextHeight() const { return 14; }
+    int getTextHeight() const { return getLocalBounds().getHeight()*0.15; }
     juce::String getDisplayString() const;
     void setSliderColor(juce::Colour newColor);
 

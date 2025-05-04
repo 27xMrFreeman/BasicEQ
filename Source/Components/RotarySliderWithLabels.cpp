@@ -27,11 +27,12 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
     g.setColour(juce::Colours::aquamarine);
     g.drawRect(nameBounds);
 
-    nameBounds.removeFromTop(sliderBounds.getHeight()).reduce(0, nameBounds.getHeight() * 0.1);
+    //nameBounds.removeFromTop(sliderBounds.getHeight());
+    //nameBounds.reduce(0, nameBounds.getHeight() * 0.02);
 
-    g.setColour(Colours::white);
-    g.setFont(lnf.getCustomFont().withHeight(nameBounds.getHeight()));
-    g.drawFittedText(name, nameBounds, Justification::centred, 1);
+    //g.setColour(Colours::white);
+    g.setFont(lnf.getCustomFont().withHeight(nameBounds.getHeight()*0.6));
+    //g.drawFittedText(name, nameBounds, Justification::centred, 1);
 
     /*g.setColour(Colours::red);
     g.drawRect(nameBounds);
@@ -83,7 +84,7 @@ juce::Rectangle<int> RotarySliderWithLabels::getSliderBounds() const
 
     auto size = juce::jmin(bounds.getWidth(), bounds.getHeight());
 
-    size -= getTextHeight() * 2;
+    //size -= getTextHeight() * 2;
     juce::Rectangle<int> r;
     r.setSize(size, size);
     r.setCentre(bounds.getCentreX(), 0);

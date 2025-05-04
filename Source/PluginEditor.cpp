@@ -275,17 +275,26 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
         addAndMakeVisible(comp);
     }
 
+    for (auto* label : getLabels())
+    {
+        //label->setFont(lnf.getCustomFont().withHeight(fontSize));
+        label->setJustificationType(juce::Justification::centred);
+    }
+
     lowCutBypassButton.setLookAndFeel(&lnf);
     highCutBypassButton.setLookAndFeel(&lnf);
     peakBypassButton.setLookAndFeel(&lnf);
     irBypassButton.setLookAndFeel(&lnfIRBypass);
     ampBypassButton.setLookAndFeel(&lnf);
-    polettiAmpTypeButton.setLookAndFeel(&lnfChoices);
-    yamahaAmpTypeButton.setLookAndFeel(&lnfChoices);
-    wavefoldAmpTypeButton.setLookAndFeel(&lnfChoices);
+    polettiAmpTypeButton.setLookAndFeel(&lnf);
+    yamahaAmpTypeButton.setLookAndFeel(&lnf);
+    wavefoldAmpTypeButton.setLookAndFeel(&lnf);
     aMicButton.setLookAndFeel(&lnfChoices);
     bMicButton.setLookAndFeel(&lnfChoices);
     cMicButton.setLookAndFeel(&lnfChoices);
+    aCabButton.setLookAndFeel(&lnfChoices);
+    bCabButton.setLookAndFeel(&lnfChoices);
+    cCabButton.setLookAndFeel(&lnfChoices);
     //lowCutFreqSlider.setLookAndFeel(&lnf);
     //lowCutSlopeSlider.setLookAndFeel(&lnf);
     //highCutFreqSlider.setLookAndFeel(&lnf);
@@ -392,6 +401,9 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
     aMicButton.setLookAndFeel(nullptr);
     bMicButton.setLookAndFeel(nullptr);
     cMicButton.setLookAndFeel(nullptr);
+    aCabButton.setLookAndFeel(nullptr);
+    bCabButton.setLookAndFeel(nullptr);
+    cCabButton.setLookAndFeel(nullptr);
     //driveSlider.setLookAndFeel(nullptr);
     //lowShelfSlider.setLookAndFeel(nullptr);
     //midPeakSlider.setLookAndFeel(nullptr);
@@ -540,6 +552,7 @@ void BasicEQAudioProcessorEditor::paint (juce::Graphics& g)
     //g.fillAll (Colours::black);
     backgroundImage = ImageCache::getFromMemory(BinaryData::BackgroundImage_png, BinaryData::BackgroundImage_pngSize);
     g.drawImage(backgroundImage, getLocalBounds().toFloat(), RectanglePlacement::stretchToFit);
+    //g.setFont(lnf.getCustomFont().withHeight(fontSize));
     //lnf.sliderColour = Colours::black;
 }
 
@@ -582,12 +595,64 @@ void BasicEQAudioProcessorEditor::resized()
 
     // Main knobs - gain sliders in with knobs, maybe smaller size
     auto oldHeight = bounds.getHeight();
-    auto mainKnobsArea = bounds.removeFromBottom(oldHeight * 0.36).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.0);
+    auto mainKnobsArea = bounds.removeFromBottom(oldHeight * 0.36).reduced(bounds.getWidth() * 0.02, 0.0);
     auto knobLabelArea = mainKnobsArea.removeFromBottom(mainKnobsArea.getHeight() * 0.28);
-    //driveSlider.setBounds(mainKnobsArea);
-    mainKnobsArea.removeFromLeft(mainKnobsArea.getWidth() * 0.05);
+    knobLabelArea.removeFromBottom(knobLabelArea.getHeight() * 0.3);
+    fontSize = knobLabelArea.getHeight()*0.6;
+
+    for (auto* label : getLabels())
+    {
+        label->setFont(lnf.getCustomFont().withHeight(fontSize));
+        //label->setJustificationType(juce::Justification::centred);
+    }
+    
+    //yellow part width
+    auto yellowBackgroundWidth = mainKnobsArea.getWidth();
+    mainKnobsArea.removeFromLeft(yellowBackgroundWidth * 0.05);
+    mainKnobsArea.removeFromRight(yellowBackgroundWidth * 0.05); // this should center all the knobs relative to main plugin body
     mainKnobsArea.removeFromTop(mainKnobsArea.getHeight() * 0.07);
-    ampBypassButton.setBounds(mainKnobsArea.removeFromLeft(mainKnobsArea.getWidth()*0.04).reduced(0,mainKnobsArea.getHeight()*0.355));
+
+    float spaceBetweenKnobs = (yellowBackgroundWidth / 1384.f) * 13; // 7 spaces, should be 37px when max size
+    float knobSize = (yellowBackgroundWidth / 1384.f) * 169; // knob size is 169px
+    float switchSize = (yellowBackgroundWidth / 1384.f) * 87;// switch size is 87 x 169 px
+    float bypassSize = (yellowBackgroundWidth / 1384.f) * 52;// bypass size is 52 px
+    
+    ampBypassButton.setBounds(mainKnobsArea.removeFromLeft(bypassSize).reduced(0,mainKnobsArea.getHeight()*0.355));
+    mainKnobsArea.removeFromLeft(spaceBetweenKnobs);
+    inputGainSlider.setBounds(mainKnobsArea.removeFromLeft(knobSize));
+    mainKnobsArea.removeFromLeft(spaceBetweenKnobs);
+    driveSlider.setBounds(mainKnobsArea.removeFromLeft(knobSize));
+    mainKnobsArea.removeFromLeft(spaceBetweenKnobs);
+    auto ampTypeArea = mainKnobsArea.removeFromLeft(switchSize);
+    polettiAmpTypeButton.setBounds(ampTypeArea);
+    //polettiAmpTypeButton.setBounds(knobLabelArea);
+    mainKnobsArea.removeFromLeft(spaceBetweenKnobs);
+    lowShelfSlider.setBounds(mainKnobsArea.removeFromLeft(knobSize));
+    mainKnobsArea.removeFromLeft(spaceBetweenKnobs);
+    midPeakSlider.setBounds(mainKnobsArea.removeFromLeft(knobSize));
+    mainKnobsArea.removeFromLeft(spaceBetweenKnobs);
+    highShelfSlider.setBounds(mainKnobsArea.removeFromLeft(knobSize));
+    mainKnobsArea.removeFromLeft(spaceBetweenKnobs);
+    outputGainSlider.setBounds(mainKnobsArea.removeFromLeft(knobSize));
+
+    knobLabelArea.removeFromLeft(spaceBetweenKnobs * 3);
+    ampBypassLabel.setBounds(knobLabelArea.removeFromLeft(bypassSize * 1.84));
+    //knobLabelArea.removeFromLeft(spaceBetweenKnobs);
+    inputGainLabel.setBounds(knobLabelArea.removeFromLeft(knobSize));
+    knobLabelArea.removeFromLeft(spaceBetweenKnobs);
+    driveLabel.setBounds(knobLabelArea.removeFromLeft(knobSize));
+    knobLabelArea.removeFromLeft(spaceBetweenKnobs);
+    ampTypeLabel.setBounds(knobLabelArea.removeFromLeft(switchSize));
+    knobLabelArea.removeFromLeft(spaceBetweenKnobs);
+    lowLabel.setBounds(knobLabelArea.removeFromLeft(knobSize));
+    knobLabelArea.removeFromLeft(spaceBetweenKnobs);
+    midLabel.setBounds(knobLabelArea.removeFromLeft(knobSize));
+    knobLabelArea.removeFromLeft(spaceBetweenKnobs);
+    highLabel.setBounds(knobLabelArea.removeFromLeft(knobSize));
+    knobLabelArea.removeFromLeft(spaceBetweenKnobs);
+    outputGainLabel.setBounds(knobLabelArea.removeFromLeft(knobSize));
+    //ampBypassButton.setBounds(mainKnobsArea);
+
     //auto knobWidth = mainKnobsArea.getWidth() / 5;
     //driveSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
     //auto ampTypeArea = mainKnobsArea.removeFromLeft(knobWidth);
@@ -808,7 +873,29 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &cCabButton,
         &aMicButton,
         &bMicButton,
-        &cMicButton
+        &cMicButton,
+        &ampBypassLabel,
+        &inputGainLabel,
+        &driveLabel,
+        &ampTypeLabel,
+        &lowLabel,
+        &midLabel,
+        &highLabel,
+        &outputGainLabel
     };
 }
 
+std::vector<juce::Label*> BasicEQAudioProcessorEditor::getLabels()
+{
+    
+    return {
+        &ampBypassLabel,
+        &inputGainLabel,
+        &driveLabel,
+        &ampTypeLabel,
+        &lowLabel,
+        &midLabel,
+        &highLabel,
+        &outputGainLabel
+    };
+}
