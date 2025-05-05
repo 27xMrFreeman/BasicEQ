@@ -21,6 +21,7 @@
 #include "Components/ResponseCurveComponent.h"
 #include "Components/RotarySliderWithLabels.h"
 #include "Components/XYPad.h"
+#include "Components/AmpTypeSwitch.h"
 
 //==============================================================================
 /**
@@ -71,16 +72,17 @@ private:
     RotarySliderWithLabels driveSlider;
     Attachment driveSliderAttachment;
 
-    juce::ComboBox ampTypeBox;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> ampTypeBoxAttachment;
+    //juce::ComboBox ampTypeBox;
+    /*std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> ampTypeBoxAttachment;*/
     
-    juce::ToggleButton polettiAmpTypeButton, yamahaAmpTypeButton, wavefoldAmpTypeButton;
+    //juce::ToggleButton polettiAmpTypeButton, yamahaAmpTypeButton, wavefoldAmpTypeButton;
     //ButtonAttachment polettiAmpTypeButtonAttachment, yamahaAmpTypeButtonAttachment, wavefoldAmpTypeButtonAttachment;
     juce::ToggleButton ampBypassButton/*, osBypassButton*/;
     ButtonAttachment ampBypassButtonAttachment/*, osBypassButtonAttachment*/;
 
     juce::Label driveLabel{ {}, "Drive" }, ampTypeLabel{ {}, "Type" }, ampBypassLabel{ {}, "Bypass" };
     
+    AmpTypeSwitch ampTypeSwitch;
     //===============================================================================================================================
     // Tone Stack GUI
 

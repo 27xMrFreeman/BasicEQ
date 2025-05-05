@@ -203,3 +203,16 @@ void LookAndFeelChoiceButtons::drawToggleButton(juce::Graphics& g, juce::ToggleB
     }
 
 }
+
+void LookAndFeelAmpTypeButtons::drawToggleButton(juce::Graphics& g, juce::ToggleButton& toggleButton, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
+{
+    auto bounds = toggleButton.getLocalBounds();
+    //auto w = bounds.getWidth();
+    auto h = bounds.getHeight();
+    bounds = bounds.withSizeKeepingCentre(h, h);
+
+    g.setColour(juce::Colour::fromRGBA(0, 0, 0, 150));
+    if (!toggleButton.getToggleState()) {
+        g.fillEllipse(bounds.toFloat());
+    }
+}

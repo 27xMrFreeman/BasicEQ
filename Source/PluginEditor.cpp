@@ -166,24 +166,24 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
         break;
     }
 
-    ampTypeBox.addItem("Poletti", 1);
+    /*ampTypeBox.addItem("Poletti", 1);
     ampTypeBox.addItem("Yamaha", 2);
-    ampTypeBox.addItem("WaveFolder", 3);
+    ampTypeBox.addItem("WaveFolder", 3);*/
     //ampTypeBox.setSelectedItemIndex(0);
-    ampTypeBox.onChange = [this]() {
+    ampTypeSwitch.ampTypeBox.onChange = [this]() {
         //audioProcessor.ampDrive.simTypeChanged(ampTypeBox.getSelectedId());
-        audioProcessor.ampSim.ampType = static_cast<AmpTypeEnum>(ampTypeBox.getSelectedId() - 1);
+        audioProcessor.ampSim.ampType = static_cast<AmpTypeEnum>(ampTypeSwitch.ampTypeBox.getSelectedId() - 1);
         //DBG("ComboBox: ");
         //DBG(audioProcessor.ampSim.ampType);
 
         };
 
 
-    polettiAmpTypeButton.setRadioGroupId(RadioButtonIDs::AmpTypeButtons);
-    polettiAmpTypeButton.setClickingTogglesState(true);
-    polettiAmpTypeButton.onClick = [this]() { /*audioProcessor.ampSim.ampType = AmpTypeEnum::Poletti;*/ 
-        if (!polettiAmpTypeButton.getToggleState()) return;
-        ampTypeBox.setSelectedItemIndex(0);
+    /*polettiAmpTypeButton.setRadioGroupId(RadioButtonIDs::AmpTypeButtons);
+    polettiAmpTypeButton.setClickingTogglesState(true);*/
+    ampTypeSwitch.polettiAmpTypeButton.onClick = [this]() { /*audioProcessor.ampSim.ampType = AmpTypeEnum::Poletti;*/
+        if (!ampTypeSwitch.polettiAmpTypeButton.getToggleState()) return;
+        ampTypeSwitch.ampTypeBox.setSelectedItemIndex(0);
         //getLookAndFeel().setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colours::red);
         driveSlider.setSliderColor(juce::Colours::red);
         driveSlider.repaint();
@@ -205,11 +205,11 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
         //DBG(ampTypeBox.getSelectedId());
         };
 
-    yamahaAmpTypeButton.setRadioGroupId(RadioButtonIDs::AmpTypeButtons);
-    yamahaAmpTypeButton.setClickingTogglesState(true);
-    yamahaAmpTypeButton.onClick = [this]() { /*audioProcessor.ampSim.ampType = AmpTypeEnum::Yamaha;*/ 
-        if (!yamahaAmpTypeButton.getToggleState()) return;
-        ampTypeBox.setSelectedItemIndex(1);
+    /*yamahaAmpTypeButton.setRadioGroupId(RadioButtonIDs::AmpTypeButtons);
+    yamahaAmpTypeButton.setClickingTogglesState(true);*/
+    ampTypeSwitch.yamahaAmpTypeButton.onClick = [this]() { /*audioProcessor.ampSim.ampType = AmpTypeEnum::Yamaha;*/
+        if (!ampTypeSwitch.yamahaAmpTypeButton.getToggleState()) return;
+        ampTypeSwitch.ampTypeBox.setSelectedItemIndex(1);
         driveSlider.setSliderColor(juce::Colours::blue);
         driveSlider.repaint();
         lowShelfSlider.setSliderColor(juce::Colours::blue);
@@ -231,11 +231,11 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
         //DBG(ampTypeBox.getSelectedId());
         };
     
-    wavefoldAmpTypeButton.setRadioGroupId(RadioButtonIDs::AmpTypeButtons);
-    wavefoldAmpTypeButton.setClickingTogglesState(true);
-    wavefoldAmpTypeButton.onClick = [this]() { /*audioProcessor.ampSim.ampType = AmpTypeEnum::WaveFolder;*/ 
-        if (!wavefoldAmpTypeButton.getToggleState()) return;
-        ampTypeBox.setSelectedItemIndex(2);
+    /*wavefoldAmpTypeButton.setRadioGroupId(RadioButtonIDs::AmpTypeButtons);
+    wavefoldAmpTypeButton.setClickingTogglesState(true);*/
+    ampTypeSwitch.wavefoldAmpTypeButton.onClick = [this]() { /*audioProcessor.ampSim.ampType = AmpTypeEnum::WaveFolder;*/
+        if (!ampTypeSwitch.wavefoldAmpTypeButton.getToggleState()) return;
+        ampTypeSwitch.ampTypeBox.setSelectedItemIndex(2);
         driveSlider.setSliderColor(juce::Colours::green);
         driveSlider.repaint();
         lowShelfSlider.setSliderColor(juce::Colours::green);
@@ -260,13 +260,13 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     switch (audioProcessor.ampSim.ampType)
     {
     case AmpTypeEnum::Poletti:
-        polettiAmpTypeButton.triggerClick();
+        ampTypeSwitch.polettiAmpTypeButton.triggerClick();
         break;
     case AmpTypeEnum::Yamaha:
-        yamahaAmpTypeButton.triggerClick();
+        ampTypeSwitch.yamahaAmpTypeButton.triggerClick();
         break;
     case AmpTypeEnum::WaveFolder:
-        wavefoldAmpTypeButton.triggerClick();
+        ampTypeSwitch.wavefoldAmpTypeButton.triggerClick();
         break;
     }
 
@@ -286,9 +286,9 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     peakBypassButton.setLookAndFeel(&lnf);
     irBypassButton.setLookAndFeel(&lnfIRBypass);
     ampBypassButton.setLookAndFeel(&lnf);
-    polettiAmpTypeButton.setLookAndFeel(&lnf);
+    /*polettiAmpTypeButton.setLookAndFeel(&lnf);
     yamahaAmpTypeButton.setLookAndFeel(&lnf);
-    wavefoldAmpTypeButton.setLookAndFeel(&lnf);
+    wavefoldAmpTypeButton.setLookAndFeel(&lnf);*/
     aMicButton.setLookAndFeel(&lnfChoices);
     bMicButton.setLookAndFeel(&lnfChoices);
     cMicButton.setLookAndFeel(&lnfChoices);
@@ -312,7 +312,7 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
 
     comboTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Combo Type", comboTypeBox);
     mikTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Mic Type", mikTypeBox);
-    ampTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Amp Type", ampTypeBox);
+    ampTypeSwitch.ampTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Amp Type", ampTypeSwitch.ampTypeBox);
 
     yPosSlider.onValueChange = [this]() {
         ////DBG("changed yPos to " << yPosSlider.getValue());
@@ -395,9 +395,9 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
     inputGainSlider.setLookAndFeel(nullptr);
     outputGainSlider.setLookAndFeel(nullptr);
     ampBypassButton.setLookAndFeel(nullptr);
-    polettiAmpTypeButton.setLookAndFeel(nullptr);
+    /*polettiAmpTypeButton.setLookAndFeel(nullptr);
     yamahaAmpTypeButton.setLookAndFeel(nullptr);
-    wavefoldAmpTypeButton.setLookAndFeel(nullptr);
+    wavefoldAmpTypeButton.setLookAndFeel(nullptr);*/
     aMicButton.setLookAndFeel(nullptr);
     bMicButton.setLookAndFeel(nullptr);
     cMicButton.setLookAndFeel(nullptr);
@@ -624,7 +624,8 @@ void BasicEQAudioProcessorEditor::resized()
     driveSlider.setBounds(mainKnobsArea.removeFromLeft(knobSize));
     mainKnobsArea.removeFromLeft(spaceBetweenKnobs);
     auto ampTypeArea = mainKnobsArea.removeFromLeft(switchSize);
-    polettiAmpTypeButton.setBounds(ampTypeArea);
+    //polettiAmpTypeButton.setBounds(ampTypeArea);
+    ampTypeSwitch.setBounds(ampTypeArea);
     //polettiAmpTypeButton.setBounds(knobLabelArea);
     mainKnobsArea.removeFromLeft(spaceBetweenKnobs);
     lowShelfSlider.setBounds(mainKnobsArea.removeFromLeft(knobSize));
@@ -863,11 +864,11 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         //&asymNegLPSlider,
         //&asymNegLNSlider,
         //&ampBypassButton,
-        &ampTypeBox,
+        //&ampTypeBox,
         &xyPad,
-        &polettiAmpTypeButton,
+        /*&polettiAmpTypeButton,
         &yamahaAmpTypeButton,
-        &wavefoldAmpTypeButton,
+        &wavefoldAmpTypeButton,*/
         &aCabButton,
         &bCabButton,
         &cCabButton,
@@ -881,7 +882,8 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &lowLabel,
         &midLabel,
         &highLabel,
-        &outputGainLabel
+        &outputGainLabel,
+        &ampTypeSwitch
     };
 }
 

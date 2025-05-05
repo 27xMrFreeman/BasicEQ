@@ -58,3 +58,11 @@ struct LookAndFeelChoiceButtons : juce::LookAndFeel_V4
         bool shouldDrawButtonAsHighlighted,
         bool shouldDrawButtonAsDown) override;
 };
+
+struct LookAndFeelAmpTypeButtons : juce::LookAndFeel_V4
+{
+    void drawToggleButton(juce::Graphics& g,
+        juce::ToggleButton& toggleButton,
+        bool shouldDrawButtonAsHighlighted,
+        bool shouldDrawButtonAsDown) override;
+};
