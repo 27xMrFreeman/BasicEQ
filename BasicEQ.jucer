@@ -18,6 +18,9 @@
     </GROUP>
     <GROUP id="{738C76C2-F9DF-054B-1271-C9222DBDB02E}" name="Source">
       <GROUP id="{7736E6C6-E69B-2196-95B8-E06560E35405}" name="Components">
+        <FILE id="to0g5f" name="LoadIRButton.cpp" compile="1" resource="0"
+              file="Source/Components/LoadIRButton.cpp"/>
+        <FILE id="mDL7Wv" name="LoadIRButton.h" compile="0" resource="0" file="Source/Components/LoadIRButton.h"/>
         <FILE id="T4E6JI" name="AmpTypeSwitch.cpp" compile="1" resource="0"
               file="Source/Components/AmpTypeSwitch.cpp"/>
         <FILE id="CtZC50" name="AmpTypeSwitch.h" compile="0" resource="0" file="Source/Components/AmpTypeSwitch.h"/>

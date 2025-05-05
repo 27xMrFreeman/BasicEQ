@@ -24,8 +24,8 @@ void RotarySliderWithLabels::paint(juce::Graphics& g)
     auto nameBounds = getLocalBounds();
 
     //debug
-    g.setColour(juce::Colours::aquamarine);
-    g.drawRect(nameBounds);
+    //g.setColour(juce::Colours::aquamarine);
+    //g.drawRect(nameBounds);
 
     //nameBounds.removeFromTop(sliderBounds.getHeight());
     //nameBounds.reduce(0, nameBounds.getHeight() * 0.02);

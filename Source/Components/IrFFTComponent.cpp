@@ -150,6 +150,10 @@ void IrFFTComponent::paint(juce::Graphics& g)
 
 
     auto irArea = getLocalBounds();
+
+    //g.setColour(juce::Colours::red);
+    //g.drawRect(irArea);
+
     auto irAreaWidth = irArea.getWidth();
 
     g.drawImage(background, irArea.reduced(0,irAreaWidth*0.02).toFloat());

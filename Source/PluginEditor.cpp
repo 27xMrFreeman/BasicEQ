@@ -102,15 +102,16 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     aCabButton.setRadioGroupId(RadioButtonIDs::CabTypeButtons);
     aCabButton.setClickingTogglesState(true);
     aCabButton.onClick = [this]() { comboTypeBox.setSelectedItemIndex(0); };
+    aCabButton.setName("A");
 
     bCabButton.setRadioGroupId(RadioButtonIDs::CabTypeButtons);
     bCabButton.setClickingTogglesState(true);
     bCabButton.onClick = [this]() { comboTypeBox.setSelectedItemIndex(1); };
-
+    bCabButton.setName("B");
     cCabButton.setRadioGroupId(RadioButtonIDs::CabTypeButtons);
     cCabButton.setClickingTogglesState(true);
     cCabButton.onClick = [this]() { comboTypeBox.setSelectedItemIndex(2); };
-
+    cCabButton.setName("C");
     //auto x = comboTypeBox.getSelectedId();
     int cabTypeSelected = audioProcessor.apvts.getRawParameterValue("Combo Type")->load();
 
@@ -143,15 +144,15 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     aMicButton.setRadioGroupId(RadioButtonIDs::MicTypeButtons);
     aMicButton.setClickingTogglesState(true);
     aMicButton.onClick = [this]() { mikTypeBox.setSelectedItemIndex(0); };
-
+    aMicButton.setName("A");
     bMicButton.setRadioGroupId(RadioButtonIDs::MicTypeButtons);
     bMicButton.setClickingTogglesState(true);
     bMicButton.onClick = [this]() { mikTypeBox.setSelectedItemIndex(1); };
-
+    bMicButton.setName("B");
     cMicButton.setRadioGroupId(RadioButtonIDs::MicTypeButtons);
     cMicButton.setClickingTogglesState(true);
     cMicButton.onClick = [this]() { mikTypeBox.setSelectedItemIndex(2); };
-
+    cMicButton.setName("C");
     int micTypeSelected = audioProcessor.apvts.getRawParameterValue("Mic Type")->load();
 
     switch (micTypeSelected) {
@@ -210,21 +211,22 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     ampTypeSwitch.yamahaAmpTypeButton.onClick = [this]() { /*audioProcessor.ampSim.ampType = AmpTypeEnum::Yamaha;*/
         if (!ampTypeSwitch.yamahaAmpTypeButton.getToggleState()) return;
         ampTypeSwitch.ampTypeBox.setSelectedItemIndex(1);
-        driveSlider.setSliderColor(juce::Colours::blue);
+        auto colour = juce::Colour::fromString("FF00E7D3");
+        driveSlider.setSliderColor(colour);
         driveSlider.repaint();
-        lowShelfSlider.setSliderColor(juce::Colours::blue);
+        lowShelfSlider.setSliderColor(colour);
         lowShelfSlider.repaint();
-        midPeakSlider.setSliderColor(juce::Colours::blue);
+        midPeakSlider.setSliderColor(colour);
         midPeakSlider.repaint();
-        highShelfSlider.setSliderColor(juce::Colours::blue);
+        highShelfSlider.setSliderColor(colour);
         highShelfSlider.repaint();
-        inputGainSlider.setSliderColor(juce::Colours::blue);
+        inputGainSlider.setSliderColor(colour);
         inputGainSlider.repaint();
-        outputGainSlider.setSliderColor(juce::Colours::blue);
+        outputGainSlider.setSliderColor(colour);
         outputGainSlider.repaint();
-        xyPad.thumb.setThumbColor(juce::Colours::blue);
+        xyPad.thumb.setThumbColor(colour);
         xyPad.thumb.repaint();
-        this->lnf.bypassButtonFillColor = juce::Colours::blue;
+        this->lnf.bypassButtonFillColor = colour;
         ampBypassButton.repaint();
         //getLookAndFeel().setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colours::red);
         //DBG("Button 2 pressed: ");
@@ -236,21 +238,22 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     ampTypeSwitch.wavefoldAmpTypeButton.onClick = [this]() { /*audioProcessor.ampSim.ampType = AmpTypeEnum::WaveFolder;*/
         if (!ampTypeSwitch.wavefoldAmpTypeButton.getToggleState()) return;
         ampTypeSwitch.ampTypeBox.setSelectedItemIndex(2);
-        driveSlider.setSliderColor(juce::Colours::green);
+        auto colour = juce::Colour::fromString("FFBF00FF");
+        driveSlider.setSliderColor(colour);
         driveSlider.repaint();
-        lowShelfSlider.setSliderColor(juce::Colours::green);
+        lowShelfSlider.setSliderColor(colour);
         lowShelfSlider.repaint();
-        midPeakSlider.setSliderColor(juce::Colours::green);
+        midPeakSlider.setSliderColor(colour);
         midPeakSlider.repaint();
-        highShelfSlider.setSliderColor(juce::Colours::green);
+        highShelfSlider.setSliderColor(colour);
         highShelfSlider.repaint();
-        inputGainSlider.setSliderColor(juce::Colours::green);
+        inputGainSlider.setSliderColor(colour);
         inputGainSlider.repaint();
-        outputGainSlider.setSliderColor(juce::Colours::green);
+        outputGainSlider.setSliderColor(colour);
         outputGainSlider.repaint();
-        xyPad.thumb.setThumbColor(juce::Colours::green);
+        xyPad.thumb.setThumbColor(colour);
         xyPad.thumb.repaint();
-        this->lnf.bypassButtonFillColor = juce::Colours::green;
+        this->lnf.bypassButtonFillColor = colour;
         ampBypassButton.repaint();
         //getLookAndFeel().setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colours::red);
         //DBG("Button 3 pressed: ");
@@ -279,6 +282,7 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     {
         //label->setFont(lnf.getCustomFont().withHeight(fontSize));
         label->setJustificationType(juce::Justification::centred);
+        label->setColour(juce::Label::ColourIds::textColourId, juce::Colour::fromString("FFE5E5E5"));
     }
 
     lowCutBypassButton.setLookAndFeel(&lnf);
@@ -295,6 +299,7 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     aCabButton.setLookAndFeel(&lnfChoices);
     bCabButton.setLookAndFeel(&lnfChoices);
     cCabButton.setLookAndFeel(&lnfChoices);
+    loadBtn.setLookAndFeel(&lnf);
     //lowCutFreqSlider.setLookAndFeel(&lnf);
     //lowCutSlopeSlider.setLookAndFeel(&lnf);
     //highCutFreqSlider.setLookAndFeel(&lnf);
@@ -404,6 +409,7 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
     aCabButton.setLookAndFeel(nullptr);
     bCabButton.setLookAndFeel(nullptr);
     cCabButton.setLookAndFeel(nullptr);
+    loadBtn.setLookAndFeel(nullptr);
     //driveSlider.setLookAndFeel(nullptr);
     //lowShelfSlider.setLookAndFeel(nullptr);
     //midPeakSlider.setLookAndFeel(nullptr);
@@ -602,7 +608,7 @@ void BasicEQAudioProcessorEditor::resized()
 
     for (auto* label : getLabels())
     {
-        label->setFont(lnf.getCustomFont().withHeight(fontSize));
+        label->setFont(lnf.getCustomFont().withHeight(fontSize).withExtraKerningFactor(0.02));
         //label->setJustificationType(juce::Justification::centred);
     }
     
@@ -672,22 +678,50 @@ void BasicEQAudioProcessorEditor::resized()
 
     //xPosSlider.setBounds(xyPadArea.removeFromTop(xyPadArea.getHeight()*0.5).reduced(xyPadArea.getWidth()*0.05));
     //yPosSlider.setBounds(xyPadArea.reduced(xyPadArea.getWidth() * 0.05));
-    bounds.removeFromBottom(oldHeight * 0.04);
+    //bounds.removeFromBottom(oldHeight * 0.04);
     auto xyPadArea = bounds.removeFromLeft(bounds.getWidth() * 0.299);
     xyPadArea.removeFromTop(xyPadArea.getHeight() * 0.21);
-    xyPadArea.removeFromBottom(xyPadArea.getHeight() * 0.138);
+    auto labelHeight = xyPadArea.getHeight() * 0.138;
+    auto labelPadding = xyPadArea.getHeight() * 0.085;
+    auto xyPadNameArea = xyPadArea.removeFromBottom(labelHeight);
+    xyPadArea.removeFromBottom(labelPadding);
     xyPadArea.removeFromLeft(xyPadArea.getWidth() * 0.295);
     xyPad.setBounds(xyPadArea);
+    xyPadNameArea.removeFromLeft(xyPadNameArea.getWidth() - xyPadArea.getWidth());
+    xyPadLabel.setBounds(xyPadNameArea);
 
     auto responseArea = bounds.removeFromRight(bounds.getWidth() * 0.635);
-    responseArea.removeFromTop(bounds.getHeight() * 0.182);
-    responseArea.removeFromBottom(bounds.getHeight() * 0.08);
+    responseArea.removeFromTop(bounds.getHeight() * 0.17);
+    labelPadding = bounds.getHeight() * 0.03;
+    auto irCompNameArea = responseArea.removeFromBottom(labelHeight);
+    responseArea.removeFromBottom(labelPadding);
     responseArea.removeFromRight(responseArea.getWidth() * 0.184);
     irfftComponent.setBounds(responseArea);
+    irCompNameArea.removeFromRight( irCompNameArea.getWidth() - responseArea.getWidth() );
+    irfftLabel.setBounds(irCompNameArea);
 
+    bounds.removeFromLeft(bounds.getWidth() * 0.037);
+    bounds.reduce(bounds.getWidth()*0.1, 0);
+    micButtonsLabel.setBounds(bounds.removeFromBottom(labelHeight));
+    // button has 15px of "empty" space until main body of button from all sides (95x95 but button 65x65)
+    // ir load button has the same padding (174x95 but 144x65 main body)
+    // thus label padding -= 15px
+    labelPadding -= (yellowBackgroundWidth / 1384.f) * 15;
+    bounds.removeFromBottom(labelPadding);
+    auto btnHeight = (yellowBackgroundWidth / 1384.f) * 95;
+    auto micBtnBounds = bounds.removeFromBottom(btnHeight);
+    aMicButton.setBounds(micBtnBounds.removeFromLeft(micBtnBounds.getWidth()*0.33));
+    bMicButton.setBounds(micBtnBounds.removeFromLeft(micBtnBounds.getWidth() * 0.5));
+    cMicButton.setBounds(micBtnBounds);
 
+    cabButtonsLabel.setBounds(bounds.removeFromBottom(labelHeight));
+    auto cabBtnBounds = bounds.removeFromBottom(btnHeight);
+    aCabButton.setBounds(cabBtnBounds.removeFromLeft(cabBtnBounds.getWidth() * 0.33));
+    bCabButton.setBounds(cabBtnBounds.removeFromLeft(cabBtnBounds.getWidth() * 0.5));
+    cCabButton.setBounds(cabBtnBounds);
 
-
+    bounds.removeFromBottom(labelHeight*0.4);
+    loadBtn.setBounds(bounds.removeFromBottom(btnHeight));
 
     //irBypassButton.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.25).reduced(irChoicesArea.getWidth() * 0.09));
     //loadBtn.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.33).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
@@ -883,7 +917,11 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &midLabel,
         &highLabel,
         &outputGainLabel,
-        &ampTypeSwitch
+        &ampTypeSwitch,
+        &xyPadLabel,
+        &irfftLabel,
+        &micButtonsLabel,
+        &cabButtonsLabel
     };
 }
 
@@ -898,6 +936,10 @@ std::vector<juce::Label*> BasicEQAudioProcessorEditor::getLabels()
         &lowLabel,
         &midLabel,
         &highLabel,
-        &outputGainLabel
+        &outputGainLabel,
+        &xyPadLabel,
+        &irfftLabel,
+        &micButtonsLabel,
+        &cabButtonsLabel
     };
 }

@@ -64,7 +64,7 @@ private:
     RotarySliderWithLabels inputGainSlider, outputGainSlider;
     Attachment inputGainSliderAttachment, outputGainSliderAttachment;
 
-    juce::Label inputGainLabel{ {}, "In" }, outputGainLabel{ {}, "Out" };
+    juce::Label inputGainLabel{ {}, "in" }, outputGainLabel{ {}, "out" };
 
     //===============================================================================================================================
     // Amp GUI
@@ -80,7 +80,7 @@ private:
     juce::ToggleButton ampBypassButton/*, osBypassButton*/;
     ButtonAttachment ampBypassButtonAttachment/*, osBypassButtonAttachment*/;
 
-    juce::Label driveLabel{ {}, "Drive" }, ampTypeLabel{ {}, "Type" }, ampBypassLabel{ {}, "Bypass" };
+    juce::Label driveLabel{ {}, "drive" }, ampTypeLabel{ {}, "type" }, ampBypassLabel{ {}, "bypass" };
     
     AmpTypeSwitch ampTypeSwitch;
     //===============================================================================================================================
@@ -89,7 +89,7 @@ private:
     RotarySliderWithLabels lowShelfSlider, midPeakSlider, highShelfSlider;
     Attachment lowShelfSliderAttachment, midPeakSliderAttachment, highShelfSliderAttachment;
 
-    juce::Label lowLabel{ {}, "Low" }, midLabel{ {}, "Mid" }, highLabel{ {}, "High" };
+    juce::Label lowLabel{ {}, "low" }, midLabel{ {}, "mid" }, highLabel{ {}, "high" };
     
     //===============================================================================================================================
     // IR loader GUI:
@@ -110,6 +110,7 @@ private:
     ButtonAttachment irBypassButtonAttachment;
     IrFFTComponent irfftComponent;
     
+    juce::Label xyPadLabel{ {}, "mic position" }, irfftLabel{ {}, "response" }, micButtonsLabel{ {}, "mic type" }, cabButtonsLabel{ {}, "cab type" };
     //===============================================================================================================================
     // EQ GUI:
         // knobs

@@ -26,6 +26,17 @@ struct LookAndFeel : juce::LookAndFeel_V4
         bool shouldDrawButtonAsHighlighted,
         bool shouldDrawButtonAsDown) override;
 
+    void drawButtonBackground(juce::Graphics& g,
+        juce::Button& button,
+        const juce::Colour& backgroundColour,
+        bool shouldDrawButtonAsHighlighted,
+        bool shouldDrawButtonAsDown) override;
+
+    void drawButtonText(juce::Graphics& g,
+        juce::TextButton& button,
+        bool /*shouldDrawButtonAsHighlighted*/,
+        bool /*shouldDrawButtonAsDown*/) override;
+
     juce::Typeface::Ptr getTypefaceForFont(const juce::Font& f) override
     {
         static juce::Typeface::Ptr myFont = juce::Typeface::createSystemTypefaceFor(BinaryData::InstrumentSansBold_ttf,
@@ -57,6 +68,13 @@ struct LookAndFeelChoiceButtons : juce::LookAndFeel_V4
         juce::ToggleButton& toggleButton,
         bool shouldDrawButtonAsHighlighted,
         bool shouldDrawButtonAsDown) override;
+
+    static const juce::Font& getCustomFont()
+    {
+        static juce::Font customFont(juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::InstrumentSansBold_ttf,
+            BinaryData::InstrumentSansBold_ttfSize)));
+        return customFont;
+    }
 };
 
 struct LookAndFeelAmpTypeButtons : juce::LookAndFeel_V4

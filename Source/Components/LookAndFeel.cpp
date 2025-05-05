@@ -57,7 +57,8 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
             /*g.setColour(Colours::black);
             g.fillRect(r);*/
 
-            g.setColour(Colours::white);
+            //g.setColour(Colours::white);
+            g.setColour(Colour::fromString("FFE5E5E5"));
             g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
         }
     }
@@ -137,7 +138,7 @@ void LookAndFeel::drawToggleButton(juce::Graphics& g,
     //g.setColour(bypassButtonEdgeColor);
     //g.drawEllipse(bounds.toFloat(),bounds.getWidth()*0.05);
 
-    if (toggleButton.getToggleState())    g.setColour(bypassButtonFillColor); //ON
+    if (!toggleButton.getToggleState())    g.setColour(bypassButtonFillColor); //ON
     else g.setColour(Colours::black);                                         //OFF
 
     g.fillEllipse(bounds.reduced(bounds.getWidth() * 0.2).toFloat());
@@ -165,14 +166,34 @@ void LookAndFeel::drawToggleButton(juce::Graphics& g,
 
 }
 
+void LookAndFeel::drawButtonBackground(juce::Graphics& g, juce::Button& button, const juce::Colour& backgroundColour, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
+{
+    auto btnImage = juce::ImageCache::getFromMemory(BinaryData::LoadIRBtn_png, BinaryData::LoadIRBtn_pngSize);
+    auto bounds = button.getLocalBounds();
+    bounds.reduce(bounds.getWidth() * 0.16, 0);
+    //g.setColour(juce::Colours::red);
+    //g.drawRect(bounds);
+
+    g.drawImage(btnImage, bounds.toFloat(), juce::RectanglePlacement::stretchToFit, false);
+    
+}
+
+void LookAndFeel::drawButtonText(juce::Graphics& g, juce::TextButton& button, bool, bool)
+{
+    //g.setColour(juce::Colours::white);
+    g.setColour(juce::Colour::fromString("FFE5E5E5"));
+    g.setFont(getCustomFont().withHeight(button.getLocalBounds().getHeight()*0.33).withExtraKerningFactor(0.02));
+    g.drawFittedText("load", button.getLocalBounds(), juce::Justification::centred, 1);
+}
+
 void LookAndFeelIRBypass::drawToggleButton(juce::Graphics& g, juce::ToggleButton& toggleButton, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
     using namespace juce;
 
     auto bounds = toggleButton.getLocalBounds();
 
-    g.setColour(Colours::red);
-    g.drawRect(bounds);
+    /*g.setColour(Colours::red);
+    g.drawRect(bounds);*/
     
     g.setColour(Colour::fromString("FF4F83F3"));
     g.drawEllipse(bounds.reduced(bounds.getWidth() * 0.06).toFloat(), bounds.getWidth() * 0.1);
@@ -189,8 +210,8 @@ void LookAndFeelChoiceButtons::drawToggleButton(juce::Graphics& g, juce::ToggleB
 
     auto bounds = toggleButton.getLocalBounds();
 
-    g.setColour(Colours::red);
-    g.drawRect(bounds);
+    /*g.setColour(Colours::red);
+    g.drawRect(bounds);*/
 
     auto onBtnImage = ImageCache::getFromMemory(BinaryData::ChoiceOn_png, BinaryData::ChoiceOn_pngSize);
     auto offBtnImage = ImageCache::getFromMemory(BinaryData::ChoiceOff_png, BinaryData::ChoiceOff_pngSize);
@@ -201,7 +222,12 @@ void LookAndFeelChoiceButtons::drawToggleButton(juce::Graphics& g, juce::ToggleB
     else {
         g.drawImage(offBtnImage, bounds.toFloat(), RectanglePlacement::stretchToFit, false);
     }
-
+    
+    auto name = toggleButton.getName();
+    //g.setColour(juce::Colours::white);
+    g.setColour(Colour::fromString("FFE5E5E5"));
+    g.setFont(getCustomFont().withHeight(bounds.getHeight()*0.33));
+    g.drawFittedText(name, bounds, juce::Justification::centred, 1);
 }
 
 void LookAndFeelAmpTypeButtons::drawToggleButton(juce::Graphics& g, juce::ToggleButton& toggleButton, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)

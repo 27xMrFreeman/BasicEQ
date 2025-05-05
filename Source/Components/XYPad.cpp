@@ -49,6 +49,8 @@ void XYPad::paint(juce::Graphics& g)
 	/*g.setColour(juce::Colours::black);
 	g.fillRoundedRectangle(getLocalBounds().toFloat(), 10.f);*/
 	g.drawImage(background, getLocalBounds().reduced(thumbSize/2).toFloat());
+	//g.setColour(juce::Colours::red);
+	//g.drawRect(getLocalBounds());
 }
 
 void XYPad::resized()

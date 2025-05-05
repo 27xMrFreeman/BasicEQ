@@ -47,11 +47,11 @@ void AmpTypeSwitch::paint (juce::Graphics& g)
 {
     juce::Image switchImage = juce::ImageCache::getFromMemory(BinaryData::AmpTypeSwitch_png, BinaryData::AmpTypeSwitch_pngSize);
 
-    g.setColour(juce::Colours::blue);
+    g.setColour(juce::Colour::fromString("FF00E7D3"));
     g.fillEllipse(yBtnBounds);
     g.setColour(juce::Colours::red);
     g.fillEllipse(pBtnBounds);
-    g.setColour(juce::Colours::purple);
+    g.setColour(juce::Colour::fromString("FFBF00FF"));
     g.fillEllipse(wBtnBounds);
 
     g.drawImage(switchImage, imageBounds, juce::RectanglePlacement::stretchToFit, false);
