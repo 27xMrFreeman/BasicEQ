@@ -219,6 +219,8 @@ void BasicEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBloc
     irLoader.reset();
     irLoader.prepare(spec);
 
+    if (shippedIRsMissing.get()) { return; }
+
     std::unique_ptr<juce::AudioFormatReader> audioFormatReader;
     audioFormatReader.reset(formatManager.createReaderFor(impulseResponseArray[0][0][0][0]));
     int numChannels = audioFormatReader->numChannels;
@@ -454,6 +456,7 @@ void BasicEQAudioProcessor::setStateInformation (const void* data, int sizeInByt
         loadShippedImpulseResponses();
         juce::AudioBuffer<float> irBuffer;
         int sampleRate = 0;
+        if (shippedIRsMissing.get()) return;
         updateLoadedIR(irBuffer, sampleRate, settings.comboType, settings.micType, settings.yPos, settings.xPos);
         //irLoader.loadImpulseResponse((juce::AudioBuffer<float>)newIRAudioBuffer, interpIRSampleRate, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, juce::dsp::Convolution::Normalise::yes);
     }
@@ -801,6 +804,19 @@ void BasicEQAudioProcessor::loadShippedImpulseResponses()
     //juce::File dataFolder = juce::File::getSpecialLocation(juce::File::currentExecutableFile).getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getParentDirectory().getChildFile("Data");
     juce::File dataFolder = juce::File::getSpecialLocation(juce::File::SpecialLocationType::commonApplicationDataDirectory).getChildFile("PechacekIRLoader").getChildFile("Data");
     //DBG(dataFolder.getFullPathName());
+    
+    // check if data folder exists
+    if (!dataFolder.exists()) {
+        //set flag to display warning
+        shippedIRsMissing.set(true);
+        return;
+    }
+    // check if data folder isnt empty or missing files - findChildFiles is recursive, returns array of matching files, full collection should be 162 files
+    if (!dataFolder.containsSubDirectories() || dataFolder.findChildFiles(juce::File::TypesOfFileToFind::findFiles, true, "*.wav", juce::File::FollowSymlinks::yes).size() < 162) {
+        shippedIRsMissing.set(true);
+        return;
+    }
+
     for (juce::DirectoryEntry entry : juce::RangedDirectoryIterator(/*juce::File("C:/Users/knize/Documents/VST_CODE/BasicEQ/Data")*/dataFolder, true, "*.wav", 2)) {
         juce::String filename = entry.getFile().getFileNameWithoutExtension();
         juce::StringArray filenameArray;

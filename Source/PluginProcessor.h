@@ -196,7 +196,7 @@ public:
     Distortion<float> ampSim;
     ToneStack toneStack;
 
-    juce::Atomic<bool> newIRReady{ false };
+    juce::Atomic<bool> newIRReady{ false }, shippedIRsMissing{ false };
 
     juce::AudioFormatManager formatManager;
 

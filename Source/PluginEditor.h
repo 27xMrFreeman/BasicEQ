@@ -111,6 +111,8 @@ private:
     IrFFTComponent irfftComponent;
     
     juce::Label xyPadLabel{ {}, "mic position" }, irfftLabel{ {}, "response" }, micButtonsLabel{ {}, "mic type" }, cabButtonsLabel{ {}, "cab type" }, irBypassLabel{ {}, "bypass" };
+
+    std::unique_ptr<juce::AlertWindow> alertWindow;
     //===============================================================================================================================
     // EQ GUI:
         // knobs

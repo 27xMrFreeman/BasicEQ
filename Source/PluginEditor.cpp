@@ -381,6 +381,12 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
 
     startTimer(0, 33);
     startTimer(1, 50);
+
+    if (audioProcessor.shippedIRsMissing.get()) {
+        // maybe set a flag here so it shows only once
+        alertWindow = std::make_unique<juce::AlertWindow>("Alert", "Prepackaged files are missing or incomplete", juce::MessageBoxIconType::WarningIcon, nullptr);
+        alertWindow->showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Alert", "Prepackaged files are missing or incomplete", "OK");
+    }
 }
 
 BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
@@ -433,7 +439,7 @@ void BasicEQAudioProcessorEditor::timerCallback(int timerID)
         meterOutRight.repaint();
     }
     else if (timerID == 1) {
-        if (needIRUpdate.get()) {
+        if (needIRUpdate.get() && !audioProcessor.shippedIRsMissing.get()) {
             juce::AudioBuffer<float> irBuffer;
             int sampleRate = 0;
             float yPos = yPosSlider.getValue(), 
