@@ -151,8 +151,8 @@ void IrFFTComponent::paint(juce::Graphics& g)
 
     auto irArea = getLocalBounds();
 
-    g.setColour(juce::Colours::red);
-    g.drawRect(irArea);
+    //g.setColour(juce::Colours::red);
+    //g.drawRect(irArea);
 
     auto irAreaWidth = irArea.getWidth();
 
@@ -172,10 +172,10 @@ void IrFFTComponent::paint(juce::Graphics& g)
     //g.setColour(Colours::green);
     g.drawRoundedRectangle(irArea.reduced(irAreaWidth*0.005).toFloat(), irAreaWidth * 0.061, irAreaWidth * 0.015); // 32 cornersize, 8 linethickness when max size
 
-    g.setColour(Colours::red);
+    //g.setColour(Colours::red);
     //g.drawRect(irArea);
 
-    g.setColour(Colours::blue);
+    //g.setColour(Colours::blue);
     //g.drawRect(getAnalysisArea());
 
     //g.setColour(Colours::aqua);
