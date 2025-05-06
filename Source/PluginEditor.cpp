@@ -462,6 +462,7 @@ void BasicEQAudioProcessorEditor::timerCallback(int timerID)
                 if (!reader->read(&irBuffer, 0, reader->lengthInSamples, 0, true, true)) { DBG("Reader for non-interpolated file failed to write to buffer"); }
 
                 sampleRate = reader->sampleRate;
+                audioProcessor.interpIRSampleRate = sampleRate;
 
                 audioProcessor.newIRAudioBuffer = irBuffer;
                 audioProcessor.newIRReady.set(true);
