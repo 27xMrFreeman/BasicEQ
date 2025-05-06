@@ -132,8 +132,8 @@ void LookAndFeel::drawToggleButton(juce::Graphics& g,
     auto size = jmin(bounds.getWidth(), bounds.getHeight()) - 5;
     auto r = bounds.withSizeKeepingCentre(size, size).toFloat();
 
-    /*g.setColour(Colours::red);
-    g.drawRect(bounds);*/
+    //g.setColour(Colours::red);
+    //g.drawRect(bounds);
 
     //g.setColour(bypassButtonEdgeColor);
     //g.drawEllipse(bounds.toFloat(),bounds.getWidth()*0.05);
@@ -192,13 +192,15 @@ void LookAndFeelIRBypass::drawToggleButton(juce::Graphics& g, juce::ToggleButton
 
     auto bounds = toggleButton.getLocalBounds();
 
-    /*g.setColour(Colours::red);
-    g.drawRect(bounds);*/
+    //g.setColour(Colours::red);
+    //g.drawRect(bounds);
     
-    g.setColour(Colour::fromString("FF4F83F3"));
-    g.drawEllipse(bounds.reduced(bounds.getWidth() * 0.06).toFloat(), bounds.getWidth() * 0.1);
+    bounds.reduce(bounds.getWidth() * 0.32, bounds.getWidth() * 0.32);
 
-    if (toggleButton.getToggleState())    g.setColour(Colour::fromString("FF4F83F3")); //ON
+    g.setColour(Colour::fromString("FF4F83F3"));
+    g.drawEllipse(bounds.toFloat(), bounds.getWidth() * 0.3);
+
+    if (!toggleButton.getToggleState())    g.setColour(Colour::fromString("FF4F83F3")); //ON
     else g.setColour(Colour::fromString("FF14213D"));                                  //OFF
 
     g.fillEllipse(bounds.reduced(bounds.getWidth() * 0.1).toFloat());

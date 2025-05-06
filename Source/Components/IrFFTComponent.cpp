@@ -151,8 +151,8 @@ void IrFFTComponent::paint(juce::Graphics& g)
 
     auto irArea = getLocalBounds();
 
-    //g.setColour(juce::Colours::red);
-    //g.drawRect(irArea);
+    g.setColour(juce::Colours::red);
+    g.drawRect(irArea);
 
     auto irAreaWidth = irArea.getWidth();
 
@@ -228,10 +228,10 @@ juce::Rectangle<int> IrFFTComponent::getRenderArea()
 {
     auto bounds = getLocalBounds();
 
-    bounds.removeFromTop(0);
-    bounds.removeFromBottom(bounds.getHeight()*0.1);
-    bounds.removeFromLeft(0);
-    bounds.removeFromRight(0);
+    bounds.removeFromTop(bounds.getHeight() * 0.1);
+    bounds.removeFromBottom(bounds.getHeight()*0.08);
+    //bounds.removeFromLeft(0);
+    //bounds.removeFromRight(0);
 
     return bounds;
 }

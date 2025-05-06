@@ -284,6 +284,9 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
         label->setJustificationType(juce::Justification::centred);
         label->setColour(juce::Label::ColourIds::textColourId, juce::Colour::fromString("FFE5E5E5"));
     }
+    irBypassLabel.setJustificationType(juce::Justification::right);
+    irBypassLabel.setColour(juce::Label::ColourIds::textColourId, juce::Colour::fromString("FF4F83F3"));
+
 
     lowCutBypassButton.setLookAndFeel(&lnf);
     highCutBypassButton.setLookAndFeel(&lnf);
@@ -611,7 +614,7 @@ void BasicEQAudioProcessorEditor::resized()
         label->setFont(lnf.getCustomFont().withHeight(fontSize).withExtraKerningFactor(0.02));
         //label->setJustificationType(juce::Justification::centred);
     }
-    
+    irBypassLabel.setFont(lnf.getCustomFont().withHeight(fontSize).withExtraKerningFactor(0.02));
     //yellow part width
     auto yellowBackgroundWidth = mainKnobsArea.getWidth();
     mainKnobsArea.removeFromLeft(yellowBackgroundWidth * 0.05);
@@ -699,6 +702,12 @@ void BasicEQAudioProcessorEditor::resized()
     irfftComponent.setBounds(responseArea);
     irCompNameArea.removeFromRight( irCompNameArea.getWidth() - responseArea.getWidth() );
     irfftLabel.setBounds(irCompNameArea);
+    responseArea.removeFromBottom(responseArea.getHeight() * 0.8);
+    responseArea.removeFromLeft(responseArea.getWidth() * 0.5);
+    irBypassLabel.setBounds(responseArea.removeFromLeft(responseArea.getWidth() * 0.8));
+    responseArea.removeFromRight(responseArea.getWidth() * 0.2);
+    auto bypassBtnArea = responseArea.withSizeKeepingCentre(responseArea.getWidth(), responseArea.getWidth());
+    irBypassButton.setBounds(bypassBtnArea);
 
     bounds.removeFromLeft(bounds.getWidth() * 0.037);
     bounds.reduce(bounds.getWidth()*0.1, 0);
@@ -921,7 +930,8 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &xyPadLabel,
         &irfftLabel,
         &micButtonsLabel,
-        &cabButtonsLabel
+        &cabButtonsLabel,
+        &irBypassLabel
     };
 }
 
@@ -940,6 +950,7 @@ std::vector<juce::Label*> BasicEQAudioProcessorEditor::getLabels()
         &xyPadLabel,
         &irfftLabel,
         &micButtonsLabel,
-        &cabButtonsLabel
+        &cabButtonsLabel,
+        //&irBypassLabel
     };
 }

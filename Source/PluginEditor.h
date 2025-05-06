@@ -110,7 +110,7 @@ private:
     ButtonAttachment irBypassButtonAttachment;
     IrFFTComponent irfftComponent;
     
-    juce::Label xyPadLabel{ {}, "mic position" }, irfftLabel{ {}, "response" }, micButtonsLabel{ {}, "mic type" }, cabButtonsLabel{ {}, "cab type" };
+    juce::Label xyPadLabel{ {}, "mic position" }, irfftLabel{ {}, "response" }, micButtonsLabel{ {}, "mic type" }, cabButtonsLabel{ {}, "cab type" }, irBypassLabel{ {}, "bypass" };
     //===============================================================================================================================
     // EQ GUI:
         // knobs
