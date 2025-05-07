@@ -19,7 +19,6 @@ public:
 
     void reset();
     void prepare(const juce::dsp::ProcessSpec& spec);
-    //template <typename ProcessContext>
     void process(juce::dsp::AudioBlock<float>& block);
 
     void simTypeChanged(int simTypeID);

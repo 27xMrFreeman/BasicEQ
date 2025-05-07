@@ -1,12 +1,3 @@
-/*
-  ==============================================================================
-
-    AmpDrive.cpp
-    Created: 2 Apr 2025 6:23:52pm
-    Author:  knize
-
-  ==============================================================================
-*/
 
 #include <JuceHeader.h>
 #include "AmpDrive.h"
@@ -59,7 +50,6 @@ AmpDrive::AmpDrive()
         return y;
         };
 
-    // Other sim types will go here..
 }
 
 AmpDrive::~AmpDrive()

@@ -1,12 +1,4 @@
-/*
-  ==============================================================================
 
-    CustomYamahaClassB.cpp
-    Created: 15 Apr 2025 9:20:04pm
-    Author:  knize
-
-  ==============================================================================
-*/
 
 #include "CustomYamahaClassB.h"
 
@@ -19,14 +11,10 @@ void CustomYamahaClassB::prepare(juce::dsp::ProcessSpec& spec, size_t oversampli
 
     waveShaperPos.functionToUse = [this](float x) {
         float y = ( 2 / ( 1 + std::exp( - this->a * x + this->b )) - 1 );
-        //float y;
-        //x > 0 ? y = 1 : y = -1;
         return y;
         };
     waveShaperNeg.functionToUse = [this](float x) {
         float y = (2 / (1 + std::exp(-this->a * x + this->b)) - 1);
-        //float y;
-        //x > 0 ? y = 1 : y = -1;
         return y;
         };
 
