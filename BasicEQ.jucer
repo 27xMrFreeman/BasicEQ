@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="ch0Qbp" name="BasicEQ" projectType="audioplug" useAppConfig="0"
+<JUCERPROJECT id="ch0Qbp" name="AmpSimulator" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
               pluginName="Amp Simulator" pluginDesc="Amp simulator with IR loader"
               pluginManufacturer="Bartolom&#283;j Pech&#225;&#269;ek">
-  <MAINGROUP id="mAuQQK" name="BasicEQ">
+  <MAINGROUP id="mAuQQK" name="AmpSimulator">
     <GROUP id="{F640BCEA-ABE8-5245-9F88-90E07B1587F1}" name="Assets">
       <FILE id="tRYZV8" name="AmpTypeSwitch.png" compile="0" resource="1"
             file="Assets/AmpTypeSwitch.png"/>
@@ -108,8 +108,8 @@
   <EXPORTFORMATS>
     <VS2022 targetFolder="Builds/VisualStudio2022">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="BasicEQ"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="BasicEQ"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="Amp Simulator"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Amp Simulator"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../../JUCE/modules"/>
