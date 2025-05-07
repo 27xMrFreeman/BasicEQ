@@ -2,19 +2,20 @@
 
 <JUCERPROJECT id="ch0Qbp" name="BasicEQ" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
-              pluginName="IRLoader" pluginDesc="IRLoader with 3band EQ" pluginManufacturer="Bartolom&#283;j Pech&#225;&#269;ek">
+              pluginName="Amp Simulator" pluginDesc="Amp simulator with IR loader"
+              pluginManufacturer="Bartolom&#283;j Pech&#225;&#269;ek">
   <MAINGROUP id="mAuQQK" name="BasicEQ">
     <GROUP id="{F640BCEA-ABE8-5245-9F88-90E07B1587F1}" name="Assets">
-      <FILE id="XfYZJg" name="AmpTypeSwitch.png" compile="0" resource="1"
-            file="F:/VUT/bakalarka/AmpTypeSwitch.png"/>
-      <FILE id="vyniS3" name="BackgroundImage.png" compile="0" resource="1"
-            file="F:/VUT/bakalarka/BackgroundImage.png"/>
-      <FILE id="iEU0Xv" name="ChoiceOff.png" compile="0" resource="1" file="F:/VUT/bakalarka/ChoiceOff.png"/>
-      <FILE id="ELc2tl" name="ChoiceOn.png" compile="0" resource="1" file="F:/VUT/bakalarka/ChoiceOn.png"/>
-      <FILE id="i3FXD1" name="InstrumentSans-Bold.ttf" compile="0" resource="1"
-            file="F:/VUT/bakalarka/InstrumentSans-Bold.ttf"/>
-      <FILE id="bpo2Ye" name="Knob.png" compile="0" resource="1" file="F:/VUT/bakalarka/Knob.png"/>
-      <FILE id="MLePgJ" name="LoadIRBtn.png" compile="0" resource="1" file="F:/VUT/bakalarka/LoadIRBtn.png"/>
+      <FILE id="tRYZV8" name="AmpTypeSwitch.png" compile="0" resource="1"
+            file="Assets/AmpTypeSwitch.png"/>
+      <FILE id="jdVZ5j" name="BackgroundImage.png" compile="0" resource="1"
+            file="Assets/BackgroundImage.png"/>
+      <FILE id="uFcQ8N" name="ChoiceOff.png" compile="0" resource="1" file="Assets/ChoiceOff.png"/>
+      <FILE id="WG2vLJ" name="ChoiceOn.png" compile="0" resource="1" file="Assets/ChoiceOn.png"/>
+      <FILE id="w08PL5" name="InstrumentSans-Bold.ttf" compile="0" resource="1"
+            file="Assets/InstrumentSans-Bold.ttf"/>
+      <FILE id="QJFKNL" name="Knob.png" compile="0" resource="1" file="Assets/Knob.png"/>
+      <FILE id="XadXTo" name="LoadIRBtn.png" compile="0" resource="1" file="Assets/LoadIRBtn.png"/>
     </GROUP>
     <GROUP id="{738C76C2-F9DF-054B-1271-C9222DBDB02E}" name="Source">
       <GROUP id="{7736E6C6-E69B-2196-95B8-E06560E35405}" name="Components">
@@ -87,7 +88,6 @@
     </GROUP>
   </MAINGROUP>
   <MODULES>
-    <MODULE id="foleys_gui_magic" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
@@ -125,7 +125,6 @@
         <MODULEPATH id="juce_gui_basics" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_dsp" path="../../../JUCE/modules"/>
-        <MODULEPATH id="foleys_gui_magic" path="modules/foleys_gui_magic/modules"/>
         <MODULEPATH id="juce_cryptography" path="../../../JUCE/modules"/>
       </MODULEPATHS>
     </VS2022>
