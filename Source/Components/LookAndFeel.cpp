@@ -1,12 +1,3 @@
-/*
-  ==============================================================================
-
-    LookAndFeel.cpp
-    Created: 25 Feb 2025 7:23:45pm
-    Author:  knize
-
-  ==============================================================================
-*/
 
 #include "LookAndFeel.h"
 #include "RotarySliderWithLabels.h"
@@ -19,17 +10,8 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
     auto sliderBounds = imageBounds.reduced(width * 0.1);
     juce::Image sliderImage = juce::ImageCache::getFromMemory(BinaryData::Knob_png, BinaryData::Knob_pngSize);
 
-    // for debugging
-    /*g.setColour(Colour(Colours::red));
-    g.drawRect(imageBounds);
-    g.drawRect(sliderBounds);*/
-
-    //g.setColour(Colour(72u, 30u, 20u));
-    //g.setColour(findColour(juce::Slider::rotarySliderFillColourId));
-    //g.setColour(sliderColour);
-
     //====================================================================================
-    // slider should be rectangle with height proportional to slider value
+    // slider should be ellipse, cut off with rectangle with height proportional to slider value
 
     g.fillEllipse(sliderBounds);
 
@@ -43,82 +25,23 @@ void LookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, i
     g.drawImage(sliderImage, imageBounds.toFloat(), RectanglePlacement::stretchToFit, false);
 
     if (auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider))
-    {
-        //if (slider.isMouseOverOrDragging())
-        {
-            g.setFont(rswl->getTextHeight());                           // sets basic font with set height
-            auto text = rswl->getDisplayString();                       // gets text to put in
-            auto strWidth = GlyphArrangement::getStringWidthInt(g.getCurrentFont(), text);  //g.getCurrentFont().getStringWidth(text);    // gets width of text
+    {        
+        g.setFont(rswl->getTextHeight());                           // sets basic font with set height
+        auto text = rswl->getDisplayString();                       // gets text to put in
+        auto strWidth = GlyphArrangement::getStringWidthInt(g.getCurrentFont(), text);  //g.getCurrentFont().getStringWidth(text);    // gets width of text
 
-            Rectangle<float> r;
-            r.setSize(strWidth + 4, rswl->getTextHeight() + 2);         // rectangle r is little bigger than the text
-            r.setCentre(sliderBounds.getCentre());                            // set centre of the rectangle to centre of bounds (slider)
+        Rectangle<float> r;
+        r.setSize(strWidth + 4, rswl->getTextHeight() + 2);         // rectangle r is little bigger than the text
+        r.setCentre(sliderBounds.getCentre());                            // set centre of the rectangle to centre of bounds (slider)
 
-            /*g.setColour(Colours::black);
-            g.fillRect(r);*/
-
-            //g.setColour(Colours::white);
-            g.setColour(Colour::fromString("FFE5E5E5"));
-            g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
-        }
+        g.setColour(Colour::fromString("FFE5E5E5"));
+        g.drawFittedText(text, r.toNearestInt(), juce::Justification::centred, 1);
+        
     }
-    //====================================================================================
-    // old circular sliders
-    //g.fillEllipse(bounds);
-
-    //g.setColour(Colour(242u, 97u, 63u));
-    //g.drawEllipse(bounds, 1.5);
-
-    //if (auto* rswl = dynamic_cast<RotarySliderWithLabels*>(&slider))
-    //{
-    //    auto center = bounds.getCentre();
-    //    //whatever we want to rotate needs to be in a path
-    //    Path p;
-
-    //    Rectangle<float> r;
-    //    r.setLeft(center.getX() - 2);   // left side of rectangle 2 pixels left of center
-    //    r.setRight(center.getX() + 2);  // right side of rectangle 2 pixels right of center
-    //    r.setTop(bounds.getY());        // top of rectangle = top of bounds
-    //    r.setBottom(center.getY() - rswl->getTextHeight() * 1.5);     // bottom of rectangle = text height above center
-
-    //    p.addRoundedRectangle(r, 2.f);
-
-    //    jassert(rotaryStartAngle < rotaryEndAngle); // check if start angle is smaller than end angle
-
-    //    auto sliderAngRad = jmap(sliderPosProportional, 0.f, 1.f, rotaryStartAngle, rotaryEndAngle); // mapping normalised slider value to angles
-
-    //    p.applyTransform(AffineTransform().rotated(sliderAngRad, center.getX(), center.getY())); // transform rotates path by sliderAngRad with x and y of pivot point
-
-    //    g.fillPath(p);
-
-    //    //// TRYING TO PUT IMAGE HERE
-    //    //juce::Image knobRed = ImageCache::getFromMemory(BinaryData::knob_red_png, BinaryData::knob_red_pngSize);
-    //    //juce::Image knobRedRescaled = knobRed.rescaled(bounds.getWidth() / knobRed.getWidth() * knobRed.getWidth(), bounds.getHeight() / knobRed.getHeight() * knobRed.getHeight(), Graphics::highResamplingQuality);
-    //    //
-    //    //AffineTransform rotator;
-    //    ////if (!slider.isMouseOverOrDragging())
-    //    ////{
-    //    ////    g.drawImage(knobRed, bounds, RectanglePlacement::stretchToFit, false);
-    //    ////}
-    //    ////else
-    //    ////{
-    //    ////    //g.drawImage(knobRed, x, y, width, height, 0, 0, width, height, false);
-    //    ////    g.drawImage(knobRed, bounds, RectanglePlacement::stretchToFit, false);
-    //    ////}
-    //    ////g.drawImageTransformed(knobRed, x, y, width, height, rotator.rotated((float)sliderPosProportional * rotaryEndAngle, (float)(knobRed.getWidth() / 2), (float)(knobRed.getHeight() / 2)), false);
-    //    ////g.drawImage(knobRedRescaled, bounds, RectanglePlacement::stretchToFit, false);
-    //    //int origX = g.getClipBounds().getX();
-    //    //int origY = g.getClipBounds().getY();
-    //    //g.drawImageTransformed(knobRedRescaled, rotator.rotated(sliderAngRad, knobRedRescaled.getWidth() / 2, knobRedRescaled.getHeight() / 2).translated(bounds.getX()-origX, bounds.getY()-origY));
-
-
-    //    // TRYING TO PUT IMAGE HERE
-    //}
-
 }
 
 //====================================================================================
-
+// drawing amp bypass button
 void LookAndFeel::drawToggleButton(juce::Graphics& g,
     juce::ToggleButton& toggleButton,
     bool shouldDrawButtonAsHighlighted,
@@ -126,53 +49,22 @@ void LookAndFeel::drawToggleButton(juce::Graphics& g,
 {
     using namespace juce;
 
-    //Path powerButton;
-
     auto bounds = toggleButton.getLocalBounds();
     auto size = jmin(bounds.getWidth(), bounds.getHeight()) - 5;
     auto r = bounds.withSizeKeepingCentre(size, size).toFloat();
-
-    //g.setColour(Colours::red);
-    //g.drawRect(bounds);
-
-    //g.setColour(bypassButtonEdgeColor);
-    //g.drawEllipse(bounds.toFloat(),bounds.getWidth()*0.05);
 
     if (!toggleButton.getToggleState())    g.setColour(bypassButtonFillColor); //ON
     else g.setColour(Colours::black);                                         //OFF
 
     g.fillEllipse(bounds.reduced(bounds.getWidth() * 0.2).toFloat());
-    //auto name = toggleButton.getName();
-
-    //float ang = 30.f;
-
-    //size -= 6;
-
-    //powerButton.addCentredArc(r.getCentreX(), r.getCentreY(), size * 0.5, size * 0.5, 0.f, degreesToRadians(ang), degreesToRadians(360.f - ang), true);
-
-    //powerButton.startNewSubPath(r.getCentreX(), r.getY() + 3);
-    //powerButton.lineTo(r.getCentre());
-
-    //PathStrokeType pst(2.f, PathStrokeType::JointStyle::curved);
-
-    //auto color = toggleButton.getToggleState() ? Colours::dimgrey : Colours::lightgreen;
-
-    //g.setColour(color);
-    ////g.strokePath(powerButton, pst);
-    //size = jmin(bounds.getWidth(), bounds.getHeight()) - 3;
-    //r = bounds.withSizeKeepingCentre(size, size).toFloat();
-    //g.setColour(Colours::silver);
-    ////g.drawEllipse(r, 2);
-
 }
 
+// drawing background image of Load IR button 
 void LookAndFeel::drawButtonBackground(juce::Graphics& g, juce::Button& button, const juce::Colour& backgroundColour, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
     auto btnImage = juce::ImageCache::getFromMemory(BinaryData::LoadIRBtn_png, BinaryData::LoadIRBtn_pngSize);
     auto bounds = button.getLocalBounds();
     bounds.reduce(bounds.getWidth() * 0.16, 0);
-    //g.setColour(juce::Colours::red);
-    //g.drawRect(bounds);
 
     g.drawImage(btnImage, bounds.toFloat(), juce::RectanglePlacement::stretchToFit, false);
     
@@ -180,20 +72,17 @@ void LookAndFeel::drawButtonBackground(juce::Graphics& g, juce::Button& button, 
 
 void LookAndFeel::drawButtonText(juce::Graphics& g, juce::TextButton& button, bool, bool)
 {
-    //g.setColour(juce::Colours::white);
     g.setColour(juce::Colour::fromString("FFE5E5E5"));
     g.setFont(getCustomFont().withHeight(button.getLocalBounds().getHeight()*0.33).withExtraKerningFactor(0.02));
     g.drawFittedText("load", button.getLocalBounds(), juce::Justification::centred, 1);
 }
 
+// drawing IR bypass button
 void LookAndFeelIRBypass::drawToggleButton(juce::Graphics& g, juce::ToggleButton& toggleButton, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
     using namespace juce;
 
     auto bounds = toggleButton.getLocalBounds();
-
-    //g.setColour(Colours::red);
-    //g.drawRect(bounds);
     
     bounds.reduce(bounds.getWidth() * 0.32, bounds.getWidth() * 0.32);
 
@@ -206,14 +95,12 @@ void LookAndFeelIRBypass::drawToggleButton(juce::Graphics& g, juce::ToggleButton
     g.fillEllipse(bounds.reduced(bounds.getWidth() * 0.1).toFloat());
 }
 
+// drawing mic and combo type buttons
 void LookAndFeelChoiceButtons::drawToggleButton(juce::Graphics& g, juce::ToggleButton& toggleButton, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
     using namespace juce;
 
     auto bounds = toggleButton.getLocalBounds();
-
-    /*g.setColour(Colours::red);
-    g.drawRect(bounds);*/
 
     auto onBtnImage = ImageCache::getFromMemory(BinaryData::ChoiceOn_png, BinaryData::ChoiceOn_pngSize);
     auto offBtnImage = ImageCache::getFromMemory(BinaryData::ChoiceOff_png, BinaryData::ChoiceOff_pngSize);
@@ -226,19 +113,19 @@ void LookAndFeelChoiceButtons::drawToggleButton(juce::Graphics& g, juce::ToggleB
     }
     
     auto name = toggleButton.getName();
-    //g.setColour(juce::Colours::white);
     g.setColour(Colour::fromString("FFE5E5E5"));
     g.setFont(getCustomFont().withHeight(bounds.getHeight()*0.33));
     g.drawFittedText(name, bounds, juce::Justification::centred, 1);
 }
 
+// drawing amp type buttons
 void LookAndFeelAmpTypeButtons::drawToggleButton(juce::Graphics& g, juce::ToggleButton& toggleButton, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
     auto bounds = toggleButton.getLocalBounds();
-    //auto w = bounds.getWidth();
     auto h = bounds.getHeight();
     bounds = bounds.withSizeKeepingCentre(h, h);
 
+    // semi transparent black drawn over OFF buttons
     g.setColour(juce::Colour::fromRGBA(0, 0, 0, 150));
     if (!toggleButton.getToggleState()) {
         g.fillEllipse(bounds.toFloat());

@@ -1,12 +1,3 @@
-/*
-  ==============================================================================
-
-    PolettiDistortion.cpp
-    Created: 15 Apr 2025 6:00:14pm
-    Author:  knize
-
-  ==============================================================================
-*/
 
 #include "PolettiDistortion.h"
 
@@ -27,8 +18,6 @@ void PolettiDistortion::prepare(juce::dsp::ProcessSpec& spec, size_t oversamplin
         }
         return y;
         };
-    //posProcessorChain.get<FirstDCFilter>().state->type = juce::dsp::StateVariableFilter::Parameters<float>::Type::highPass;
-    //posProcessorChain.get<FirstDCFilter>().state->setCutOffFrequency(spec.sampleRate, 13, 1 / std::sqrt(2));
     posProcessorChain.get<posLRFilter>().setType(juce::dsp::LinkwitzRileyFilterType::highpass);
     posProcessorChain.get<posLRFilter>().setCutoffFrequency(5);
     posProcessorChain.get<posTPTFilter>().setType(Tpt::Type::highpass);
@@ -51,8 +40,6 @@ void PolettiDistortion::prepare(juce::dsp::ProcessSpec& spec, size_t oversamplin
         }
         return y;
         };
-    /*posProcessorChain.get<SecondDCFilter>().state->type = juce::dsp::StateVariableFilter::Parameters<float>::Type::highPass;
-    posProcessorChain.get<SecondDCFilter>().state->setCutOffFrequency(spec.sampleRate, 13, 1 / std::sqrt(2));*/
     posProcessorChain.prepare(spec);
 
     negProcessorChain.reset();
@@ -68,8 +55,6 @@ void PolettiDistortion::prepare(juce::dsp::ProcessSpec& spec, size_t oversamplin
         }
         return y;
         };
-    //negProcessorChain.get<FirstDCFilter>().state->type = juce::dsp::StateVariableFilter::Parameters<float>::Type::highPass;
-    //negProcessorChain.get<FirstDCFilter>().state->setCutOffFrequency(spec.sampleRate, 13, 1 / std::sqrt(2));
     negProcessorChain.get<posLRFilter>().setType(juce::dsp::LinkwitzRileyFilterType::highpass);
     negProcessorChain.get<posLRFilter>().setCutoffFrequency(5);
     negProcessorChain.get<posTPTFilter>().setType(Tpt::Type::highpass);
@@ -92,8 +77,6 @@ void PolettiDistortion::prepare(juce::dsp::ProcessSpec& spec, size_t oversamplin
         }
         return y;
         };
-    /*negProcessorChain.get<SecondDCFilter>().state->type = juce::dsp::StateVariableFilter::Parameters<float>::Type::highPass;
-    negProcessorChain.get<SecondDCFilter>().state->setCutOffFrequency(spec.sampleRate, 13, 1 / std::sqrt(2));*/
     negProcessorChain.prepare(spec);
 
 
@@ -108,7 +91,7 @@ void PolettiDistortion::process(juce::dsp::AudioBlock<float>& inputBlock)
     negBufferBlock = inputBlock;
 
     //==========================================================================================================================
-       //both positive and negative WS work by themselves fine like this
+    // asymmetric waveshape, parallel processing
     if (!asymBypassed) {
         posProcessorChain.get<posAsymWaveShaper>().process(juce::dsp::ProcessContextReplacing(posBufferBlock));
         float asymGain = posProcessorChain.get<posAsymWaveShaper>().asymPosGain;
@@ -120,7 +103,7 @@ void PolettiDistortion::process(juce::dsp::AudioBlock<float>& inputBlock)
     //==========================================================================================================================
 
     //==========================================================================================================================
-    //both filters work fine by themselves
+    // DC filtering
     if (!filterBypassed) {
         switch (filterType) {
         case posLRFilter:
@@ -144,12 +127,11 @@ void PolettiDistortion::process(juce::dsp::AudioBlock<float>& inputBlock)
             negProcessorChain.get<5>().process(juce::dsp::ProcessContextReplacing(negBufferBlock));
             break;
         }
-        //negProcessorChain.get<FirstDCFilter>().process(juce::dsp::ProcessContextReplacing(inputBlock));
     }
     //==========================================================================================================================
 
     //==========================================================================================================================
-    //both work by themselves just fine
+    // symmetric waveshaping
     if (!symBypassed) {
         posProcessorChain.get<posSymWaveShaper>().process(juce::dsp::ProcessContextReplacing(posBufferBlock));
         float symGain = posProcessorChain.get<posSymWaveShaper>().symGain;

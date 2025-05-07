@@ -1,12 +1,3 @@
-/*
-  ==============================================================================
-
-    ResponseCurveComponent.cpp
-    Created: 25 Feb 2025 7:24:23pm
-    Author:  knize
-
-  ==============================================================================
-*/
 
 #include "ResponseCurveComponent.h"
 
@@ -36,7 +27,6 @@ ResponseCurveComponent::~ResponseCurveComponent()
 
 void ResponseCurveComponent::parameterValueChanged(int parameterIndex, float newValue)
 {
-    //DBG("param changed" << parameterIndex);
     parametersChanged.set(true);
 }
 
@@ -51,8 +41,6 @@ void ResponseCurveComponent::timerCallback()
     if (parametersChanged.compareAndSetBool(false, true))
     {
         updateChain();
-        //signal a repaint
-        //repaint();
     }
     // need to be repainting all the time, not only when a parameter changes
     repaint();

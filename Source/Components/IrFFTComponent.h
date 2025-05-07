@@ -1,12 +1,3 @@
-/*
-  ==============================================================================
-
-    IrFFTComponent.h
-    Created: 25 Feb 2025 7:24:37pm
-    Author:  knize
-
-  ==============================================================================
-*/
 
 #pragma once
 #include <JuceHeader.h>
@@ -19,8 +10,6 @@ struct IrFFTComponent : juce::Component/*,
     IrFFTComponent(BasicEQAudioProcessor&);
     ~IrFFTComponent();
 
-    /*void parameterValueChanged(int parameterIndex, float newValue) override;
-    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;*/
     void loadedIRChanged(juce::File newIR);
     void loadedIRChanged(const juce::AudioBuffer<float>& newIR, const int& sampleRate);
     void paint(juce::Graphics& g) override;
