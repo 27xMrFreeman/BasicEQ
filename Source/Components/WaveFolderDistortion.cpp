@@ -13,28 +13,22 @@
 void WaveFolderDistortion::prepare(juce::dsp::ProcessSpec& spec, size_t oversamplingFactor)
 {
     sampleRate = spec.sampleRate;
-
+    // preallocating buffers
     posBuffer.setSize(spec.numChannels, spec.maximumBlockSize * oversamplingFactor);
     negBuffer.setSize(spec.numChannels, spec.maximumBlockSize * oversamplingFactor);
 
+    // even triangle function
     waveFolderTri.functionToUse = [this](float x){
-        /*if (x > 0) {
-            y = std::abs(x - std::round(x));
-        }
-        else {
-            y = - std::abs(x - std::round(x));
-        }*/
         float y = std::abs(x - std::round(x));
         return y;
         };
-
+    // odd function
     waveFolderSin.functionToUse = [this](float x) {
         float y = 0.9 * std::tanh(x) + 0.1 * std::sin(8 * x);
         return y;
         };
 
     waveShaper.functionToUse = [this](float x) {
-        //float y = 0;
         if (x > 0) {
             float y = (2 / (1 + std::exp(-5 * x + 1)) - 1);
             return y;
@@ -55,17 +49,18 @@ void WaveFolderDistortion::process(juce::dsp::AudioBlock<float>& inputBlock)
 {
     //init buffer blocks
     juce::dsp::AudioBlock<float> posBlock(posBuffer), negBlock(negBuffer);
-    //ws positive
+    // processing in parallel
     waveFolderTri.process(juce::dsp::ProcessContextNonReplacing<float>(inputBlock, posBlock));
     waveFolderSin.process(juce::dsp::ProcessContextReplacing<float>(inputBlock));
+    // join blocks
     inputBlock += posBlock;
-    //inputBlock += negBlock;
     inputBlock.multiplyBy(0.5);
+
     waveShaper.process(juce::dsp::ProcessContextReplacing<float>(inputBlock));
     DCFilter.process(juce::dsp::ProcessContextReplacing<float>(inputBlock));
 }
 
 void WaveFolderDistortion::reset()
 {
-
+    DCFilter.reset();
 }

@@ -72,13 +72,8 @@ private:
     RotarySliderWithLabels driveSlider;
     Attachment driveSliderAttachment;
 
-    //juce::ComboBox ampTypeBox;
-    /*std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> ampTypeBoxAttachment;*/
-    
-    //juce::ToggleButton polettiAmpTypeButton, yamahaAmpTypeButton, wavefoldAmpTypeButton;
-    //ButtonAttachment polettiAmpTypeButtonAttachment, yamahaAmpTypeButtonAttachment, wavefoldAmpTypeButtonAttachment;
-    juce::ToggleButton ampBypassButton/*, osBypassButton*/;
-    ButtonAttachment ampBypassButtonAttachment/*, osBypassButtonAttachment*/;
+    juce::ToggleButton ampBypassButton;
+    ButtonAttachment ampBypassButtonAttachment;
 
     juce::Label driveLabel{ {}, "drive" }, ampTypeLabel{ {}, "type" }, ampBypassLabel{ {}, "bypass" };
     
@@ -128,8 +123,6 @@ private:
     ResponseCurveComponent responseCurveComponent;
 
         // attaching knobs to values
-    
-
     Attachment
         peakFreqSliderAttachment,
         peakGainSliderAttachment,
@@ -138,7 +131,6 @@ private:
         highCutFreqSliderAttachment,
         lowCutSlopeSliderAttachment,
         highCutSlopeSliderAttachment;
-
     
     ButtonAttachment lowCutBypassButtonAttachment, peakBypassButtonAttachment, highCutBypassButtonAttachment;
 
@@ -148,9 +140,6 @@ private:
     LookAndFeel lnf;
     LookAndFeelIRBypass lnfIRBypass;
     LookAndFeelChoiceButtons lnfChoices;
-    /*LookAndFeelBlue lnfb;
-    LookAndFeelGreen lnfg;
-    LookAndFeelBlack lnfk;*/
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BasicEQAudioProcessorEditor)
 };

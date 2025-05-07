@@ -13,7 +13,6 @@
 #include <cmath>
 #include "Components/FFTDataGenerator.h"
 #include "Components/SingleChannelSampleFifo.h"
-//#include "Components/AmpDrive.h"
 #include "Components/Distortion.h"
 #include "Components/ToneStack.h"
 
@@ -200,22 +199,19 @@ public:
 
     juce::AudioFormatManager formatManager;
 
-    // AudioBuffers for data to interpolate and interpolants, 2D interpolation between 4 data points + 2 intermediate interpolants + 1 finished interpolant
-    juce::AudioBuffer<float> audioBufferInterpBL, audioBufferInterpBR, audioBufferInterpTL, audioBufferInterpTR, /*audioBufferInterpBottom, audioBufferInterpTop,*/ audioBufferInterpFin, newIRAudioBuffer;
+    // AudioBuffers for data to interpolate and interpolants, 2D interpolation between 4 data points + 1 finished interpolant
+    juce::AudioBuffer<float> audioBufferInterpBL, audioBufferInterpBR, audioBufferInterpTL, audioBufferInterpTR, audioBufferInterpFin, newIRAudioBuffer;
 
     float interpIRSampleRate{ 0 };
 
 private:
     MonoChain leftChain, rightChain;
-    //ChainSettings chainSettings;
     juce::AudioBuffer<float> bufferBPContour, bufferHPContour;
-    //juce::dsp::IIR::Filter <float> LcontourBP, RcontourBP, LcontourHP, RcontourHP;
-    //juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>> contourHP, contourBP;
     // contour filters in parallel before tone stack -> response is not linear when all controls on 50%
     juce::dsp::FirstOrderTPTFilter<float> TPTcontourHP;
     juce::dsp::StateVariableTPTFilter<float> TPTcontourBP;
     juce::dsp::Gain<float> contourBPGain, contourHPGain;
-    // tone stack filters - approximation from TI´s Tone Stack for Guitar Amplifier Reference Design
+    // tone stack filters - approximation from Texas Instruments Tone Stack for Guitar Amplifier Reference Design
     using IIRFilter = juce::dsp::IIR::Filter<float>;
     using IIRFilterCoeff = juce::dsp::IIR::Coefficients<float>;
     juce::dsp::ProcessorChain<juce::dsp::ProcessorDuplicator<IIRFilter, IIRFilterCoeff>, juce::dsp::ProcessorDuplicator<IIRFilter, IIRFilterCoeff>, juce::dsp::ProcessorDuplicator<IIRFilter, IIRFilterCoeff>> toneStackFilters;

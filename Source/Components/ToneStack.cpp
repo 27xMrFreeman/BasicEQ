@@ -14,9 +14,6 @@
 //==============================================================================
 ToneStack::ToneStack()
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
-
 }
 
 ToneStack::~ToneStack()
@@ -75,6 +72,7 @@ void ToneStack::process(juce::dsp::AudioBlock<float>& inputBlock)
 {
     juce::dsp::AudioBlock<float> blockBP(bufferBP), blockHP(bufferHP);
     
+    // processing first two filters in parallel, these shape the response when all controls are neutral
     tsHighPass.process(juce::dsp::ProcessContextNonReplacing<float>(inputBlock, blockHP));
     tsHighPassGain.process(juce::dsp::ProcessContextReplacing<float>(blockHP));
 
@@ -82,7 +80,7 @@ void ToneStack::process(juce::dsp::AudioBlock<float>& inputBlock)
     tsBandPassGain.process(juce::dsp::ProcessContextNonReplacing<float>(blockBP, inputBlock));
 
     inputBlock.add(blockHP);
-
+    // processing main (controlled) tone stack filters in series
     tsLowShelf.process(juce::dsp::ProcessContextReplacing<float>(inputBlock));
     tsMidPeak.process(juce::dsp::ProcessContextReplacing<float>(inputBlock));
     tsHighShelf.process(juce::dsp::ProcessContextReplacing<float>(inputBlock));

@@ -2,6 +2,7 @@
 
 XYPad::Thumb::Thumb()
 {
+	// constraining thumb movement in bounds
 	constrainer.setMinimumOnscreenAmounts(thumbSize, thumbSize, thumbSize, thumbSize);
 }
 
@@ -46,11 +47,8 @@ XYPad::XYPad()
 
 void XYPad::paint(juce::Graphics& g)
 {
-	/*g.setColour(juce::Colours::black);
-	g.fillRoundedRectangle(getLocalBounds().toFloat(), 10.f);*/
+	// drawing background grid
 	g.drawImage(background, getLocalBounds().reduced(thumbSize/2).toFloat());
-	//g.setColour(juce::Colours::red);
-	//g.drawRect(getLocalBounds());
 }
 
 void XYPad::resized()
@@ -69,6 +67,7 @@ void XYPad::resized()
 									juce::jmap(ySliders[0]->getValue(), ySliders[0]->getMinimum(), ySliders[0]->getMaximum(), bounds.getHeight()-thumbSize, 0.0));
 	}
 
+	// constructing background grid, lines represent measured (non-interpolated) points
 	auto backgroundBounds = bounds.reduced(thumbSize);
 
 	background = juce::Image(juce::Image::PixelFormat::ARGB, backgroundBounds.getWidth(), backgroundBounds.getHeight(), true);
@@ -93,19 +92,14 @@ void XYPad::resized()
 	for (auto l : verticalLines)
 	{
 		auto normX = juce::jmap(l, 0.f, 10.f, 0.f, (float)backgroundBounds.getWidth());
-		//g.drawVerticalLine(normX, 0.f, backgroundBounds.getHeight());
 		g.fillRect(normX, 0.f, 2.f, (float)backgroundBounds.getHeight());
 	}
 	g.fillRect(backgroundBounds.getWidth() - 2.f, 0.f, 2.f, (float)backgroundBounds.getHeight());
-	//g.drawVerticalLine(backgroundBounds.getWidth()-1, 0.f, backgroundBounds.getHeight());
 
-	//g.setColour(juce::Colour::fromRGB(120, 120, 120));
 	for (auto l : horizontalLines)
 	{
 		auto normY = juce::jmap(l, 40.f, 0.f, 0.f, (float)backgroundBounds.getHeight());
 		g.fillRect(0.f, normY, (float)backgroundBounds.getWidth(), 2.f);
-		//auto normX = juce::mapFromLog10(f, 20.f, 20000.f);
-		//g.drawVerticalLine(getWidth() * normX, 0.f, getHeight());
 	}
 	g.fillRect(0.f, (float)backgroundBounds.getHeight()-2, (float)backgroundBounds.getWidth(), 2.f);
 }
