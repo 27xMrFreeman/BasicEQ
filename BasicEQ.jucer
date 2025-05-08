@@ -38,8 +38,6 @@
               file="Source/Components/WaveFolderDistortion.cpp"/>
         <FILE id="vEM3dL" name="WaveFolderDistortion.h" compile="0" resource="0"
               file="Source/Components/WaveFolderDistortion.h"/>
-        <FILE id="i6iSjz" name="AmpDrive.cpp" compile="1" resource="0" file="Source/Components/AmpDrive.cpp"/>
-        <FILE id="SElEhZ" name="AmpDrive.h" compile="0" resource="0" file="Source/Components/AmpDrive.h"/>
         <FILE id="s469Fp" name="AnalyzerPathGenerator.h" compile="0" resource="0"
               file="Source/Components/AnalyzerPathGenerator.h"/>
         <FILE id="ytLgPq" name="Channel.h" compile="0" resource="0" file="Source/Components/Channel.h"/>

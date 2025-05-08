@@ -419,7 +419,7 @@ void BasicEQAudioProcessorEditor::timerCallback(int timerID)
             readerTR->read(&audioProcessor.audioBufferInterpTR, 0, readerTR->lengthInSamples, 0, true, true);
 
             // check if both audioBuffers are equal length
-            if (audioProcessor.audioBufferInterpBL.getNumChannels() != audioProcessor.audioBufferInterpBR.getNumChannels() || audioProcessor.audioBufferInterpBL.getNumSamples() != audioProcessor.audioBufferInterpBR.getNumSamples()) { DBG("Not the same no of channels or samples"); }
+            if (audioProcessor.audioBufferInterpBL.getNumChannels() != audioProcessor.audioBufferInterpBR.getNumChannels() || audioProcessor.audioBufferInterpBL.getNumSamples() != audioProcessor.audioBufferInterpBR.getNumSamples()) { return; }
 
             irBuffer.setSize(audioProcessor.audioBufferInterpBL.getNumChannels(), audioProcessor.audioBufferInterpBL.getNumSamples());
 
