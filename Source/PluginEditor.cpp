@@ -48,35 +48,12 @@ lowCutBypassButtonAttachment(audioProcessor.apvts, "LowCut Bypassed", lowCutBypa
 highCutBypassButtonAttachment(audioProcessor.apvts, "HighCut Bypassed", highCutBypassButton),
 peakBypassButtonAttachment(audioProcessor.apvts, "Peak Bypassed", peakBypassButton),
 ampBypassButtonAttachment(audioProcessor.apvts, "Amp Bypassed", ampBypassButton),
-//osBypassButtonAttachment(audioProcessor.apvts, "Oversampling Bypassed", osBypassButton),
-irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)/*,
-polettiAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", polettiAmpTypeButton),
-yamahaAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", yamahaAmpTypeButton),
-wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmpTypeButton)*/
+irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-
-
-    /*peakFreqSlider.labels.add({ 0.f, "10Hz" });
-    peakFreqSlider.labels.add({ 1.f, "20kHz" });
-    peakGainSlider.labels.add({ 0.f, "-24dB" });
-    peakGainSlider.labels.add({ 1.f, "24dB" });
-    peakQualitySlider.labels.add({ 0.f, "0.1" });
-    peakQualitySlider.labels.add({ 1.f, "10" });
-    lowCutFreqSlider.labels.add({ 0.f, "10Hz" });
-    lowCutFreqSlider.labels.add({ 1.f, "20kHz" });
-    lowCutSlopeSlider.labels.add({ 0.f, "12" });
-    lowCutSlopeSlider.labels.add({ 1.f, "48" });
-    highCutFreqSlider.labels.add({ 0.f, "10Hz" });
-    highCutFreqSlider.labels.add({ 1.f, "20kHz" });
-    highCutSlopeSlider.labels.add({ 0.f, "12" });
-    highCutSlopeSlider.labels.add({ 1.f, "48" });*/
-    //xPosSlider.labels.add({ 0.f, "0cm" });
-    //xPosSlider.labels.add({ 1.f, "10cm" });
+   
     xPosSlider.name = "X Position";
-    //yPosSlider.labels.add({ 0.f, "0cm" });
-    //yPosSlider.labels.add({ 1.f, "40cm" });
     yPosSlider.name = "Y Position";
     driveSlider.name = "Drive";
     lowShelfSlider.name = "Low";
@@ -88,14 +65,7 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     comboTypeBox.addItem("Mar", 1);
     comboTypeBox.addItem("MM", 2);
     comboTypeBox.addItem("SV", 3);
-    //comboTypeBox.setSelectedItemIndex(1);
     comboTypeBox.onChange = [this]() { 
-        //DBG("changed combo");
-        //juce::AudioBuffer<float> irBuffer;
-        //int sampleRate = 0;
-        ////audioProcessor.updateLoadedIR(irBuffer, sampleRate, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
-        //userIRLoaded = false; 
-        //irfftComponent.loadedIRChanged(irBuffer, sampleRate);
         needIRUpdate.set(true);
         };
 
@@ -108,11 +78,12 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     bCabButton.setClickingTogglesState(true);
     bCabButton.onClick = [this]() { comboTypeBox.setSelectedItemIndex(1); };
     bCabButton.setName("B");
+    
     cCabButton.setRadioGroupId(RadioButtonIDs::CabTypeButtons);
     cCabButton.setClickingTogglesState(true);
     cCabButton.onClick = [this]() { comboTypeBox.setSelectedItemIndex(2); };
     cCabButton.setName("C");
-    //auto x = comboTypeBox.getSelectedId();
+
     int cabTypeSelected = audioProcessor.apvts.getRawParameterValue("Combo Type")->load();
 
     switch (cabTypeSelected) {
@@ -130,14 +101,7 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     mikTypeBox.addItem("57A", 1);
     mikTypeBox.addItem("kalib", 2);
     mikTypeBox.addItem("sm57", 3);
-    //mikTypeBox.setSelectedItemIndex(1);
     mikTypeBox.onChange = [this]() {
-        //DBG("changed mic");
-        //juce::AudioBuffer<float> irBuffer;
-        //int sampleRate = 0;
-        ////audioProcessor.updateLoadedIR(irBuffer, sampleRate, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
-        //userIRLoaded = false;
-        //irfftComponent.loadedIRChanged(irBuffer, sampleRate);
         needIRUpdate.set(true);
         };
 
@@ -167,25 +131,15 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
         break;
     }
 
-    /*ampTypeBox.addItem("Poletti", 1);
-    ampTypeBox.addItem("Yamaha", 2);
-    ampTypeBox.addItem("WaveFolder", 3);*/
-    //ampTypeBox.setSelectedItemIndex(0);
     ampTypeSwitch.ampTypeBox.onChange = [this]() {
-        //audioProcessor.ampDrive.simTypeChanged(ampTypeBox.getSelectedId());
         audioProcessor.ampSim.ampType = static_cast<AmpTypeEnum>(ampTypeSwitch.ampTypeBox.getSelectedId() - 1);
-        //DBG("ComboBox: ");
-        //DBG(audioProcessor.ampSim.ampType);
-
         };
 
 
-    /*polettiAmpTypeButton.setRadioGroupId(RadioButtonIDs::AmpTypeButtons);
-    polettiAmpTypeButton.setClickingTogglesState(true);*/
-    ampTypeSwitch.polettiAmpTypeButton.onClick = [this]() { /*audioProcessor.ampSim.ampType = AmpTypeEnum::Poletti;*/
+    ampTypeSwitch.polettiAmpTypeButton.onClick = [this]() {
+        // on click lambda gets called on every button change
         if (!ampTypeSwitch.polettiAmpTypeButton.getToggleState()) return;
         ampTypeSwitch.ampTypeBox.setSelectedItemIndex(0);
-        //getLookAndFeel().setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colours::red);
         driveSlider.setSliderColor(juce::Colours::red);
         driveSlider.repaint();
         lowShelfSlider.setSliderColor(juce::Colours::red);
@@ -202,13 +156,9 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
         xyPad.thumb.repaint();
         this->lnf.bypassButtonFillColor = juce::Colours::red;
         ampBypassButton.repaint();
-        //DBG("Button 1 pressed: ");
-        //DBG(ampTypeBox.getSelectedId());
         };
 
-    /*yamahaAmpTypeButton.setRadioGroupId(RadioButtonIDs::AmpTypeButtons);
-    yamahaAmpTypeButton.setClickingTogglesState(true);*/
-    ampTypeSwitch.yamahaAmpTypeButton.onClick = [this]() { /*audioProcessor.ampSim.ampType = AmpTypeEnum::Yamaha;*/
+    ampTypeSwitch.yamahaAmpTypeButton.onClick = [this]() { 
         if (!ampTypeSwitch.yamahaAmpTypeButton.getToggleState()) return;
         ampTypeSwitch.ampTypeBox.setSelectedItemIndex(1);
         auto colour = juce::Colour::fromString("FF00E7D3");
@@ -228,14 +178,9 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
         xyPad.thumb.repaint();
         this->lnf.bypassButtonFillColor = colour;
         ampBypassButton.repaint();
-        //getLookAndFeel().setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colours::red);
-        //DBG("Button 2 pressed: ");
-        //DBG(ampTypeBox.getSelectedId());
         };
     
-    /*wavefoldAmpTypeButton.setRadioGroupId(RadioButtonIDs::AmpTypeButtons);
-    wavefoldAmpTypeButton.setClickingTogglesState(true);*/
-    ampTypeSwitch.wavefoldAmpTypeButton.onClick = [this]() { /*audioProcessor.ampSim.ampType = AmpTypeEnum::WaveFolder;*/
+    ampTypeSwitch.wavefoldAmpTypeButton.onClick = [this]() { 
         if (!ampTypeSwitch.wavefoldAmpTypeButton.getToggleState()) return;
         ampTypeSwitch.ampTypeBox.setSelectedItemIndex(2);
         auto colour = juce::Colour::fromString("FFBF00FF");
@@ -255,9 +200,6 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
         xyPad.thumb.repaint();
         this->lnf.bypassButtonFillColor = colour;
         ampBypassButton.repaint();
-        //getLookAndFeel().setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colours::red);
-        //DBG("Button 3 pressed: ");
-        //DBG(ampTypeBox.getSelectedId());
         };
 
     switch (audioProcessor.ampSim.ampType)
@@ -280,7 +222,6 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
 
     for (auto* label : getLabels())
     {
-        //label->setFont(lnf.getCustomFont().withHeight(fontSize));
         label->setJustificationType(juce::Justification::centred);
         label->setColour(juce::Label::ColourIds::textColourId, juce::Colour::fromString("FFE5E5E5"));
     }
@@ -293,9 +234,6 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     peakBypassButton.setLookAndFeel(&lnf);
     irBypassButton.setLookAndFeel(&lnfIRBypass);
     ampBypassButton.setLookAndFeel(&lnf);
-    /*polettiAmpTypeButton.setLookAndFeel(&lnf);
-    yamahaAmpTypeButton.setLookAndFeel(&lnf);
-    wavefoldAmpTypeButton.setLookAndFeel(&lnf);*/
     aMicButton.setLookAndFeel(&lnfChoices);
     bMicButton.setLookAndFeel(&lnfChoices);
     cMicButton.setLookAndFeel(&lnfChoices);
@@ -303,43 +241,15 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
     bCabButton.setLookAndFeel(&lnfChoices);
     cCabButton.setLookAndFeel(&lnfChoices);
     loadBtn.setLookAndFeel(&lnf);
-    //lowCutFreqSlider.setLookAndFeel(&lnf);
-    //lowCutSlopeSlider.setLookAndFeel(&lnf);
-    //highCutFreqSlider.setLookAndFeel(&lnf);
-    //highCutSlopeSlider.setLookAndFeel(&lnf);
-    //peakFreqSlider.setLookAndFeel(&lnf);
-    //peakGainSlider.setLookAndFeel(&lnf);
-    //peakQualitySlider.setLookAndFeel(&lnf);
-    //xPosSlider.setLookAndFeel(&lnf);
-    //yPosSlider.setLookAndFeel(&lnf);
-    //outputGainSlider.setLookAndFeel(&lnf);
-    //driveSlider.setLookAndFeel(&lnf);
-    //lowShelfSlider.setLookAndFeel(&lnf);
-    //midPeakSlider.setLookAndFeel(&lnf);
-    //highShelfSlider.setLookAndFeel(&lnf);
 
     comboTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Combo Type", comboTypeBox);
     mikTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Mic Type", mikTypeBox);
     ampTypeSwitch.ampTypeBoxAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(p.apvts, "Amp Type", ampTypeSwitch.ampTypeBox);
 
     yPosSlider.onValueChange = [this]() {
-        ////DBG("changed yPos to " << yPosSlider.getValue());
-        //juce::AudioBuffer<float> irBuffer;
-        //int sampleRate = 0;
-        //audioProcessor.updateLoadedIR(irBuffer, sampleRate, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
-        //userIRLoaded = false;
-        ////if (tempFile.getFile().getSize() == 0) return;
-        //irfftComponent.loadedIRChanged(irBuffer, sampleRate);
         needIRUpdate.set(true);
     };
     xPosSlider.onValueChange = [this]() { 
-        ////DBG("changed xPos to " << xPosSlider.getValue());
-        //juce::AudioBuffer<float> irBuffer;
-        //int sampleRate = 0;
-        //audioProcessor.updateLoadedIR(irBuffer, sampleRate, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
-        //userIRLoaded = false;
-        ////if (tempFile.getFile().getSize() == 0) return;
-        //irfftComponent.loadedIRChanged(irBuffer, sampleRate);
         needIRUpdate.set(true);
         };
 
@@ -358,32 +268,29 @@ wavefoldAmpTypeButtonAttachment(audioProcessor.apvts, "IR Bypassed", wavefoldAmp
                 {
                     // save chosen file
                     juce::File result(chooser.getResult());
-                    if (!result.existsAsFile()) { /*DBG("pressed cancel");*/ return; }
+                    if (!result.existsAsFile()) { /*pressed cancel*/ return; }
                     audioProcessor.savedFile = result;
                     audioProcessor.root = result.getParentDirectory().getFullPathName();    // set root directory to where the file was selected from
-                    //irNameLabel.setText( result.getFileNameWithoutExtension(), juce::dontSendNotification );
                     audioProcessor.irLoader.reset();
                     // load IR, stereo, trimmed, normalized, size 0 = original IR size
                     audioProcessor.irLoader.loadImpulseResponse(result, juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
                     irfftComponent.loadedIRChanged(result);
                 });
             userIRLoaded = true;
-            //DBG("loaded ir " << (int)userIRLoaded.compareAndSetBool(true, true) << "with length " << audioProcessor.irLoader.getCurrentIRSize());
     };
 
     inputGainSlider.onValueChange = [this] { audioProcessor.inputGain.setGainDecibels(inputGainSlider.getValue()); };
-    outputGainSlider.onValueChange = [this] { audioProcessor.outputGain.setGainDecibels(outputGainSlider.getValue()); /*DBG("Output gain set to " << outputGainSlider.getValue());*/ };
+    outputGainSlider.onValueChange = [this] { audioProcessor.outputGain.setGainDecibels(outputGainSlider.getValue()); };
 
     setSize (1674, 752);
     setResizable(true, true);
-    setResizeLimits( 418.5, 188, 1674, 752);
+    setResizeLimits( 837, 376, 1674, 752);
     getConstrainer()->setFixedAspectRatio(1674.f / 752.f);
 
     startTimer(0, 33);
     startTimer(1, 50);
 
     if (audioProcessor.shippedIRsMissing.get()) {
-        // maybe set a flag here so it shows only once
         alertWindow = std::make_unique<juce::AlertWindow>("Alert", "Prepackaged files are missing or incomplete", juce::MessageBoxIconType::WarningIcon, nullptr);
         alertWindow->showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon, "Alert", "Prepackaged files are missing or incomplete", "OK");
     }
@@ -409,9 +316,6 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
     inputGainSlider.setLookAndFeel(nullptr);
     outputGainSlider.setLookAndFeel(nullptr);
     ampBypassButton.setLookAndFeel(nullptr);
-    /*polettiAmpTypeButton.setLookAndFeel(nullptr);
-    yamahaAmpTypeButton.setLookAndFeel(nullptr);
-    wavefoldAmpTypeButton.setLookAndFeel(nullptr);*/
     aMicButton.setLookAndFeel(nullptr);
     bMicButton.setLookAndFeel(nullptr);
     cMicButton.setLookAndFeel(nullptr);
@@ -419,10 +323,6 @@ BasicEQAudioProcessorEditor::~BasicEQAudioProcessorEditor()
     bCabButton.setLookAndFeel(nullptr);
     cCabButton.setLookAndFeel(nullptr);
     loadBtn.setLookAndFeel(nullptr);
-    //driveSlider.setLookAndFeel(nullptr);
-    //lowShelfSlider.setLookAndFeel(nullptr);
-    //midPeakSlider.setLookAndFeel(nullptr);
-    //highShelfSlider.setLookAndFeel(nullptr);
 }
 
 //==============================================================================
@@ -446,7 +346,7 @@ void BasicEQAudioProcessorEditor::timerCallback(int timerID)
                   xPos = xPosSlider.getValue();
             int comboTypeID = comboTypeBox.getSelectedId() - 1,
                 mikTypeID = mikTypeBox.getSelectedId() - 1;
-            // should compute interpolation here, then pass interpolated IR buffer to audioprocessor, where it is checked each buffer, if new IR is ready to be loaded -> need another atomic bool
+            // compute interpolation here, then pass interpolated IR buffer to audioprocessor, where it is checked each buffer, if new IR is ready to be loaded
             audioProcessor.newIRReady.set(false);
 
             // interpolate here
@@ -454,18 +354,15 @@ void BasicEQAudioProcessorEditor::timerCallback(int timerID)
             float XmaxDistance = 0, Xdistance = 0, XtransposedDistance = 0, YmaxDistance = 0, Ydistance = 0, YtransposedDistance = 0;
             int yPosArr[3] = { 0, 10, 40 };
             int xPosArr[6] = { 0, 2, 4, 6, 8, 10 };
-            // formatManager takes a file (wav in our case), returns AudioBuffer (could return float array tho)
+            // formatManager takes a file (wav in our case), returns AudioBuffer
 
 
             // if Y = {0,10,40} and X = {0,2,4,..,10}, no need to interpolate
             if (std::any_of(std::begin(yPosArr), std::end(yPosArr), [&](int i) { return i == yPos; }) && std::any_of(std::begin(xPosArr), std::end(xPosArr), [&](int j) {return j == xPos; })) {
-                // load IR, stereo, trimmed, normalized, size 0 = original IR size
-                //irLoader.loadImpulseResponse(impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPos / 20)][xPos], juce::dsp::Convolution::Stereo::yes, juce::dsp::Convolution::Trim::yes, 0, juce::dsp::Convolution::Normalise::yes);
-                // TODO: file -> audiobuffer, get samplerate from file
                 std::unique_ptr<juce::AudioFormatReader> reader;
                 reader.reset(audioProcessor.formatManager.createReaderFor(audioProcessor.impulseResponseArray[comboTypeID][mikTypeID][std::ceil(yPos / 20)][xPos]));
                 irBuffer.setSize(reader->numChannels, reader->lengthInSamples);
-                if (!reader->read(&irBuffer, 0, reader->lengthInSamples, 0, true, true)) { DBG("Reader for non-interpolated file failed to write to buffer"); }
+                if (!reader->read(&irBuffer, 0, reader->lengthInSamples, 0, true, true)) { return; }
 
                 sampleRate = reader->sampleRate;
                 audioProcessor.interpIRSampleRate = sampleRate;
@@ -505,20 +402,13 @@ void BasicEQAudioProcessorEditor::timerCallback(int timerID)
             // (a * (1.0 - f)) + (b * f) where f = transposedDistance
 
 
-            // impulseResponseArray[typ komba][typ mikrofonu][pozice Y - 0=0, 1=10, 2=40]  [pozice X] 
+            // impulseResponseArray[combo type][mic type][Y position == 0=0, 1=10, 2=40][X position] 
             std::unique_ptr<juce::AudioFormatReader> readerBL, readerBR, readerTL, readerTR; // bottom-left, bottom-right etc
 
             readerBL.reset(audioProcessor.formatManager.createReaderFor(audioProcessor.impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPosRoundDown / 20)][xPosRoundDown]));
             readerTL.reset(audioProcessor.formatManager.createReaderFor(audioProcessor.impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPosRoundUp / 20)][xPosRoundDown]));
             readerTR.reset(audioProcessor.formatManager.createReaderFor(audioProcessor.impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPosRoundUp / 20)][xPosRoundUp]));
             readerBR.reset(audioProcessor.formatManager.createReaderFor(audioProcessor.impulseResponseArray[comboTypeID][mikTypeID][std::ceil((double)yPosRoundDown / 20)][xPosRoundUp]));
-
-            /*juce::AudioBuffer<float> audioBufferBL, audioBufferBR, audioBufferTL, audioBufferTR, audioBufferInterpBottom, audioBufferInterpTop, audioBufferInterp;
-
-            audioBufferBL.setSize(readerBL->numChannels, readerBL->lengthInSamples);
-            audioBufferBR.setSize(readerBR->numChannels, readerBR->lengthInSamples);
-            audioBufferTL.setSize(readerTL->numChannels, readerTL->lengthInSamples);
-            audioBufferTR.setSize(readerTR->numChannels, readerTR->lengthInSamples);*/
 
             sampleRate = readerBL->sampleRate;
             audioProcessor.interpIRSampleRate = sampleRate;
@@ -531,9 +421,6 @@ void BasicEQAudioProcessorEditor::timerCallback(int timerID)
             // check if both audioBuffers are equal length
             if (audioProcessor.audioBufferInterpBL.getNumChannels() != audioProcessor.audioBufferInterpBR.getNumChannels() || audioProcessor.audioBufferInterpBL.getNumSamples() != audioProcessor.audioBufferInterpBR.getNumSamples()) { DBG("Not the same no of channels or samples"); }
 
-            /*audioBufferInterpBottom.setSize(audioBufferBL.getNumChannels(), audioBufferBL.getNumSamples());
-            audioBufferInterpTop.setSize(audioBufferBL.getNumChannels(), audioBufferBL.getNumSamples());
-            audioBufferInterp.setSize(audioBufferBL.getNumChannels(), audioBufferBL.getNumSamples());*/
             irBuffer.setSize(audioProcessor.audioBufferInterpBL.getNumChannels(), audioProcessor.audioBufferInterpBL.getNumSamples());
 
             float interpBottom = 0, interpTop = 0, interpValue = 0;
@@ -552,9 +439,7 @@ void BasicEQAudioProcessorEditor::timerCallback(int timerID)
             audioProcessor.newIRAudioBuffer = irBuffer;
             audioProcessor.newIRReady.set(true);
             
-            //audioProcessor.updateLoadedIR(irBuffer, sampleRate, comboTypeBox.getSelectedId() - 1, mikTypeBox.getSelectedId() - 1, yPosSlider.getValue(), xPosSlider.getValue());
             userIRLoaded = false;
-            //if (tempFile.getFile().getSize() == 0) return;
             irfftComponent.loadedIRChanged(irBuffer, sampleRate);
             needIRUpdate.set(false);
         }
@@ -564,12 +449,8 @@ void BasicEQAudioProcessorEditor::timerCallback(int timerID)
 void BasicEQAudioProcessorEditor::paint (juce::Graphics& g)
 {
     using namespace juce;
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    //g.fillAll (Colours::black);
     backgroundImage = ImageCache::getFromMemory(BinaryData::BackgroundImage_png, BinaryData::BackgroundImage_pngSize);
     g.drawImage(backgroundImage, getLocalBounds().toFloat(), RectanglePlacement::stretchToFit);
-    //g.setFont(lnf.getCustomFont().withHeight(fontSize));
-    //lnf.sliderColour = Colours::black;
 }
 
 void BasicEQAudioProcessorEditor::resized()
@@ -579,7 +460,7 @@ void BasicEQAudioProcessorEditor::resized()
     // Padding from sides
     auto bounds = getLocalBounds();
     bounds.reduce(bounds.getWidth() * 0.01, bounds.getHeight() * 0.01);
-    // Input/Output meters and sliders
+    // Input/Output meters
     auto meterWidth = bounds.getWidth() * 0.062;
     auto meterHeight = bounds.getHeight() * 0.2;
     auto inputMeterArea = bounds.removeFromLeft(meterWidth);
@@ -588,10 +469,6 @@ void BasicEQAudioProcessorEditor::resized()
     auto outputMeterArea = bounds.removeFromRight(meterWidth);
     outputMeterArea.removeFromTop(outputMeterArea.getHeight() * 0.02);
     auto outputMeterLabelArea = outputMeterArea.removeFromBottom(outputMeterArea.getHeight() * 0.122);
-    //auto inputGainArea = inputMeterArea.removeFromBottom(meterHeight);
-    //auto outputGainArea = outputMeterArea.removeFromBottom(meterHeight);
-    //inputGainSlider.setBounds(inputGainArea.reduced(0, inputGainArea.getHeight()*0.05));
-    //outputGainSlider.setBounds(outputGainArea.reduced(0, outputGainArea.getHeight() * 0.05));
     inputMeterArea.removeFromLeft(inputMeterArea.getWidth() * 0.03);
     meterInLeft.setBounds(inputMeterArea.removeFromLeft(inputMeterArea.getWidth()*0.33));
     inputMeterArea.removeFromLeft(inputMeterArea.getWidth() * 0.36);
@@ -602,14 +479,7 @@ void BasicEQAudioProcessorEditor::resized()
     outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.41);
     meterOutRight.setBounds(outputMeterArea.removeFromLeft(outputMeterArea.getWidth()*0.92));
 
-    // Space for buffer if it will be implemented
-    //auto bufferArea = bounds.removeFromTop(bounds.getHeight() * 0.1);
-    //auto buttonWidth = bufferArea.getWidth() * 0.33;
-    
-    //osBypassButton.setBounds(bufferArea.removeFromLeft(buttonWidth));
-    
-
-    // Main knobs - gain sliders in with knobs, maybe smaller size
+    // Main knobs
     auto oldHeight = bounds.getHeight();
     auto mainKnobsArea = bounds.removeFromBottom(oldHeight * 0.36).reduced(bounds.getWidth() * 0.02, 0.0);
     auto knobLabelArea = mainKnobsArea.removeFromBottom(mainKnobsArea.getHeight() * 0.28);
@@ -619,9 +489,9 @@ void BasicEQAudioProcessorEditor::resized()
     for (auto* label : getLabels())
     {
         label->setFont(lnf.getCustomFont().withHeight(fontSize).withExtraKerningFactor(0.02));
-        //label->setJustificationType(juce::Justification::centred);
     }
     irBypassLabel.setFont(lnf.getCustomFont().withHeight(fontSize).withExtraKerningFactor(0.02));
+    
     //yellow part width
     auto yellowBackgroundWidth = mainKnobsArea.getWidth();
     mainKnobsArea.removeFromLeft(yellowBackgroundWidth * 0.05);
@@ -640,9 +510,7 @@ void BasicEQAudioProcessorEditor::resized()
     driveSlider.setBounds(mainKnobsArea.removeFromLeft(knobSize));
     mainKnobsArea.removeFromLeft(spaceBetweenKnobs);
     auto ampTypeArea = mainKnobsArea.removeFromLeft(switchSize);
-    //polettiAmpTypeButton.setBounds(ampTypeArea);
     ampTypeSwitch.setBounds(ampTypeArea);
-    //polettiAmpTypeButton.setBounds(knobLabelArea);
     mainKnobsArea.removeFromLeft(spaceBetweenKnobs);
     lowShelfSlider.setBounds(mainKnobsArea.removeFromLeft(knobSize));
     mainKnobsArea.removeFromLeft(spaceBetweenKnobs);
@@ -654,7 +522,6 @@ void BasicEQAudioProcessorEditor::resized()
 
     knobLabelArea.removeFromLeft(spaceBetweenKnobs * 3);
     ampBypassLabel.setBounds(knobLabelArea.removeFromLeft(bypassSize * 1.84));
-    //knobLabelArea.removeFromLeft(spaceBetweenKnobs);
     inputGainLabel.setBounds(knobLabelArea.removeFromLeft(knobSize));
     knobLabelArea.removeFromLeft(spaceBetweenKnobs);
     driveLabel.setBounds(knobLabelArea.removeFromLeft(knobSize));
@@ -668,27 +535,8 @@ void BasicEQAudioProcessorEditor::resized()
     highLabel.setBounds(knobLabelArea.removeFromLeft(knobSize));
     knobLabelArea.removeFromLeft(spaceBetweenKnobs);
     outputGainLabel.setBounds(knobLabelArea.removeFromLeft(knobSize));
-    //ampBypassButton.setBounds(mainKnobsArea);
-
-    //auto knobWidth = mainKnobsArea.getWidth() / 5;
-    //driveSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
-    //auto ampTypeArea = mainKnobsArea.removeFromLeft(knobWidth);
-    //polettiAmpTypeButton.setBounds(ampTypeArea.removeFromTop(ampTypeArea.getHeight() * 0.33));
-    //yamahaAmpTypeButton.setBounds(ampTypeArea.removeFromTop(ampTypeArea.getHeight() * 0.5));
-    //wavefoldAmpTypeButton.setBounds(ampTypeArea);
-    ////ampTypeBox.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
-    //lowShelfSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
-    //midPeakSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
-    //highShelfSlider.setBounds(mainKnobsArea.removeFromLeft(knobWidth));
-
-    // bounds are now only top "half"
-    //auto xyPadArea = bounds.removeFromLeft(bounds.getWidth() * 0.25).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);
-    //auto irChoicesArea = bounds.removeFromLeft(bounds.getWidth() * 0.33).reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);
-    //auto responseArea = bounds.reduced(bounds.getWidth() * 0.02, bounds.getHeight() * 0.02);
-
-    //xPosSlider.setBounds(xyPadArea.removeFromTop(xyPadArea.getHeight()*0.5).reduced(xyPadArea.getWidth()*0.05));
-    //yPosSlider.setBounds(xyPadArea.reduced(xyPadArea.getWidth() * 0.05));
-    //bounds.removeFromBottom(oldHeight * 0.04);
+    
+    // XY Pad
     auto xyPadArea = bounds.removeFromLeft(bounds.getWidth() * 0.299);
     xyPadArea.removeFromTop(xyPadArea.getHeight() * 0.21);
     auto labelHeight = xyPadArea.getHeight() * 0.138;
@@ -700,6 +548,7 @@ void BasicEQAudioProcessorEditor::resized()
     xyPadNameArea.removeFromLeft(xyPadNameArea.getWidth() - xyPadArea.getWidth());
     xyPadLabel.setBounds(xyPadNameArea);
 
+    // IR response
     auto responseArea = bounds.removeFromRight(bounds.getWidth() * 0.635);
     responseArea.removeFromTop(bounds.getHeight() * 0.17);
     labelPadding = bounds.getHeight() * 0.03;
@@ -716,6 +565,7 @@ void BasicEQAudioProcessorEditor::resized()
     auto bypassBtnArea = responseArea.withSizeKeepingCentre(responseArea.getWidth(), responseArea.getWidth());
     irBypassButton.setBounds(bypassBtnArea);
 
+    // IR choice buttons, load button
     bounds.removeFromLeft(bounds.getWidth() * 0.037);
     bounds.reduce(bounds.getWidth()*0.1, 0);
     micButtonsLabel.setBounds(bounds.removeFromBottom(labelHeight));
@@ -738,138 +588,6 @@ void BasicEQAudioProcessorEditor::resized()
 
     bounds.removeFromBottom(labelHeight*0.4);
     loadBtn.setBounds(bounds.removeFromBottom(btnHeight));
-
-    //irBypassButton.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.25).reduced(irChoicesArea.getWidth() * 0.09));
-    //loadBtn.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.33).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
-    //mikTypeBox.setBounds(irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.5).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
-    //comboTypeBox.setBounds(irChoicesArea.reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02));
-
-    /*auto cabBtnsArea = irChoicesArea.removeFromTop(irChoicesArea.getHeight() * 0.5).reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02);
-    auto cabBtnWidth = cabBtnsArea.getWidth() * 0.33;
-    aCabButton.setBounds(cabBtnsArea.removeFromLeft(cabBtnWidth));
-    bCabButton.setBounds(cabBtnsArea.removeFromLeft(cabBtnWidth));
-    cCabButton.setBounds(cabBtnsArea);
-
-    auto micBtnsArea = irChoicesArea.reduced(irChoicesArea.getWidth() * 0.02, irChoicesArea.getHeight() * 0.02);
-    aMicButton.setBounds(micBtnsArea.removeFromLeft(cabBtnWidth));
-    bMicButton.setBounds(micBtnsArea.removeFromLeft(cabBtnWidth));
-    cMicButton.setBounds(micBtnsArea);*/
-
-    //irfftComponent.setBounds(responseArea);
-
-    //auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.4);
-
-    //auto responseCurveComponentBounds = responseArea.removeFromRight(responseArea.getWidth() * 0.5);
-    //responseCurveComponent.setBounds(responseCurveComponentBounds.reduced(responseCurveComponentBounds.getWidth()*0.05, 0).removeFromBottom(responseCurveComponentBounds.getHeight()*0.95));
-
-    /*auto AmpArea = bounds.removeFromBottom(bounds.getHeight() * 0.5);
-    auto AmpAreaWidth = AmpArea.getWidth();
-    auto WidthOfOneSlider = AmpAreaWidth / 10;
-    ampBypassButton.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
-    asymPosGainSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
-    asymNegGainSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
-    symGainSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
-    asymPosLPSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
-    asymPosLNSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
-    asymNegLPSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
-    asymNegLNSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
-    symLPLNSlider.setBounds(AmpArea.removeFromLeft(WidthOfOneSlider));
-    ampTypeBox.setBounds(AmpArea);*/
-
-
-    /*auto GainArea = bounds;
-    auto IRArea = bounds.removeFromLeft(bounds.getWidth() * 0.5);
-    auto IRSlidersArea = IRArea.removeFromBottom(IRArea.getHeight() * 0.7);
-    IRSlidersArea.reduce(IRSlidersArea.getWidth()*0.05, 0);
-    IRSlidersArea.removeFromBottom(IRSlidersArea.getHeight() * 0.4);
-    xPosSlider.setBounds(IRSlidersArea.removeFromRight(IRSlidersArea.getWidth() * 0.5));
-    yPosSlider.setBounds(IRSlidersArea);
-
-    auto comboBoxArea = IRArea;
-    auto mikBoxArea = IRArea;
-    auto irBypassButtonArea = IRArea;
-    comboBoxArea = comboBoxArea.removeFromLeft(comboBoxArea.getWidth() * 0.5);
-    comboBoxArea = comboBoxArea.removeFromLeft(comboBoxArea.getWidth() * 0.75);
-    comboBoxArea = comboBoxArea.removeFromRight(comboBoxArea.getWidth() * 0.67);
-    comboBoxArea.reduce(0, comboBoxArea.getHeight() * 0.35);
-    comboTypeBox.setBounds(comboBoxArea);
-
-    mikBoxArea = mikBoxArea.removeFromRight(mikBoxArea.getWidth() * 0.5);
-    mikBoxArea = mikBoxArea.removeFromRight(mikBoxArea.getWidth() * 0.75);
-    mikBoxArea = mikBoxArea.removeFromLeft(mikBoxArea.getWidth() * 0.67);
-    mikBoxArea.reduce(0, mikBoxArea.getHeight() * 0.35);
-    mikTypeBox.setBounds(mikBoxArea);
-
-    irBypassButtonArea.reduce(irBypassButtonArea.getWidth() * 0.37, irBypassButtonArea.getHeight() * 0.15);
-    irBypassButtonArea.removeFromTop(irBypassButtonArea.getHeight() * 0.55);
-    irBypassButton.setBounds(irBypassButtonArea);
-
-    auto IrFFTComponentBounds = responseArea;
-    irfftComponent.setBounds(IrFFTComponentBounds.reduced(IrFFTComponentBounds.getWidth() * 0.05, 0).removeFromBottom(IrFFTComponentBounds.getHeight() * 0.95));*/
-
-    //bounds.removeFromTop(5);
-    //================================================================================================================
-    //EQ just commented out for testing
-    /*auto EQArea = bounds.removeFromRight(bounds.getWidth());
-    EQArea.reduce(EQArea.getWidth() * 0.05, 0);
-    EQArea.removeFromBottom(EQArea.getHeight() * 0.279);
-    EQArea.removeFromTop(EQArea.getHeight() * 0.05);
-    auto lowCutArea = EQArea.removeFromLeft(EQArea.getWidth() * 0.33);
-    auto highCutArea = EQArea.removeFromRight(EQArea.getWidth() * 0.5);
-
-    lowCutBypassButton.setBounds(lowCutArea.removeFromTop(30));
-    lowCutArea.removeFromTop(lowCutArea.getHeight() * 0.02);
-    lowCutFreqSlider.setBounds(lowCutArea.removeFromTop(lowCutArea.getHeight() * 0.66));
-    lowCutSlopeSlider.setBounds(lowCutArea);
-
-    highCutBypassButton.setBounds(highCutArea.removeFromTop(30));
-    highCutArea.removeFromTop(highCutArea.getHeight() * 0.02);
-    highCutFreqSlider.setBounds(highCutArea.removeFromTop(highCutArea.getHeight() * 0.66 ));
-    highCutSlopeSlider.setBounds(highCutArea);
-
-    peakBypassButton.setBounds(EQArea.removeFromTop(30));
-    EQArea.removeFromTop(EQArea.getHeight() * 0.02);
-    peakFreqSlider.setBounds(EQArea.removeFromTop(EQArea.getHeight() * 0.33));
-    peakGainSlider.setBounds(EQArea.removeFromTop(EQArea.getHeight() * 0.5));
-    peakQualitySlider.setBounds(EQArea);*/
-    //================================================================================================================
-    //ToneStack
-    /*auto ToneStackArea = bounds.removeFromRight(bounds.getWidth());
-    toneStackLowSlider.setBounds(ToneStackArea.removeFromLeft(ToneStackArea.getWidth() * 0.33));
-    toneStackMidSlider.setBounds(ToneStackArea.removeFromLeft(ToneStackArea.getWidth() * 0.5));
-    toneStackHighSlider.setBounds(ToneStackArea);*/
-
-
-    //================================================================================================================
-
-
-    //auto loadBtnArea = IRArea;
-    //loadBtn.setBounds(loadBtnArea.removeFromLeft(loadBtnArea.getWidth()*0.6).removeFromRight(loadBtnArea.getWidth()*0.5).removeFromBottom(loadBtnArea.getHeight()*0.9).removeFromTop(loadBtnArea.getHeight()*0.3));
-    //irNameLabel.setBounds(loadBtnArea);
-
-    //GainArea.removeFromTop(GainArea.getHeight() * 0.5);
-    //GainArea.removeFromTop(GainArea.getHeight() * 0.6);
-    //GainArea.reduce(GainArea.getWidth() * 0.02, 0);
-    
-    //auto OutputGainArea = GainArea;
-    //OutputGainArea.reduce(OutputGainArea.getWidth() * 0.44, 0);
-    //inputGainSlider.setBounds(OutputGainArea.removeFromLeft(OutputGainArea.getWidth() * 0.5));
-    //OutputGainArea.reduce(OutputGainArea.getWidth() * 0.44, 0);
-    //outputGainSlider.setBounds(OutputGainArea);
-
-    /*auto meterLeftArea = GainArea.removeFromLeft(GainArea.getWidth() * 0.5);
-    auto meterRightArea = GainArea;
-    meterLeftArea.removeFromRight(OutputGainArea.getWidth() * 0.6);
-    meterLeftArea.removeFromLeft(OutputGainArea.getWidth() * 0.6);
-    meterRightArea.removeFromLeft(OutputGainArea.getWidth() * 0.6);
-    meterRightArea.removeFromRight(OutputGainArea.getWidth() * 0.6);
-    meterLeftArea.reduce(0, meterLeftArea.getHeight() * 0.35);
-    meterRightArea.reduce(0, meterRightArea.getHeight() * 0.35);
-    meterLeftArea.translate(0, meterLeftArea.getHeight() * (-0.5));
-    meterRightArea.translate(0, meterRightArea.getHeight() * (-0.5));
-
-    meterLeft.setBounds(meterLeftArea);
-    meterRight.setBounds(meterRightArea);*/
 
 }
 
@@ -906,19 +624,8 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &lowShelfSlider,
         &midPeakSlider,
         &highShelfSlider,
-        //&osBypassButton,
         &ampBypassButton,
-        //&symLPLNSlider,
-        //&asymPosLPSlider,
-        //&asymPosLNSlider,
-        //&asymNegLPSlider,
-        //&asymNegLNSlider,
-        //&ampBypassButton,
-        //&ampTypeBox,
         &xyPad,
-        /*&polettiAmpTypeButton,
-        &yamahaAmpTypeButton,
-        &wavefoldAmpTypeButton,*/
         &aCabButton,
         &bCabButton,
         &cCabButton,
@@ -958,6 +665,5 @@ std::vector<juce::Label*> BasicEQAudioProcessorEditor::getLabels()
         &irfftLabel,
         &micButtonsLabel,
         &cabButtonsLabel,
-        //&irBypassLabel
     };
 }
