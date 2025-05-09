@@ -234,11 +234,11 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     // CALC and SET RMS LEVEL OF L&R CHANNELS
     rmsLevelInputLeft.skip(buffer.getNumSamples());
     rmsLevelInputRight.skip(buffer.getNumSamples());
-    const auto valueInLeft = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
+    const auto valueInLeft = juce::Decibels::gainToDecibels(buffer.getMagnitude(0, 0, buffer.getNumSamples()));
     if (valueInLeft < rmsLevelInputLeft.getCurrentValue()) { rmsLevelInputLeft.setTargetValue(valueInLeft); } // if the new value is lower than the current one, apply smoothing
     else { rmsLevelInputLeft.setCurrentAndTargetValue(valueInLeft); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
 
-    const auto valueInRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+    const auto valueInRight = juce::Decibels::gainToDecibels(buffer.getMagnitude(1, 0, buffer.getNumSamples()));
     if (valueInRight < rmsLevelInputRight.getCurrentValue()) { rmsLevelInputRight.setTargetValue(valueInRight); } // if the new value is lower than the current one, apply smoothing
     else { rmsLevelInputRight.setCurrentAndTargetValue(valueInRight); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
     //==============================================================================================================================================
@@ -278,11 +278,11 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     // CALC and SET RMS LEVEL OF L&R CHANNELS
     rmsLevelOutputLeft.skip(buffer.getNumSamples());
     rmsLevelOutputRight.skip(buffer.getNumSamples());
-    const auto valueOutLeft = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples()));
+    const auto valueOutLeft = juce::Decibels::gainToDecibels(buffer.getMagnitude(0, 0, buffer.getNumSamples()));
     if (valueOutLeft < rmsLevelOutputLeft.getCurrentValue()) { rmsLevelOutputLeft.setTargetValue(valueOutLeft); } // if the new value is lower than the current one, apply smoothing
     else { rmsLevelOutputLeft.setCurrentAndTargetValue(valueOutLeft); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
 
-    const auto valueOutRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+    const auto valueOutRight = juce::Decibels::gainToDecibels(buffer.getMagnitude(1, 0, buffer.getNumSamples()));
     if (valueOutRight < rmsLevelOutputRight.getCurrentValue()) { rmsLevelOutputRight.setTargetValue(valueOutRight); } // if the new value is lower than the current one, apply smoothing
     else { rmsLevelOutputRight.setCurrentAndTargetValue(valueOutRight); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
     //==============================================================================================================================================
@@ -680,7 +680,7 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new BasicEQAudioProcessor();
 }
-
+// returns peak value, not RMS
 float BasicEQAudioProcessor::getInputRMSValue(const int channel) const
 {
     jassert(channel == 0 || channel == 1);
@@ -688,7 +688,7 @@ float BasicEQAudioProcessor::getInputRMSValue(const int channel) const
     else if (channel == 1) { return rmsLevelInputRight.getCurrentValue(); }
     return 0.f;
 }
-
+// returns peak value, not RMS
 float BasicEQAudioProcessor::getOutputRMSValue(const int channel) const
 {
     jassert(channel == 0 || channel == 1);
