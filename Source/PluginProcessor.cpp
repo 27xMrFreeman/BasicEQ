@@ -242,20 +242,18 @@ void BasicEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
     if (valueInRight < rmsLevelInputRight.getCurrentValue()) { rmsLevelInputRight.setTargetValue(valueInRight); } // if the new value is lower than the current one, apply smoothing
     else { rmsLevelInputRight.setCurrentAndTargetValue(valueInRight); }  // if the new value is greater than the current one, do not apply smoothing - so that transients are shown well
     //==============================================================================================================================================
-    // AMP PROCESS
+    // AMP & TONESTACK PROCESS
     ampSim.drive = settings.drive;
     ampSim.osBypassed = settings.osBypassed;
     ampSim.ampType = settings.ampType;
-    if (!settings.ampBypassed) {
-        ampSim.process(block);
-    }
-    //==============================================================================================================================================
-    // TONESTACK PROCESS
     toneStack.setLowGain(settings.stackLowGain);
     toneStack.setMidGain(settings.stackMidGain);
     toneStack.setHighGain(settings.stackHighGain);
-
-    toneStack.process(block);
+    
+    if (!settings.ampBypassed) {
+        ampSim.process(block);
+        toneStack.process(block);
+    }
     //==============================================================================================================================================
     // IR PROCESS
     if (!settings.irBypassed)
