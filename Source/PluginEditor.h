@@ -48,6 +48,8 @@ private:
 
     enum RadioButtonIDs { AmpTypeButtons = 1001, MicTypeButtons = 1002, CabTypeButtons = 1003 };
 
+    juce::TooltipWindow tooltipWindow;
+
     // background image
     juce::Image backgroundImage;
 
@@ -60,7 +62,8 @@ private:
     HorizontalMeterLeft meterOutLeft;
     HorizontalMeterRight meterInRight;
     HorizontalMeterRight meterOutRight;
-    
+    DecibelGrid inputDecibelGrid, outputDecibelGrid;
+
     RotarySliderWithLabels inputGainSlider, outputGainSlider;
     Attachment inputGainSliderAttachment, outputGainSliderAttachment;
 

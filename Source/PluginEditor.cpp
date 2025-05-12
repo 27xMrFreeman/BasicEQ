@@ -53,6 +53,8 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
    
+    tooltipWindow.setMillisecondsBeforeTipAppears(1000);
+
     xPosSlider.name = "X Position";
     yPosSlider.name = "Y Position";
     driveSlider.name = "Drive";
@@ -78,7 +80,7 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     bCabButton.setClickingTogglesState(true);
     bCabButton.onClick = [this]() { comboTypeBox.setSelectedItemIndex(1); };
     bCabButton.setName("B");
-    
+
     cCabButton.setRadioGroupId(RadioButtonIDs::CabTypeButtons);
     cCabButton.setClickingTogglesState(true);
     cCabButton.onClick = [this]() { comboTypeBox.setSelectedItemIndex(2); };
@@ -135,7 +137,7 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
         audioProcessor.ampSim.ampType = static_cast<AmpTypeEnum>(ampTypeSwitch.ampTypeBox.getSelectedId() - 1);
         };
 
-
+    
     ampTypeSwitch.polettiAmpTypeButton.onClick = [this]() {
         // on click lambda gets called on every button change
         if (!ampTypeSwitch.polettiAmpTypeButton.getToggleState()) return;
@@ -227,8 +229,12 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     }
     irBypassLabel.setJustificationType(juce::Justification::right);
     irBypassLabel.setColour(juce::Label::ColourIds::textColourId, juce::Colour::fromString("FF4F83F3"));
-
-
+    micButtonsLabel.setTooltip("A = Beta 57A\nB = Measurement microphone\nC = Shure SM57");
+    cabButtonsLabel.setTooltip("A = Marshall 4x12\nB = Marshall JCM2000-DSL401\nC = Line6 Spider Valve 112");
+    ampTypeLabel.setTooltip("Blue = Yamaha Class B emulation, modified patent\nRed = Mark Poletti Class B modified patent\nPurple = Experimental wavefolding/shaping combination");
+    lowLabel.setTooltip("Low shelf @ 180 Hz");
+    midLabel.setTooltip("Peak @ 500 Hz");
+    highLabel.setTooltip("High shelf @ 1250 Hz");
     lowCutBypassButton.setLookAndFeel(&lnf);
     highCutBypassButton.setLookAndFeel(&lnf);
     peakBypassButton.setLookAndFeel(&lnf);
@@ -255,6 +261,8 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
 
     xyPad.registerSlider(&xPosSlider, XYPad::Axis::X);
     xyPad.registerSlider(&yPosSlider, XYPad::Axis::Y);
+    //xyPad.setTooltip("Mic position");
+    xyPadLabel.setTooltip("Grid represents points where measurement was taken.\nX axis is in 1cm steps from center of speaker.\nY axis measurements were taken from 0, 10 and 40cm away.");
 
     loadBtn.setButtonText("Load IR");
     loadBtn.onClick = [this]()
@@ -462,22 +470,28 @@ void BasicEQAudioProcessorEditor::resized()
     bounds.reduce(bounds.getWidth() * 0.01, bounds.getHeight() * 0.01);
     // Input/Output meters
     auto meterWidth = bounds.getWidth() * 0.062;
-    auto meterHeight = bounds.getHeight() * 0.2;
+    //auto meterHeight = bounds.getHeight() * 0.2;
     auto inputMeterArea = bounds.removeFromLeft(meterWidth);
+    inputMeterArea.removeFromRight(-meterWidth/12);
     inputMeterArea.removeFromTop(inputMeterArea.getHeight() * 0.02);
     auto inputMeterLabelArea = inputMeterArea.removeFromBottom(inputMeterArea.getHeight() * 0.122);
+    
     auto outputMeterArea = bounds.removeFromRight(meterWidth);
+    outputMeterArea.removeFromLeft(-meterWidth / 11);
     outputMeterArea.removeFromTop(outputMeterArea.getHeight() * 0.02);
     auto outputMeterLabelArea = outputMeterArea.removeFromBottom(outputMeterArea.getHeight() * 0.122);
+    
     inputMeterArea.removeFromLeft(inputMeterArea.getWidth() * 0.03);
-    meterInLeft.setBounds(inputMeterArea.removeFromLeft(inputMeterArea.getWidth()*0.33));
-    inputMeterArea.removeFromLeft(inputMeterArea.getWidth() * 0.36);
-    meterInRight.setBounds(inputMeterArea.removeFromLeft(inputMeterArea.getWidth()*0.75));
+    meterInLeft.setBounds(inputMeterArea.removeFromLeft(inputMeterArea.getWidth()*0.31));
+    auto meterInGridArea = inputMeterArea.removeFromLeft(inputMeterArea.getWidth() * 0.58);
+    inputDecibelGrid.setBounds(meterInGridArea);
+    meterInRight.setBounds(inputMeterArea);
 
-    outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.11);
-    meterOutLeft.setBounds(outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.36));
-    outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.41);
-    meterOutRight.setBounds(outputMeterArea.removeFromLeft(outputMeterArea.getWidth()*0.92));
+    //outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.11);
+    meterOutLeft.setBounds(outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.295));
+    auto meterOutGridArea = outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.55);
+    outputDecibelGrid.setBounds(meterOutGridArea);
+    meterOutRight.setBounds(outputMeterArea.removeFromLeft(outputMeterArea.getWidth() * 0.9));
 
     // Main knobs
     auto oldHeight = bounds.getHeight();
@@ -645,7 +659,9 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &irfftLabel,
         &micButtonsLabel,
         &cabButtonsLabel,
-        &irBypassLabel
+        &irBypassLabel,
+        &inputDecibelGrid,
+        &outputDecibelGrid
     };
 }
 

@@ -8,7 +8,7 @@
     <GROUP id="{F640BCEA-ABE8-5245-9F88-90E07B1587F1}" name="Assets">
       <FILE id="tRYZV8" name="AmpTypeSwitch.png" compile="0" resource="1"
             file="Assets/AmpTypeSwitch.png"/>
-      <FILE id="jdVZ5j" name="BackgroundImage.png" compile="0" resource="1"
+      <FILE id="ABLadu" name="BackgroundImage.png" compile="0" resource="1"
             file="Assets/BackgroundImage.png"/>
       <FILE id="uFcQ8N" name="ChoiceOff.png" compile="0" resource="1" file="Assets/ChoiceOff.png"/>
       <FILE id="WG2vLJ" name="ChoiceOn.png" compile="0" resource="1" file="Assets/ChoiceOn.png"/>

@@ -1,7 +1,7 @@
 #pragma once
 #include <JuceHeader.h>
 
-class XYPad : public juce::Component
+class XYPad : public juce::Component, public juce::SettableTooltipClient
 {
 public:
     enum Axis { X, Y };
