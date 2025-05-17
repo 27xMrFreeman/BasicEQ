@@ -22,6 +22,7 @@
 #include "Components/RotarySliderWithLabels.h"
 #include "Components/XYPad.h"
 #include "Components/AmpTypeSwitch.h"
+#include "Components/HelpButton.h"
 
 //==============================================================================
 /**
@@ -69,6 +70,8 @@ private:
 
     juce::Label inputGainLabel{ {}, "in" }, outputGainLabel{ {}, "out" };
 
+    HelpButton helpBtn;
+
     //===============================================================================================================================
     // Amp GUI
     
@@ -78,7 +81,7 @@ private:
     juce::ToggleButton ampBypassButton;
     ButtonAttachment ampBypassButtonAttachment;
 
-    juce::Label driveLabel{ {}, "drive" }, ampTypeLabel{ {}, "type" }, ampBypassLabel{ {}, "bypass" };
+    juce::Label driveLabel{ {}, "drive" }, ampTypeLabel{ {}, "type" }, ampBypassLabel{ {}, "enable" };
     
     AmpTypeSwitch ampTypeSwitch;
     //===============================================================================================================================
@@ -108,7 +111,7 @@ private:
     ButtonAttachment irBypassButtonAttachment;
     IrFFTComponent irfftComponent;
     
-    juce::Label xyPadLabel{ {}, "mic position" }, irfftLabel{ {}, "response" }, micButtonsLabel{ {}, "mic type" }, cabButtonsLabel{ {}, "cab type" }, irBypassLabel{ {}, "bypass" };
+    juce::Label xyPadLabel{ {}, "mic position" }, irfftLabel{ {}, "response" }, micButtonsLabel{ {}, "mic type" }, cabButtonsLabel{ {}, "cab type" }, irBypassLabel{ {}, "enable" };
 
     std::unique_ptr<juce::AlertWindow> alertWindow;
     //===============================================================================================================================

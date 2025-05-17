@@ -53,7 +53,7 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
    
-    tooltipWindow.setMillisecondsBeforeTipAppears(1000);
+    tooltipWindow.setMillisecondsBeforeTipAppears(150);
 
     xPosSlider.name = "X Position";
     yPosSlider.name = "Y Position";
@@ -227,14 +227,11 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
         label->setJustificationType(juce::Justification::centred);
         label->setColour(juce::Label::ColourIds::textColourId, juce::Colour::fromString("FFE5E5E5"));
     }
+    helpBtn.setTooltip("Mics:\nA = Beta 57A, B = Measurement mic\n C = Shure SM57\nCabs:\nA = Marshall 4x12, B = Marshall JCM2000-DSL401, C = Line6 Spider Valve 112\n\n"
+        "Mic position grid represents measured points\nX axis is in 1cm steps from center of speaker\nY axis is 0, 10 and 40cm away\n\n"
+    "Amp:\nBlue = Yamaha Class B emulation modified patent\nRed = Mark Poletti Class B modified patent\nPurple = Experimental wavefolding/shaping combination");
     irBypassLabel.setJustificationType(juce::Justification::right);
     irBypassLabel.setColour(juce::Label::ColourIds::textColourId, juce::Colour::fromString("FF4F83F3"));
-    micButtonsLabel.setTooltip("A = Beta 57A\nB = Measurement microphone\nC = Shure SM57");
-    cabButtonsLabel.setTooltip("A = Marshall 4x12\nB = Marshall JCM2000-DSL401\nC = Line6 Spider Valve 112");
-    ampTypeLabel.setTooltip("Blue = Yamaha Class B emulation, modified patent\nRed = Mark Poletti Class B modified patent\nPurple = Experimental wavefolding/shaping combination");
-    lowLabel.setTooltip("Low shelf @ 180 Hz");
-    midLabel.setTooltip("Peak @ 500 Hz");
-    highLabel.setTooltip("High shelf @ 1250 Hz");
     lowCutBypassButton.setLookAndFeel(&lnf);
     highCutBypassButton.setLookAndFeel(&lnf);
     peakBypassButton.setLookAndFeel(&lnf);
@@ -261,8 +258,6 @@ irBypassButtonAttachment(audioProcessor.apvts, "IR Bypassed", irBypassButton)
 
     xyPad.registerSlider(&xPosSlider, XYPad::Axis::X);
     xyPad.registerSlider(&yPosSlider, XYPad::Axis::Y);
-    //xyPad.setTooltip("Mic position");
-    xyPadLabel.setTooltip("Grid represents points where measurement was taken.\nX axis is in 1cm steps from center of speaker.\nY axis measurements were taken from 0, 10 and 40cm away.");
 
     loadBtn.setButtonText("Load IR");
     loadBtn.onClick = [this]()
@@ -475,7 +470,9 @@ void BasicEQAudioProcessorEditor::resized()
     inputMeterArea.removeFromRight(-meterWidth/12);
     inputMeterArea.removeFromTop(inputMeterArea.getHeight() * 0.02);
     auto inputMeterLabelArea = inputMeterArea.removeFromBottom(inputMeterArea.getHeight() * 0.122);
-    
+    inputMeterLabelArea.removeFromTop(inputMeterLabelArea.getHeight() * 0.73);
+    helpBtn.setBounds(inputMeterLabelArea.removeFromLeft(inputMeterLabelArea.getWidth()*0.55));
+
     auto outputMeterArea = bounds.removeFromRight(meterWidth);
     outputMeterArea.removeFromLeft(-meterWidth / 11);
     outputMeterArea.removeFromTop(outputMeterArea.getHeight() * 0.02);
@@ -661,7 +658,8 @@ std::vector<juce::Component*> BasicEQAudioProcessorEditor::getComps()
         &cabButtonsLabel,
         &irBypassLabel,
         &inputDecibelGrid,
-        &outputDecibelGrid
+        &outputDecibelGrid,
+        &helpBtn
     };
 }
 
