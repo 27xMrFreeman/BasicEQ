@@ -578,7 +578,7 @@ void BasicEQAudioProcessorEditor::resized()
 
     // IR choice buttons, load button
     bounds.removeFromLeft(bounds.getWidth() * 0.037);
-    bounds.reduce(bounds.getWidth()*0.1, 0);
+    bounds.reduce(bounds.getWidth()*0.1, bounds.getHeight()*0.1);
     micButtonsLabel.setBounds(bounds.removeFromBottom(labelHeight));
     // button has 15px of "empty" space until main body of button from all sides (95x95 but button 65x65)
     // ir load button has the same padding (174x95 but 144x65 main body)
@@ -597,8 +597,8 @@ void BasicEQAudioProcessorEditor::resized()
     bCabButton.setBounds(cabBtnBounds.removeFromLeft(cabBtnBounds.getWidth() * 0.5));
     cCabButton.setBounds(cabBtnBounds);
 
-    bounds.removeFromBottom(labelHeight*0.4);
-    loadBtn.setBounds(bounds.removeFromBottom(btnHeight));
+    //bounds.removeFromBottom(labelHeight*0.4);
+    //loadBtn.setBounds(bounds.removeFromBottom(btnHeight));
 
 }
 
